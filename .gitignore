@@ -1,0 +1,4 @@
+/application*.zip
+/app*
+/.history
+/copy.sh
