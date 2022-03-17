@@ -1,6 +1,6 @@
 <template>
-  <div class="main">
-    <timeline />
+  <div>
+    Test
   </div>
 </template>
 
@@ -8,6 +8,7 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
+  props: {},
   components: {},
   async mounted() {},
   methods: {},
@@ -17,7 +18,4 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped>
-.main {
-}
-</style>
+<style lang="scss" scoped></style>

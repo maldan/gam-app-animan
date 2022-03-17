@@ -9,10 +9,5 @@ import './main.scss';
 
 (async () => {
   const app = createApp(App);
-  app
-    .use(UI)
-    .use(Event)
-    .use(Router)
-    .use(Store)
-    .mount('#app');
+  app.use(UI).use(Event).use(Router).use(Store).mount('#app');
 })();
