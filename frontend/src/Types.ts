@@ -1,4 +1,4 @@
-export interface Animation_Key {
+export interface IAnimation_Key {
   type: number;
   isAuto: boolean;
   position: { x: number; y: number; z: number };
@@ -6,16 +6,16 @@ export interface Animation_Key {
   value: number;
 }
 
-export interface Animation_Event {
+export interface IAnimation_Event {
   name: string;
   frames: string;
 }
 
-export interface Animation_Frame {
-  keys: Record<string, Animation_Key>;
+export interface IAnimation_Frame {
+  keys: Record<string, IAnimation_Key>;
 }
 
-export interface Animation_Sequence {
+export interface IAnimation_Sequence {
   frameId: number;
   frameCount: number;
   fps: number;
