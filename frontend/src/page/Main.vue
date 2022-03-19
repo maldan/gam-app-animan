@@ -1,13 +1,37 @@
 <template>
   <div class="main">
     <div id="sus"></div>
-    <ui-window title="Animation list"></ui-window>
+    <ui-window title="Animation list" :initData="{ x: 400, y: 300, width: 320 }">
+      <template v-slot:body>
+        <animationlist />
+      </template>
+    </ui-window>
     <ui-window title="Event list"></ui-window>
-    <ui-window title="Character list"></ui-window>
-    <ui-window title="Pose list"></ui-window>
-    <ui-window title="Blend Shape"></ui-window>
 
-    <ui-window title="Timeline">
+    <ui-window title="Character list" :initData="{ x: 400, y: 100, width: 320 }">
+      <template v-slot:body>
+        <characterlist />
+      </template>
+    </ui-window>
+
+    <!-- Bone list -->
+    <ui-window title="Bone list" :initData="{ x: 400, y: 800, width: 320 }">
+      <template v-slot:body>
+        <bonelist />
+      </template>
+    </ui-window>
+
+    <ui-window title="Pose list"></ui-window>
+
+    <!-- Blend shape -->
+    <ui-window title="Blend Shape" :initData="{ x: 200, y: 400, width: 320 }">
+      <template v-slot:body>
+        <blendshape />
+      </template>
+    </ui-window>
+
+    <!-- Timeline -->
+    <ui-window title="Timeline" :initData="{ x: 100, y: 500, width: 720 }">
       <template v-slot:body>
         <timeline />
       </template>
@@ -19,30 +43,19 @@
 import { defineComponent } from 'vue';
 import * as THREE from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
-import { SceneNavigation } from '@/core/control/SceneNavigation';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { Animation_Character } from '@/core/Animation_Character';
 
 export default defineComponent({
   components: {},
   async mounted() {
     const animation = (time: number) => {
-      // mesh.rotation.x = time / 2000;
-      // mesh.rotation.y = time / 1000;
-
       renderer.setClearColor(0x333333);
       renderer.render(scene, camera);
-
       controls.update();
-      // SceneNavigation.tick();
-
-      if (this.bone.quaternion) {
-        // console.log();
-        this.bone.quaternion.setFromEuler(new THREE.Euler(camera.position.y, 0, 0));
-      }
     };
 
     // init
-
     const camera = new THREE.PerspectiveCamera(
       70,
       window.innerWidth / window.innerHeight,
@@ -78,29 +91,12 @@ export default defineComponent({
     fbxLoader.load(
       'Coco.fbx',
       (object) => {
-        //console.log(object);
-        //this.bone = object.children[2].children[0].children[1] as THREE.Bone;
+        const ch = new Animation_Character();
+        ch.init('Coco', object);
 
-        //(object.children[5] as THREE.SkinnedMesh).updateMorphTargets();
-        // @ts-ignore
-        //(object.children[5] as THREE.SkinnedMesh).material.morphTargets = true;
-        // @ts-ignore
-        (object.children[5] as THREE.SkinnedMesh).morphTargetInfluences[1] = 1;
-        //
+        this.$store.dispatch('scene/selectCharacter', ch);
 
-        // object.traverse(function (child) {
-        //     if ((child as THREE.Mesh).isMesh) {
-        //         // (child as THREE.Mesh).material = material
-        //         if ((child as THREE.Mesh).material) {
-        //             ((child as THREE.Mesh).material as THREE.MeshBasicMaterial).transparent = false
-        //         }
-        //     }
-        // })
-        //object.scale.set(0.1, 0.1, 0.1);
         scene.add(object);
-
-        //const helper = new THREE.SkeletonHelper(object);
-        //scene.add(helper);
       },
       (xhr) => {
         console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
@@ -109,11 +105,8 @@ export default defineComponent({
         console.log(error);
       },
     );
-    // animation
-    //  SceneNavigation.init(camera);
 
     const controls = new OrbitControls(camera, renderer.domElement);
-
     controls.mouseButtons = {
       // @ts-ignore
       LEFT: null,
@@ -127,7 +120,6 @@ export default defineComponent({
   data: () => {
     return {
       movement: { x: 0, y: 0, z: 0 },
-      bone: {} as THREE.Bone,
     };
   },
 });

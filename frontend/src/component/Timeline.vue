@@ -1,9 +1,19 @@
 <template>
   <div :class="$style.timeline">
-    <div :class="$style.line" v-for="(k, v) in keys" :key="k">
-      <div :class="$style.title">{{ v }}</div>
+    <div :class="$style.line" v-for="k in $store.state.scene.SelectedCharacter?.keyList" :key="k">
+      <div :class="$style.title">{{ k }}</div>
       <div :class="$style.keys">
-        <div :class="$style.key" v-for="y in 32" :key="y"></div>
+        <div
+          :class="[
+            $style.key,
+            $store.state.scene.SelectedCharacter?.animation?.frameId === y - 1
+              ? $style.selected
+              : '',
+          ]"
+          v-for="y in $store.state.scene.SelectedCharacter?.animation?.frameCount"
+          :key="y"
+          @click="$store.state.scene.SelectedCharacter.animation.frameId = y - 1"
+        ></div>
       </div>
     </div>
   </div>
@@ -18,17 +28,7 @@ export default defineComponent({
   async mounted() {},
   methods: {},
   data: () => {
-    return {
-      keys: {
-        Head: [],
-        Neck: [],
-        Chest: [],
-        Belly: [],
-        Root: [],
-        'Tight.L': [],
-        'Tight.R': [],
-      },
-    };
+    return {};
   },
 });
 </script>
@@ -51,6 +51,10 @@ export default defineComponent({
         width: 10px;
         background: #161616;
         margin-right: 1px;
+
+        &.selected {
+          background: #fe0000;
+        }
       }
     }
   }
