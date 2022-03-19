@@ -1,37 +1,37 @@
 <template>
   <div class="main">
     <div id="sus"></div>
-    <ui-window title="Animation list" :initData="{ x: 400, y: 300, width: 320 }">
+    <ui-window title="Animation list" :initData="{ x: 5, y: 5, width: 15, height: 20 }">
       <template v-slot:body>
         <animationlist />
       </template>
     </ui-window>
-    <ui-window title="Event list"></ui-window>
+    <!-- <ui-window title="Event list"></ui-window> -->
 
-    <ui-window title="Character list" :initData="{ x: 400, y: 100, width: 320 }">
+    <ui-window title="Character list" :initData="{ x: 80, y: 5, width: 15, height: 20 }">
       <template v-slot:body>
         <characterlist />
       </template>
     </ui-window>
 
     <!-- Bone list -->
-    <ui-window title="Bone list" :initData="{ x: 400, y: 800, width: 320 }">
+    <ui-window title="Rig list" :initData="{ x: 80, y: 35, width: 15, height: 40 }">
       <template v-slot:body>
-        <bonelist />
+        <riglist />
       </template>
     </ui-window>
 
-    <ui-window title="Pose list"></ui-window>
+    <!-- <ui-window title="Pose list"></ui-window> -->
 
     <!-- Blend shape -->
-    <ui-window title="Blend Shape" :initData="{ x: 200, y: 400, width: 320 }">
+    <ui-window title="Blend Shape" :initData="{ x: 60, y: 75, width: 15, height: 20 }">
       <template v-slot:body>
         <blendshape />
       </template>
     </ui-window>
 
     <!-- Timeline -->
-    <ui-window title="Timeline" :initData="{ x: 100, y: 500, width: 720 }">
+    <ui-window title="Timeline" :initData="{ x: 5, y: 75, width: 50, height: 20 }">
       <template v-slot:body>
         <timeline />
       </template>
@@ -50,6 +50,9 @@ export default defineComponent({
   components: {},
   async mounted() {
     const animation = (time: number) => {
+      // Update
+      this.$store.state.scene.SelectedCharacter?.tick();
+
       renderer.setClearColor(0x333333);
       renderer.render(scene, camera);
       controls.update();

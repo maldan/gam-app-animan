@@ -1,7 +1,11 @@
 <template>
   <div :class="$style.timeline">
-    <div :class="$style.line" v-for="k in $store.state.scene.SelectedCharacter?.keyList" :key="k">
-      <div :class="$style.title">{{ k }}</div>
+    <div
+      :class="$style.line"
+      v-for="rig in $store.state.scene.SelectedCharacter?.rigList"
+      :key="rig.bone.name"
+    >
+      <div :class="$style.title">{{ rig.bone.name }}</div>
       <div :class="$style.keys">
         <div
           :class="[
@@ -25,10 +29,28 @@ import { defineComponent } from 'vue';
 export default defineComponent({
   props: {},
   components: {},
-  async mounted() {},
+  async mounted() {
+    this.kd = (e: KeyboardEvent) => {
+      if (!this.$store.state.scene.SelectedCharacter) return;
+      if (!this.$store.state.scene.SelectedCharacter.animation) return;
+
+      if (e.key === 'ArrowRight') {
+        this.$store.state.scene.SelectedCharacter.animation.frameId += 1;
+      }
+      if (e.key === 'ArrowLeft') {
+        this.$store.state.scene.SelectedCharacter.animation.frameId -= 1;
+      }
+    };
+    document.addEventListener('keydown', this.kd);
+  },
+  beforeUnmount() {
+    document.removeEventListener('keydown', this.kd);
+  },
   methods: {},
   data: () => {
-    return {};
+    return {
+      kd: undefined as any,
+    };
   },
 });
 </script>

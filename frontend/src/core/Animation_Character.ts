@@ -1,13 +1,14 @@
-import { Animation_Sequence } from '@/core/Animation_Sequence';
 import * as THREE from 'three';
-import { Bone } from 'three';
+import { Animation_Sequence } from '@/core/Animation_Sequence';
+import { Animation_Rig } from '@/core/Animation_Rig';
 
 export class Animation_Character {
   public animation?: Animation_Sequence;
   public name = '';
   private _shapeKeysName: string[] = [];
   private _shapeKeysValue: number[] = [];
-  private _boneList: THREE.Bone[] = [];
+  private _boneList: Record<string, THREE.Bone> = {};
+  private _rigList: Animation_Rig[] = [];
 
   public init(name: string, obj: THREE.Group): void {
     this.name = name;
@@ -24,14 +25,28 @@ export class Animation_Character {
   }
 
   private prepareSkeleton(skeleton: THREE.Group) {
-    this._boneList.length = 0;
-
     skeleton.traverse((object) => {
+      // Skip anything except bone
       if (object.type !== 'Bone') return;
 
-      // Already have that bone
-      if (this._boneList.find((x: THREE.Bone) => x.name === object.name)) return;
-      this._boneList.push(object as THREE.Bone);
+      // Save bone
+      if (this._boneList[object.name]) return;
+      this._boneList[object.name] = object as THREE.Bone;
+
+      // Add rig
+      this._rigList.push(new Animation_Rig(object as THREE.Bone));
+    });
+  }
+
+  public tick(): void {
+    this._rigList.forEach((rig) => {
+      const newRotation = rig.boneStartRotation.clone().multiply(rig.rotationOffset);
+      this._boneList[rig.bone.name].quaternion.set(
+        newRotation.x,
+        newRotation.y,
+        newRotation.z,
+        newRotation.w,
+      );
     });
   }
 
@@ -43,11 +58,11 @@ export class Animation_Character {
     return this._shapeKeysValue;
   }
 
-  public get boneList(): THREE.Bone[] {
-    return this._boneList;
-  }
-
-  public get keyList(): string[] {
+  /*public get keyList(): string[] {
     return ['Root', 'Belly', 'Chest', 'Neck', 'Head'];
+  }*/
+
+  public get rigList(): Animation_Rig[] {
+    return this._rigList;
   }
 }
