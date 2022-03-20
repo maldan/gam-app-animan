@@ -1,10 +1,6 @@
 <template>
   <div :class="$style.rigList">
-    <div
-      :class="$style.rig"
-      v-for="rig in $store.state.scene.SelectedCharacter?.rigList"
-      :key="rig.name"
-    >
+    <div :class="$style.rig" v-for="rig in rigList" :key="rig.name">
       <div>{{ rig.bone.name }}</div>
       <div>{{ s(rig) }}</div>
       <div style="margin-left: auto"></div>
@@ -18,17 +14,30 @@
 import { defineComponent } from 'vue';
 import * as THREE from 'three';
 import { Animation_Rig } from '@/core/Animation_Rig';
+import { Animation_Character } from '@/core/Animation_Character';
 
 export default defineComponent({
   props: {},
   components: {},
+  computed: {
+    rigList() {
+      if (!this.$store.state.scene.selectedObject) return [];
+      const ch = this.$store.state.scene.selectedObject.userData.class as Animation_Character;
+      return ch.rigList || [];
+    },
+    character(): Animation_Character {
+      return this.$store.state.scene.selectedObject.userData.class as Animation_Character;
+    },
+  },
   async mounted() {},
   methods: {
     fuckRig(rig: Animation_Rig) {
       rig.rotationOffset.multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(0, 45, 0)));
+      this.character.setCurrentKey(rig.bone.name);
     },
     resetRig(rig: Animation_Rig) {
       rig.rotationOffset.identity();
+      this.character.setCurrentKey(rig.bone.name);
     },
     s(rig: Animation_Rig) {
       const tt = new THREE.Euler().setFromQuaternion(rig.rotationOffset);

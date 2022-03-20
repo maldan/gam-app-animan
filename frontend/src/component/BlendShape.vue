@@ -1,25 +1,31 @@
 <template>
   <div :class="$style.blendShape">
-    <div
-      :class="$style.shape"
-      v-for="(x, i) in $store.state.scene.SelectedCharacter?.blendShapeNameList"
-      :key="x"
-    >
+    <div :class="$style.shape" v-for="(x, i) in blendShapeNameList" :key="x">
       <div>{{ x }}</div>
-      <ui-input
-        :class="$style.input"
-        v-model="$store.state.scene.SelectedCharacter.blendShapeValueList[i]"
-      />
+      <ui-input :class="$style.input" v-model="blendShapeValueList[i]" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { Animation_Character } from '@/core/Animation_Character';
 
 export default defineComponent({
   props: {},
   components: {},
+  computed: {
+    blendShapeNameList() {
+      if (!this.$store.state.scene.selectedObject) return [];
+      const ch = this.$store.state.scene.selectedObject.userData.class as Animation_Character;
+      return ch.blendShapeNameList || [];
+    },
+    blendShapeValueList() {
+      if (!this.$store.state.scene.selectedObject) return [];
+      const ch = this.$store.state.scene.selectedObject.userData.class as Animation_Character;
+      return ch.blendShapeValueList || [];
+    },
+  },
   async mounted() {},
   methods: {},
   data: () => {

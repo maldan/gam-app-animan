@@ -1,10 +1,10 @@
 <template>
   <div :class="$style.characterList">
     <ui-button
+      @click="$store.dispatch('scene/loadCharacter', ch + '.fbx')"
       v-for="ch in characters"
       :key="ch"
       :text="ch"
-      :isSelected="$store.state.scene.SelectedCharacter?.name === ch"
     />
   </div>
 </template>
