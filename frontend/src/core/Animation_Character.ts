@@ -12,9 +12,11 @@ export class Animation_Character {
   private _boneList: Record<string, THREE.Bone> = {};
   private _rigList: Animation_Rig[] = [];
   private _rigDict: Record<string, Animation_Rig> = {};
+  private _scene!: THREE.Scene;
 
-  public init(name: string, obj: THREE.Group): void {
+  public init(name: string, obj: THREE.Group, scene: THREE.Scene): void {
     this.name = name;
+    this._scene = scene;
     obj.children.forEach((value, index) => {
       console.log(value);
       if (value.name === 'Skeleton') this.prepareSkeleton(value as THREE.Group);
@@ -36,8 +38,20 @@ export class Animation_Character {
       if (this._boneList[object.name]) return;
       this._boneList[object.name] = object as THREE.Bone;
 
+      // Create bone helper
+      const boneHelper = new THREE.Mesh(
+        new THREE.BoxGeometry(0.02, 0.02, 0.04),
+        new THREE.MeshBasicMaterial({
+          color: 0xfefefe,
+          depthTest: false,
+          opacity: 0.5,
+          transparent: true,
+        }),
+      );
+      this._scene.add(boneHelper);
+
       // Add rig
-      const rig = new Animation_Rig(object as THREE.Bone);
+      const rig = new Animation_Rig(object as THREE.Bone, boneHelper);
       this._rigList.push(rig);
       this._rigDict[object.name] = rig;
     });
@@ -71,6 +85,7 @@ export class Animation_Character {
         newRotation.z,
         newRotation.w,
       );
+      // rig.tick();
     });
   }
 

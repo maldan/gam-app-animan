@@ -95,7 +95,7 @@ export default defineComponent({
 
     const mesh = new THREE.Mesh(
       new THREE.PlaneGeometry(5, 5, 1, 1),
-      new THREE.MeshNormalMaterial(),
+      new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, color: 0x2b2b2b }),
     );
     mesh.rotateX(THREE.MathUtils.degToRad(-90));
     scene.add(mesh);

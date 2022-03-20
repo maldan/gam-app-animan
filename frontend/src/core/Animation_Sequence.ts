@@ -119,6 +119,8 @@ export class Animation_Sequence {
   }
 
   public set frameId(value: number) {
+    if (value <= 0) value = 0;
+    if (value > this.frameCount - 1) value = 0;
     this._frameId = value;
     this.emit('change', value);
   }

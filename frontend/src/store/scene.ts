@@ -66,7 +66,7 @@ export default {
           const characterName = path.split('/').pop()?.replace('.fbx', '') || 'Unknown';
 
           const ch = new Animation_Character();
-          ch.init(characterName, object);
+          ch.init(characterName, object, action.state.scene);
 
           object.userData.tag = 'Character';
           object.userData.class = ch;
