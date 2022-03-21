@@ -3,6 +3,7 @@ import { Animation_Sequence } from '@/core/Animation_Sequence';
 import { Animation_Rig } from '@/core/Animation_Rig';
 import { Animation_Key } from '@/core/Animation_Key';
 import { Quaternion } from 'three';
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 
 export class Animation_Character {
   private _animation?: Animation_Sequence;
@@ -48,13 +49,21 @@ export class Animation_Character {
           transparent: true,
         }),
       );
-      this._scene.add(boneHelper);
 
       // Add rig
       const rig = new Animation_Rig(object as THREE.Bone, boneHelper);
       this._rigList.push(rig);
       this._rigDict[object.name] = rig;
+
+      // Add bone helper
+      boneHelper.name = 'BoneHelper';
+      boneHelper.userData.tag = 'BoneHelper';
+      boneHelper.userData.rig = rig;
+      boneHelper.userData.character = this;
+      this._scene.add(boneHelper);
     });
+
+    this.tick();
   }
 
   public setCurrentKey(keyName: string): void {
@@ -78,6 +87,9 @@ export class Animation_Character {
 
   public tick(): void {
     this._rigList.forEach((rig) => {
+      const newPosition = rig.boneStartPosition.clone().add(rig.positionOffset);
+      this._boneList[rig.bone.name].position.set(newPosition.x, newPosition.y, newPosition.z);
+
       const newRotation = rig.boneStartRotation.clone().multiply(rig.rotationOffset);
       this._boneList[rig.bone.name].quaternion.set(
         newRotation.x,
@@ -85,7 +97,8 @@ export class Animation_Character {
         newRotation.z,
         newRotation.w,
       );
-      // rig.tick();
+
+      rig.tick();
     });
   }
 

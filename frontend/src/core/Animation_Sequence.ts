@@ -26,6 +26,12 @@ export class Animation_Sequence {
       const value = this.frames[this._frameId].keys[key];
 
       if (ch.rig[key]) {
+        ch.rig[key].positionOffset = new THREE.Vector3(
+          value.position.x,
+          value.position.y,
+          value.position.z,
+        );
+
         ch.rig[key].rotationOffset = new THREE.Quaternion(
           value.rotation.x,
           value.rotation.y,
@@ -34,6 +40,8 @@ export class Animation_Sequence {
         );
       }
     }
+
+    ch.tick();
   }
 
   public interpolateKey(keyName: string): void {

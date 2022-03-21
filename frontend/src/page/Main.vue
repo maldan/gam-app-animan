@@ -61,24 +61,61 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import * as THREE from 'three';
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import Stats from 'three/examples/jsm/libs/stats.module';
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
+import { DataStorage } from '@/core/DataStorage';
+import { Animation_Rig } from '@/core/Animation_Rig';
 import { Animation_Character } from '@/core/Animation_Character';
 
 export default defineComponent({
   components: {},
   async mounted() {
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+
+    window.addEventListener('pointermove', (e: PointerEvent) => {
+      pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+      pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    });
+
+    window.addEventListener('mousedown', (e: MouseEvent) => {
+      if (DataStorage.hoverObject) {
+        DataStorage.selectedObject = DataStorage.hoverObject;
+        DataStorage.manipulator.detach();
+        DataStorage.manipulator.attach(DataStorage.hoverObject);
+      }
+    });
+
     const animation = (time: number) => {
       // Update
       if (this.$store.state.scene.selectedObject != null) {
         if (this.$store.state.scene.selectedObject.userData.tag === 'Character') {
-          this.$store.state.scene.selectedObject.userData.class.tick();
+          // this.$store.state.scene.selectedObject.userData.class.tick();
         }
+      }
+
+      raycaster.setFromCamera(pointer, camera);
+      const c = scene.children.filter((x) => x.name === 'BoneHelper');
+      c.forEach((x) => {
+        // @ts-ignore
+        x.material.color.set(0xffffff);
+      });
+      DataStorage.hoverObject = undefined;
+
+      const intersects = raycaster.intersectObjects(c, true);
+      if (intersects.length > 0) {
+        const object = intersects[0].object as THREE.Mesh;
+
+        // @ts-ignore
+        object.material.color.set(0x00ff00);
+        DataStorage.hoverObject = object;
       }
 
       renderer.setClearColor(0x333333);
       renderer.render(scene, camera);
       controls.update();
+      stats.update();
     };
 
     // init
@@ -115,28 +152,6 @@ export default defineComponent({
     renderer.domElement.style.top = '0';
     renderer.domElement.style.zIndex = '0';
 
-    /*const fbxLoader = new FBXLoader();
-    fbxLoader.load(
-      'Coco.fbx',
-      (object) => {
-        const ch = new Animation_Character();
-        ch.init('Coco', object);
-
-        this.$store.dispatch('scene/selectCharacter', ch);
-
-        // scene.add(object);
-        object.userData.tag = 'Character';
-        object.name = 'Coco';
-        this.$store.dispatch('scene/addToScene', object);
-      },
-      (xhr) => {
-        console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
-      },
-      (error) => {
-        console.log(error);
-      },
-    );*/
-
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.mouseButtons = {
       // @ts-ignore
@@ -146,6 +161,36 @@ export default defineComponent({
       RIGHT: null,
     };
     controls.autoRotate = false;
+
+    DataStorage.manipulator = new TransformControls(camera, renderer.domElement);
+    DataStorage.manipulator.size = 0.5;
+    DataStorage.manipulator.setSpace('local');
+
+    DataStorage.manipulator.addEventListener('mouseDown', () => {
+      if (!DataStorage.selectedObject) return;
+      DataStorage.manipulatorStartPosition = DataStorage.selectedObject.position.clone();
+    });
+    DataStorage.manipulator.addEventListener('mouseUp', () => {
+      if (!DataStorage.selectedObject) return;
+      if (DataStorage.selectedObject.userData.tag === 'BoneHelper') {
+        const rig = DataStorage.selectedObject.userData.rig as Animation_Rig;
+        const character = DataStorage.selectedObject.userData.character as Animation_Character;
+
+        const moveDiff = DataStorage.manipulatorStartPosition
+          .clone()
+          .sub(DataStorage.selectedObject.position);
+        console.log(moveDiff);
+        rig.positionOffset.add(moveDiff.multiplyScalar(-1));
+        character.setCurrentKey(rig.bone.name);
+        character.animation?.interpolateKey(rig.bone.name);
+        character.tick();
+      }
+      // DataStorage.selectedObject.position.x
+    });
+    scene.add(DataStorage.manipulator);
+
+    const stats = Stats();
+    document.body.appendChild(stats.dom);
   },
   methods: {},
   data: () => {
