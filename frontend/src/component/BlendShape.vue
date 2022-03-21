@@ -2,7 +2,7 @@
   <div :class="$style.blendShape">
     <div :class="$style.shape" v-for="(x, i) in blendShapeNameList" :key="x">
       <div>{{ x }}</div>
-      <ui-input :class="$style.input" v-model="blendShapeValueList[i]" />
+      <ui-slider :class="$style.input" v-model="blendShapeValueList[i]" />
     </div>
   </div>
 </template>
@@ -30,14 +30,15 @@ export default defineComponent({
   async mounted() {},
   methods: {},
   data: () => {
-    return {
-      characters: ['Coco'],
-    };
+    return {};
   },
 });
 </script>
 
 <style lang="scss" module>
+@import '../gam_sdk_ui/vue/style/color';
+@import '../gam_sdk_ui/vue/style/size';
+
 .blendShape {
   display: flex;
   flex-direction: column;
@@ -45,10 +46,12 @@ export default defineComponent({
   .shape {
     display: flex;
     align-items: center;
+    font-size: 14px;
+    color: $text-gray;
 
     .input {
       flex: none;
-      width: 32px;
+      width: 96px;
       margin-left: auto;
     }
   }

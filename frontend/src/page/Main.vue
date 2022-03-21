@@ -36,7 +36,7 @@
 
     <!-- Blend shape -->
     <ui-window
-      v-if="$store.state.scene.selectedObject?.userData?.tag === 'Character'"
+      v-if="isCharacterSelected()"
       title="Blend Shape"
       :initData="{ x: 60, y: 75, width: 15, height: 20 }"
     >
