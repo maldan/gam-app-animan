@@ -4,6 +4,7 @@ import { Animation_Rig } from '@/core/Animation_Rig';
 import { Animation_Key } from '@/core/Animation_Key';
 import { Quaternion } from 'three';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
+import { MainScene } from '@/core/MainScene';
 
 export class Animation_Character {
   private _animation?: Animation_Sequence;
@@ -127,6 +128,7 @@ export class Animation_Character {
     if (this._animation)
       this._animation.on('change', () => {
         this._animation?.apply(this);
+        MainScene.ui.timeline.refresh();
       });
   }
 }

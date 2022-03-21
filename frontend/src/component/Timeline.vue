@@ -12,7 +12,7 @@
           ]"
           v-for="frameId in animation?.frameCount"
           :key="frameId"
-          @click="animation.frameId = frameId - 1"
+          @click="goToFrame(frameId - 1)"
         ></div>
       </div>
     </div>
@@ -22,41 +22,57 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { Animation_Character } from '@/core/Animation_Character';
+import { MainScene } from '@/core/MainScene';
 
 export default defineComponent({
   props: {},
   components: {},
   computed: {
     rigList() {
-      if (!this.$store.state.scene.selectedObject) return [];
-      const ch = this.$store.state.scene.selectedObject.userData.class as Animation_Character;
+      if (this.r < 0) return [];
+      if (!MainScene.selectedObject) return [];
+      const ch = MainScene.selectedObject.userData.class as Animation_Character;
       return ch.rigList || [];
     },
     animation() {
-      return this.$store.state.scene.selectedObject?.userData?.class?.animation;
+      if (this.r < 0) return null;
+      return MainScene.selectedObject?.userData?.class?.animation;
     },
   },
   async mounted() {
     this.kd = (e: KeyboardEvent) => {
-      if (!this.$store.state.scene.selectedObject) return;
-      if (this.$store.state.scene.selectedObject.userData.tag !== 'Character') return;
+      if (!MainScene.selectedObject) return;
+      if (MainScene.selectedObject?.userData.tag !== 'Character') return;
 
       if (e.key === 'ArrowRight') {
         this.animation.frameId += 1;
+        this.refresh();
       }
       if (e.key === 'ArrowLeft') {
         this.animation.frameId -= 1;
+        this.refresh();
       }
     };
     document.addEventListener('keydown', this.kd);
+
+    MainScene.ui.timeline.ref = this;
   },
   beforeUnmount() {
     document.removeEventListener('keydown', this.kd);
   },
-  methods: {},
+  methods: {
+    refresh() {
+      this.r = Math.random();
+    },
+    goToFrame(id: number) {
+      this.animation.frameId = id;
+      this.refresh();
+    },
+  },
   data: () => {
     return {
       kd: undefined as any,
+      r: 0,
     };
   },
 });

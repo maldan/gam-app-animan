@@ -10,19 +10,20 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { Animation_Character } from '@/core/Animation_Character';
+import { MainScene } from '@/core/MainScene';
 
 export default defineComponent({
   props: {},
   components: {},
   computed: {
     blendShapeNameList() {
-      if (!this.$store.state.scene.selectedObject) return [];
-      const ch = this.$store.state.scene.selectedObject.userData.class as Animation_Character;
+      if (!MainScene.selectedObject) return [];
+      const ch = MainScene.selectedObject.userData.class as Animation_Character;
       return ch.blendShapeNameList || [];
     },
     blendShapeValueList() {
-      if (!this.$store.state.scene.selectedObject) return [];
-      const ch = this.$store.state.scene.selectedObject.userData.class as Animation_Character;
+      if (!MainScene.selectedObject) return [];
+      const ch = MainScene.selectedObject.userData.class as Animation_Character;
       return ch.blendShapeValueList || [];
     },
   },

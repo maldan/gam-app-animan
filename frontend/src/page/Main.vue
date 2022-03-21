@@ -2,7 +2,7 @@
   <div class="main">
     <div id="sus"></div>
     <ui-window
-      v-if="$store.state.scene.selectedObject?.userData?.tag === 'Character'"
+      v-if="isCharacterSelected()"
       title="Animation list"
       :initData="{ x: 5, y: 5, width: 15, height: 20 }"
     >
@@ -25,7 +25,7 @@
 
     <!-- Bone list -->
     <ui-window
-      v-if="$store.state.scene.selectedObject?.userData?.tag === 'Character'"
+      v-if="isCharacterSelected()"
       title="Rig list"
       :initData="{ x: 80, y: 35, width: 15, height: 40 }"
     >
@@ -47,10 +47,18 @@
 
     <!-- Timeline -->
     <ui-window
-      v-if="$store.state.scene.selectedObject?.userData?.tag === 'Character'"
+      v-if="isCharacterSelected()"
       title="Timeline"
       :initData="{ x: 5, y: 75, width: 50, height: 20 }"
     >
+      <template v-slot:header>
+        <div>Timeline</div>
+        <ui-button
+          @click="toggleAnimation()"
+          :text="isPlayAnimation ? 'Stop' : 'Play'"
+          style="flex: none; padding: 5px; margin-left: 5px"
+        />
+      </template>
       <template v-slot:body>
         <timeline />
       </template>
@@ -67,6 +75,7 @@ import { TransformControls } from 'three/examples/jsm/controls/TransformControls
 import { DataStorage } from '@/core/DataStorage';
 import { Animation_Rig } from '@/core/Animation_Rig';
 import { Animation_Character } from '@/core/Animation_Character';
+import { MainScene } from '@/core/MainScene';
 
 export default defineComponent({
   components: {},
@@ -87,13 +96,24 @@ export default defineComponent({
       }
     });
 
+    let prevTime = 0;
     const animation = (time: number) => {
       // Update
-      if (this.$store.state.scene.selectedObject != null) {
-        if (this.$store.state.scene.selectedObject.userData.tag === 'Character') {
-          // this.$store.state.scene.selectedObject.userData.class.tick();
+      //if (this.$store.state.scene.selectedObject != null) {
+      //if (this.$store.state.scene.selectedObject.userData.tag === 'Character') {
+      // this.$store.state.scene.selectedObject.userData.class.tick();
+      //}
+      //}
+
+      const deltaTime = (time - prevTime) / 1000;
+      MainScene.timelineTimer += deltaTime;
+
+      if (MainScene.selectedObject?.userData.tag === 'Character') {
+        if (MainScene.selectedObject?.userData.class.animation && this.isPlayAnimation) {
+          MainScene.selectedObject?.userData.class.animation.tick();
         }
       }
+      prevTime = time;
 
       raycaster.setFromCamera(pointer, camera);
       const c = scene.children.filter((x) => x.name === 'BoneHelper');
@@ -191,11 +211,28 @@ export default defineComponent({
 
     const stats = Stats();
     document.body.appendChild(stats.dom);
+
+    MainScene.scene = scene;
+    MainScene.ui.main.ref = this;
   },
-  methods: {},
+  methods: {
+    refresh() {
+      this.r = Math.random();
+    },
+    isCharacterSelected() {
+      if (this.r < 0) return;
+      return MainScene.selectedObject?.userData.tag === 'Character';
+    },
+    toggleAnimation() {
+      this.isPlayAnimation = !this.isPlayAnimation;
+      MainScene.timelineTimer = 0;
+    },
+  },
   data: () => {
     return {
       movement: { x: 0, y: 0, z: 0 },
+      r: 0,
+      isPlayAnimation: false,
     };
   },
 });

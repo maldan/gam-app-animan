@@ -7,9 +7,9 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 
 export type SceneStore = {
   //selectedCharacter?: Animation_Character;
-  objectList: THREE.Object3D[];
-  selectedObject: THREE.Object3D;
-  scene: THREE.Scene;
+  //objectList: THREE.Object3D[];
+  //selectedObject: THREE.Object3D;
+  //scene: THREE.Scene;
 };
 export type SceneActionContext = ActionContext<SceneStore, MainTree>;
 
@@ -23,23 +23,23 @@ export default {
   },
   mutations: {
     SET_SELECTED_OBJECT(state: SceneStore, obj: THREE.Object3D): void {
-      state.selectedObject = obj;
+      //state.selectedObject = obj;
     },
     /*SET_SELECTED_CHARACTER(state: SceneStore, character: Animation_Character): void {
       state.selectedCharacter = character;
     },*/
     SET_ANIMATION(state: SceneStore, animation: Animation_Sequence): void {
-      if (state.selectedObject?.userData?.tag === 'Character') {
-        state.selectedObject.userData.class.animation = animation;
-      }
+      //if (state.selectedObject?.userData?.tag === 'Character') {
+      //  state.selectedObject.userData.class.animation = animation;
+      //}
     },
     SET_SCENE(state: SceneStore, scene: THREE.Scene): void {
-      state.scene = scene;
+      //state.scene = scene;
     },
     ADD_TO_SCENE(state: SceneStore, object: THREE.Object3D): void {
-      state.scene.add(object);
-      state.objectList.push(object);
-      console.log(object);
+      //state.scene.add(object);
+      //state.objectList.push(object);
+      //console.log(object);
     },
   },
   actions: {
@@ -58,29 +58,6 @@ export default {
     selectObject(action: SceneActionContext, object: THREE.Object3D): void {
       action.commit('SET_SELECTED_OBJECT', object);
     },
-    loadCharacter(action: SceneActionContext, path: string): void {
-      const fbxLoader = new FBXLoader();
-      fbxLoader.load(
-        path,
-        (object) => {
-          const characterName = path.split('/').pop()?.replace('.fbx', '') || 'Unknown';
-
-          const ch = new Animation_Character();
-          ch.init(characterName, object, action.state.scene);
-
-          object.userData.tag = 'Character';
-          object.userData.class = ch;
-          object.name = characterName;
-
-          action.dispatch('addToScene', object);
-        },
-        (xhr) => {
-          console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
-        },
-        (error) => {
-          console.log(error);
-        },
-      );
-    },
+    loadCharacter(action: SceneActionContext, path: string): void {},
   },
 };

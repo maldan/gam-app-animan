@@ -15,22 +15,29 @@ import { defineComponent } from 'vue';
 import * as THREE from 'three';
 import { Animation_Rig } from '@/core/Animation_Rig';
 import { Animation_Character } from '@/core/Animation_Character';
+import { MainScene } from '@/core/MainScene';
 
 export default defineComponent({
   props: {},
   components: {},
   computed: {
     rigList() {
-      if (!this.$store.state.scene.selectedObject) return [];
-      const ch = this.$store.state.scene.selectedObject.userData.class as Animation_Character;
+      if (this.r < 0) return [];
+      if (!MainScene.selectedObject) return [];
+      const ch = MainScene.selectedObject.userData.class as Animation_Character;
       return ch.rigList || [];
     },
     character(): Animation_Character {
-      return this.$store.state.scene.selectedObject.userData.class as Animation_Character;
+      // @ts-ignore
+      if (this.r < 0) return null;
+      return MainScene.selectedObject?.userData.class as Animation_Character;
     },
   },
   async mounted() {},
   methods: {
+    refresh() {
+      this.r = Math.random();
+    },
     fuckRig(rig: Animation_Rig) {
       rig.rotationOffset.multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(0, 45, 0)));
       this.character.setCurrentKey(rig.bone.name);
@@ -49,6 +56,7 @@ export default defineComponent({
   data: () => {
     return {
       THREE: THREE,
+      r: 0,
     };
   },
 });

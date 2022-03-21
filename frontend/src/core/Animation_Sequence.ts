@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { Animation_Frame } from '@/core/Animation_Frame';
 import { Animation_Key } from '@/core/Animation_Key';
 import { Animation_Character } from '@/core/Animation_Character';
+import { MainScene } from '@/core/MainScene';
 
 export class Animation_Sequence {
   private _frameId = 0;
@@ -9,7 +10,7 @@ export class Animation_Sequence {
 
   public frameCount = 48;
   public fps = 24;
-  public isLoop = false;
+  public isLoop = true;
   public frames: Animation_Frame[] = [];
 
   constructor(args: { frameCount: number }) {
@@ -96,6 +97,20 @@ export class Animation_Sequence {
         (i + 1) * stepSize,
       );
 
+      // Lerp position
+      this.frames[fromId + i + 1].keys[keyName].position = new THREE.Vector3(
+        this.frames[fromId].keys[keyName].position.x,
+        this.frames[fromId].keys[keyName].position.y,
+        this.frames[fromId].keys[keyName].position.z,
+      ).lerp(
+        new THREE.Vector3(
+          this.frames[toId].keys[keyName].position.x,
+          this.frames[toId].keys[keyName].position.y,
+          this.frames[toId].keys[keyName].position.z,
+        ),
+        (i + 1) * stepSize,
+      );
+
       /*Quaternion.Lerp(Frames[fromId].Keys[keyName].Rotation,
         Frames[toId].Keys[keyName].Rotation, (i + 1) * stepSize);*/
     }
@@ -119,6 +134,26 @@ export class Animation_Sequence {
     if (!this._eventList[eventName]) return;
     for (let i = 0; i < this._eventList[eventName].length; i++) {
       this._eventList[eventName][i](...data);
+    }
+  }
+
+  public tick(): void {
+    const calculatedFrame = Math.floor(MainScene.timelineTimer * this.fps) % this.frameCount;
+    let isUpdate = false;
+
+    /*if (calculatedFrame > this.frameCount) {
+      if (this.isLoop) {
+        isUpdate = true;
+        calculatedFrame = 0;
+      }
+    }*/
+
+    if (calculatedFrame != this._frameId) isUpdate = true;
+    this.frameId = calculatedFrame;
+
+    if (isUpdate) {
+      //Apply(character);
+      //ResolveEvents(calculatedFrame);
     }
   }
 

@@ -2,10 +2,10 @@
   <div :class="$style.scene">
     <div
       class="clickable"
-      :class="[$style.object, $store.state.scene.selectedObject === x ? $style.selected : null]"
-      v-for="x in $store.state.scene.objectList"
-      :key="x.uuid"
-      @click="$store.dispatch('scene/selectObject', x)"
+      :class="[$style.object, isSelected(x.uuid) ? $style.selected : null]"
+      v-for="x in objectList"
+      :key="x.uuid + '_' + r"
+      @click="selectObject(x.uuid)"
     >
       {{ x.type }} {{ x.name }}
     </div>
@@ -14,14 +14,45 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { MainScene } from '@/core/MainScene';
 
 export default defineComponent({
   props: {},
   components: {},
-  async mounted() {},
-  methods: {},
+  computed: {
+    objectList() {
+      if (this.r === 0) return [];
+      if (!MainScene.scene) return [];
+      return MainScene.scene.children
+        .filter((x) => x.name !== 'BoneHelper')
+        .map((x) => {
+          return {
+            uuid: x.uuid,
+            name: x.name,
+            type: x.type,
+          };
+        });
+    },
+  },
+  async mounted() {
+    MainScene.ui.scene.ref = this;
+  },
+  methods: {
+    refresh() {
+      this.r = Math.random();
+    },
+    isSelected(uuid: string): boolean {
+      return MainScene.selectedObject?.uuid === uuid;
+    },
+    selectObject(uuid: string) {
+      MainScene.selectObject(MainScene.scene.children.find((x) => x.uuid === uuid));
+      this.refresh();
+    },
+  },
   data: () => {
-    return {};
+    return {
+      r: 0,
+    };
   },
 });
 </script>
