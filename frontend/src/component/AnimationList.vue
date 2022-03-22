@@ -28,7 +28,7 @@ export default defineComponent({
   },
   data: () => {
     return {
-      list: ['Coco'],
+      list: [],
     };
   },
 });

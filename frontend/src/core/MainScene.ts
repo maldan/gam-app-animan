@@ -1,6 +1,7 @@
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import { Animation_Character } from '@/core/Animation_Character';
 import * as THREE from 'three';
+import { DataStorage } from '@/core/DataStorage';
 
 export class UI {
   public scene = {
@@ -50,6 +51,10 @@ export class MainScene {
     // Set selection
     this.selectedObject = obj;
 
+    if (obj instanceof THREE.DirectionalLight) {
+      DataStorage.setManipulatorTo(obj);
+    }
+
     // On select event
     if (this.selectedObject?.userData.tag === 'Character')
       this.selectedObject.userData.class.onSelect();
@@ -69,6 +74,17 @@ export class MainScene {
     fbxLoader.load(
       path,
       (object) => {
+        object.traverse(function (child) {
+          if ((child as THREE.Mesh).isMesh) {
+            // (child as THREE.Mesh).material = material
+            if ((child as THREE.Mesh).material) {
+              ((child as THREE.Mesh).material as THREE.MeshPhongMaterial).shininess = 2;
+              ((child as THREE.Mesh).material as THREE.MeshPhongMaterial).reflectivity = 0.1;
+              // ((child as THREE.Mesh).material as THREE.MeshPhongMaterial).wireframe = true;
+            }
+          }
+        });
+
         const characterName = path.split('/').pop()?.replace('.fbx', '') || 'Unknown';
 
         const ch = new Animation_Character();

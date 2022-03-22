@@ -2,3 +2,5 @@
 /app*
 /.history
 /copy.sh
+s3.json
+/backup

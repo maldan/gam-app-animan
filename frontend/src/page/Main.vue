@@ -178,12 +178,15 @@ export default defineComponent({
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setAnimationLoop(animation);
 
-    const ambientLight = new THREE.AmbientLight();
-    scene.add(ambientLight);
+    //const ambientLight = new THREE.AmbientLight();
+    //scene.add(ambientLight);
 
-    //const l = new THREE.DirectionalLight();
-    //l.rotation.set(15, 0, 0);
-    //scene.add(l);
+    const l = new THREE.DirectionalLight(0xffffff, 1);
+    l.position.set(0, 0, 10);
+    scene.add(l);
+    const l2 = new THREE.DirectionalLight(0xffffff, 1);
+    l2.position.set(0, 0, -10);
+    scene.add(l2);
 
     // @ts-ignore
     document.getElementById('sus').appendChild(renderer.domElement);

@@ -42,8 +42,18 @@ export class Animation_Character {
       this._boneList[object.name] = object as THREE.Bone;
 
       // Create bone helper
+      let size = 0.02;
+      if (
+        object.name.includes('Finger') ||
+        object.name.includes('Toe') ||
+        object.name.includes('Eye') ||
+        object.name.includes('Nose') ||
+        object.name.includes('Tongue')
+      )
+        size = 0.007;
+
       const boneHelper = new THREE.Mesh(
-        new THREE.BoxGeometry(0.02, 0.02, 0.04),
+        new THREE.BoxGeometry(size, size, size * 2),
         new THREE.MeshBasicMaterial({
           color: 0xfefefe,
           depthTest: false,
@@ -62,6 +72,7 @@ export class Animation_Character {
       boneHelper.userData.tag = 'BoneHelper';
       boneHelper.userData.rig = rig;
       boneHelper.userData.character = this;
+      boneHelper.visible = false;
       this._scene.add(boneHelper);
     });
 
