@@ -45,7 +45,19 @@ export class MainScene {
   }
 
   public static selectObject(obj: THREE.Object3D | undefined): void {
+    const previousSelected = this.selectedObject;
+
+    // Set selection
     this.selectedObject = obj;
+
+    // On select event
+    if (this.selectedObject?.userData.tag === 'Character')
+      this.selectedObject.userData.class.onSelect();
+
+    // Deselect previous
+    if (previousSelected?.userData.tag === 'Character')
+      previousSelected.userData.class.onUnselect();
+
     setTimeout(() => {
       this.ui.main.refresh();
       this.ui.timeline.refresh();

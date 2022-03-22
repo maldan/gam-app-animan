@@ -8,4 +8,13 @@ export class DataStorage {
 
   public static manipulatorStartPosition: THREE.Vector3;
   public static manipulatorStartRotation: THREE.Quaternion;
+
+  public static isLockManipulator = false;
+
+  public static selectedTimelineLayer = '';
+
+  public static setManipulatorTo(obj?: THREE.Object3D): void {
+    DataStorage.manipulator.detach();
+    if (obj) DataStorage.manipulator.attach(obj);
+  }
 }

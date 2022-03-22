@@ -15,12 +15,13 @@ export class Animation_Character {
   private _rigList: Animation_Rig[] = [];
   private _rigDict: Record<string, Animation_Rig> = {};
   private _scene!: THREE.Scene;
+  private _obj!: THREE.Object3D;
 
   public init(name: string, obj: THREE.Group, scene: THREE.Scene): void {
     this.name = name;
     this._scene = scene;
+    this._obj = obj;
     obj.children.forEach((value, index) => {
-      console.log(value);
       if (value.name === 'Skeleton') this.prepareSkeleton(value as THREE.Group);
       if (value.name === 'Character_Body_Futa') value.visible = false;
       if (value.name === 'Character_Head') {
@@ -100,6 +101,28 @@ export class Animation_Character {
       );
 
       rig.tick();
+    });
+  }
+
+  public onSelect(): void {
+    this._rigList.forEach((rig) => {
+      rig.boneHelper.visible = true;
+    });
+  }
+
+  public onUnselect(): void {
+    this._rigList.forEach((rig) => {
+      rig.boneHelper.visible = false;
+    });
+  }
+
+  public setKeysVisibility(keys: string[]): void {
+    this._rigList.forEach((rig) => {
+      rig.boneHelper.visible = false;
+    });
+
+    this._rigList.forEach((rig) => {
+      rig.boneHelper.visible = keys.includes(rig.bone.name);
     });
   }
 

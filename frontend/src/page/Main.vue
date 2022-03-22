@@ -87,6 +87,7 @@ import { DataStorage } from '@/core/DataStorage';
 import { Animation_Rig } from '@/core/Animation_Rig';
 import { Animation_Character } from '@/core/Animation_Character';
 import { MainScene } from '@/core/MainScene';
+import { MathUtils } from 'three';
 
 export default defineComponent({
   components: {},
@@ -100,10 +101,16 @@ export default defineComponent({
     });
 
     window.addEventListener('mousedown', (e: MouseEvent) => {
-      if (DataStorage.hoverObject && DataStorage.hoverObject !== DataStorage.selectedObject) {
-        DataStorage.selectedObject = DataStorage.hoverObject;
-        DataStorage.manipulator.detach();
-        DataStorage.manipulator.attach(DataStorage.hoverObject);
+      if (DataStorage.isLockManipulator) return;
+
+      if (e.button === 0) {
+        DataStorage.selectedObject = undefined;
+        DataStorage.setManipulatorTo(undefined);
+
+        if (DataStorage.hoverObject) {
+          DataStorage.selectedObject = DataStorage.hoverObject;
+          DataStorage.setManipulatorTo(DataStorage.hoverObject);
+        }
       }
     });
 
@@ -115,13 +122,6 @@ export default defineComponent({
 
     let prevTime = 0;
     const animation = (time: number) => {
-      // Update
-      //if (this.$store.state.scene.selectedObject != null) {
-      //if (this.$store.state.scene.selectedObject.userData.tag === 'Character') {
-      // this.$store.state.scene.selectedObject.userData.class.tick();
-      //}
-      //}
-
       const deltaTime = (time - prevTime) / 1000;
       MainScene.timelineTimer += deltaTime;
 
@@ -133,7 +133,7 @@ export default defineComponent({
       prevTime = time;
 
       raycaster.setFromCamera(pointer, camera);
-      const c = scene.children.filter((x) => x.name === 'BoneHelper');
+      const c = scene.children.filter((x) => x.name === 'BoneHelper' && x.visible);
       c.forEach((x) => {
         // @ts-ignore
         x.material.color.set(0xffffff);
@@ -209,19 +209,51 @@ export default defineComponent({
 
     DataStorage.manipulator.addEventListener('mouseDown', () => {
       if (!DataStorage.selectedObject) return;
+      DataStorage.isLockManipulator = true;
       DataStorage.manipulatorStartPosition = DataStorage.selectedObject.position.clone();
       DataStorage.manipulatorStartRotation = DataStorage.selectedObject.quaternion.clone();
     });
-    DataStorage.manipulator.addEventListener('mouseUp', () => {
+    DataStorage.manipulator.addEventListener('mouseUp', (e: any) => {
       if (!DataStorage.selectedObject) return;
+      DataStorage.isLockManipulator = false;
+
       if (DataStorage.selectedObject.userData.tag === 'BoneHelper') {
         const rig = DataStorage.selectedObject.userData.rig as Animation_Rig;
         const character = DataStorage.selectedObject.userData.character as Animation_Character;
 
-        const moveDiff = DataStorage.manipulatorStartPosition
+        /*const gr = new THREE.Quaternion();
+        DataStorage.selectedObject.getWorldQuaternion(gr);
+
+        const from = DataStorage.manipulatorStartPosition.clone();
+        const to = DataStorage.selectedObject.position.clone();
+
+        const dir = new THREE.Vector3();
+        dir.subVectors(from, to).normalize();
+
+        dir.applyQuaternion(gr);
+
+        const distance = DataStorage.manipulatorStartPosition
+          .clone()
+          .distanceTo(DataStorage.selectedObject.position);
+
+        rig.positionOffset.add(dir.multiplyScalar(distance));*/
+
+        const diff = DataStorage.selectedObject.worldToLocal(DataStorage.manipulatorStartPosition);
+        rig.positionOffset.add(diff.multiplyScalar(-1));
+
+        /*const moveDiff = DataStorage.manipulatorStartPosition
           .clone()
           .sub(DataStorage.selectedObject.position);
-        rig.positionOffset.add(moveDiff.multiplyScalar(-1));
+
+        const dir = new THREE.Vector3();
+        dir
+          .subVectors(DataStorage.manipulatorStartPosition, DataStorage.selectedObject.position)
+          .normalize();
+        const distance = DataStorage.manipulatorStartPosition
+          .clone()
+          .distanceTo(DataStorage.selectedObject.position);
+
+        rig.positionOffset.add(dir.multiplyScalar(distance * -1));*/
 
         const rotDiff = DataStorage.manipulatorStartRotation
           .clone()
@@ -260,7 +292,7 @@ export default defineComponent({
       movement: { x: 0, y: 0, z: 0 },
       r: 0,
       isPlayAnimation: false,
-      timelineLayers: ['All', 'Body', 'Hand'],
+      timelineLayers: ['All', 'Body', 'Hand', 'Head'],
     };
   },
 });

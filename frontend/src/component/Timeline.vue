@@ -31,6 +31,7 @@
 import { defineComponent } from 'vue';
 import { Animation_Character } from '@/core/Animation_Character';
 import { MainScene } from '@/core/MainScene';
+import { DataStorage } from '@/core/DataStorage';
 
 export default defineComponent({
   props: {},
@@ -46,6 +47,10 @@ export default defineComponent({
     animation() {
       if (this.r < 0) return null;
       return MainScene.selectedObject?.userData?.class?.animation;
+    },
+    character(): Animation_Character | undefined {
+      if (this.r < 0) return undefined;
+      return MainScene.selectedObject?.userData?.class;
     },
   },
   async mounted() {
@@ -86,6 +91,23 @@ export default defineComponent({
       if (layer === 'Body') this.filterKeys.push('Root', 'Belly', 'Chest', 'Neck', 'Head');
       if (layer === 'Hand')
         this.filterKeys.push('ArmL', 'ForearmL', 'HandL', 'ArmR', 'ForearmR', 'HandR');
+
+      if (layer === 'Head')
+        this.filterKeys.push(
+          'EyeL',
+          'EyeR',
+          'Nose',
+          'Neck',
+          'Head',
+          'Tongue_0',
+          'Tongue_1',
+          'Tongue_2',
+        );
+
+      DataStorage.selectedTimelineLayer = layer;
+      if (this.character) {
+        this.character.setKeysVisibility(this.filterKeys);
+      }
     },
   },
   data: () => {
