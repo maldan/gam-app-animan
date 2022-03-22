@@ -7,4 +7,5 @@ export class DataStorage {
   public static selectedObject?: THREE.Object3D;
 
   public static manipulatorStartPosition: THREE.Vector3;
+  public static manipulatorStartRotation: THREE.Quaternion;
 }

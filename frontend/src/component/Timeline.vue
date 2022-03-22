@@ -1,8 +1,13 @@
 <template>
   <div :class="$style.timeline">
     <div :class="$style.line" v-for="rig in rigList" :key="rig.bone.name">
-      <div :class="$style.title">{{ rig.bone.name }}</div>
-      <div :class="$style.keys">
+      <div
+        @click="selectKey(rig.bone.name)"
+        :class="[$style.title, selectedKeys.includes(rig.bone.name) ? $style.selected : null]"
+      >
+        {{ rig.bone.name }}
+      </div>
+      <div :class="[$style.keys, selectedKeys.includes(rig.bone.name) ? $style.selected : null]">
         <div
           :class="[
             $style.key,
@@ -12,7 +17,10 @@
           ]"
           v-for="frameId in animation?.frameCount"
           :key="frameId"
-          @click="goToFrame(frameId - 1)"
+          @click="
+            goToFrame(frameId - 1);
+            selectKey(rig.bone.name);
+          "
         ></div>
       </div>
     </div>
@@ -32,7 +40,8 @@ export default defineComponent({
       if (this.r < 0) return [];
       if (!MainScene.selectedObject) return [];
       const ch = MainScene.selectedObject.userData.class as Animation_Character;
-      return ch.rigList || [];
+      if (this.filterKeys.length === 0) return ch.rigList;
+      return ch.rigList.filter((x) => this.filterKeys.includes(x.bone.name));
     },
     animation() {
       if (this.r < 0) return null;
@@ -68,17 +77,32 @@ export default defineComponent({
       this.animation.frameId = id;
       this.refresh();
     },
+    selectKey(key: string) {
+      this.selectedKeys.length = 0;
+      this.selectedKeys.push(key);
+    },
+    setLayers(layer: string) {
+      this.filterKeys.length = 0;
+      if (layer === 'Body') this.filterKeys.push('Root', 'Belly', 'Chest', 'Neck', 'Head');
+      if (layer === 'Hand')
+        this.filterKeys.push('ArmL', 'ForearmL', 'HandL', 'ArmR', 'ForearmR', 'HandR');
+    },
   },
   data: () => {
     return {
       kd: undefined as any,
       r: 0,
+      filterKeys: [] as string[],
+      selectedKeys: [] as string[],
     };
   },
 });
 </script>
 
 <style lang="scss" module>
+@import '../gam_sdk_ui/vue/style/color';
+@import '../gam_sdk_ui/vue/style/size';
+
 .timeline {
   .line {
     display: flex;
@@ -87,13 +111,28 @@ export default defineComponent({
     .title {
       min-width: 128px;
       font-size: 14px;
+      color: $text-gray;
+      background: lighten($gray-dark, 5%);
+      border-right: 4px solid #4c4c4c;
+      margin-right: 5px;
+
+      &.selected {
+        border-right: 4px solid #26b518;
+        background: #4a4a4a;
+      }
     }
 
     .keys {
       display: flex;
 
+      &.selected {
+        .key {
+          background: #262626;
+        }
+      }
+
       .key {
-        width: 10px;
+        width: 8px;
         background: #161616;
         margin-right: 1px;
 

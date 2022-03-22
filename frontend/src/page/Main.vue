@@ -1,6 +1,8 @@
 <template>
   <div class="main">
     <div id="sus"></div>
+
+    <!-- Animation list -->
     <ui-window
       v-if="isCharacterSelected()"
       title="Animation list"
@@ -11,12 +13,14 @@
       </template>
     </ui-window>
 
+    <!-- Scene -->
     <ui-window title="Scene Hierarchy" :initData="{ x: 5, y: 30, width: 15, height: 20 }">
       <template v-slot:body>
         <scene />
       </template>
     </ui-window>
 
+    <!-- Character list -->
     <ui-window title="Character list" :initData="{ x: 80, y: 5, width: 15, height: 20 }">
       <template v-slot:body>
         <characterlist />
@@ -58,9 +62,16 @@
           :text="isPlayAnimation ? 'Stop' : 'Play'"
           style="flex: none; padding: 5px; margin-left: 5px"
         />
+        <ui-button
+          v-for="l in timelineLayers"
+          :key="l"
+          @click="$refs['timeline'].setLayers(l)"
+          :text="l"
+          style="flex: none; padding: 5px; margin-left: 5px"
+        />
       </template>
       <template v-slot:body>
-        <timeline />
+        <timeline ref="timeline" />
       </template>
     </ui-window>
   </div>
@@ -89,11 +100,17 @@ export default defineComponent({
     });
 
     window.addEventListener('mousedown', (e: MouseEvent) => {
-      if (DataStorage.hoverObject) {
+      if (DataStorage.hoverObject && DataStorage.hoverObject !== DataStorage.selectedObject) {
         DataStorage.selectedObject = DataStorage.hoverObject;
         DataStorage.manipulator.detach();
         DataStorage.manipulator.attach(DataStorage.hoverObject);
       }
+    });
+
+    // Key
+    document.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'r') DataStorage.manipulator.mode = 'rotate';
+      if (e.key === 'g') DataStorage.manipulator.mode = 'translate';
     });
 
     let prevTime = 0;
@@ -164,6 +181,10 @@ export default defineComponent({
     const ambientLight = new THREE.AmbientLight();
     scene.add(ambientLight);
 
+    //const l = new THREE.DirectionalLight();
+    //l.rotation.set(15, 0, 0);
+    //scene.add(l);
+
     // @ts-ignore
     document.getElementById('sus').appendChild(renderer.domElement);
 
@@ -189,6 +210,7 @@ export default defineComponent({
     DataStorage.manipulator.addEventListener('mouseDown', () => {
       if (!DataStorage.selectedObject) return;
       DataStorage.manipulatorStartPosition = DataStorage.selectedObject.position.clone();
+      DataStorage.manipulatorStartRotation = DataStorage.selectedObject.quaternion.clone();
     });
     DataStorage.manipulator.addEventListener('mouseUp', () => {
       if (!DataStorage.selectedObject) return;
@@ -199,13 +221,18 @@ export default defineComponent({
         const moveDiff = DataStorage.manipulatorStartPosition
           .clone()
           .sub(DataStorage.selectedObject.position);
-        console.log(moveDiff);
         rig.positionOffset.add(moveDiff.multiplyScalar(-1));
+
+        const rotDiff = DataStorage.manipulatorStartRotation
+          .clone()
+          .invert()
+          .multiply(DataStorage.selectedObject.quaternion);
+        rig.rotationOffset.multiply(rotDiff);
+
         character.setCurrentKey(rig.bone.name);
         character.animation?.interpolateKey(rig.bone.name);
         character.tick();
       }
-      // DataStorage.selectedObject.position.x
     });
     scene.add(DataStorage.manipulator);
 
@@ -233,6 +260,7 @@ export default defineComponent({
       movement: { x: 0, y: 0, z: 0 },
       r: 0,
       isPlayAnimation: false,
+      timelineLayers: ['All', 'Body', 'Hand'],
     };
   },
 });
