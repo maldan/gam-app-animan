@@ -8,6 +8,7 @@ import (
 	"github.com/maldan/gam-app-animan/internal/app/animan/core"
 	"github.com/maldan/go-rapi"
 	"github.com/maldan/go-rapi/rapi_core"
+	"github.com/maldan/go-rapi/rapi_file"
 	"github.com/maldan/go-rapi/rapi_rest"
 	"github.com/maldan/go-rapi/rapi_vfs"
 )
@@ -54,6 +55,9 @@ func Start(frontFs embed.FS) {
 					"animation": api.AnimationApi{},
 					"object":    api.ObjectApi{},
 				},
+			},
+			"/data": rapi_file.FileHandler{
+				Root: core.DataDir,
 			},
 		},
 		DbPath: core.DataDir,

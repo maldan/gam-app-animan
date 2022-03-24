@@ -32,6 +32,12 @@ type AnimationSequence struct {
 	Frames     []AnimationFrame `json:"frames"`
 }
 
+type VirtualObject struct {
+	Name        string `json:"name"`
+	PreviewPath string `json:"previewPath"`
+	ModelPath   string `json:"modelPath"`
+}
+
 const ANIMATION_SECTION_MARKET uint32 = 1296649793
 
 var DataDir = ""

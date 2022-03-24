@@ -9,7 +9,7 @@
       :initData="{ x: 5, y: 5, width: 15, height: 20 }"
     >
       <template v-slot:body>
-        <animationlist />
+        <animation-list />
       </template>
     </ui-window>
 
@@ -23,7 +23,7 @@
     <!-- Character list -->
     <ui-window title="Character list" :initData="{ x: 80, y: 5, width: 15, height: 20 }">
       <template v-slot:body>
-        <characterlist />
+        <character-list />
       </template>
     </ui-window>
 
@@ -34,7 +34,7 @@
       :initData="{ x: 80, y: 35, width: 15, height: 40 }"
     >
       <template v-slot:body>
-        <riglist />
+        <rig-list />
       </template>
     </ui-window>
 
@@ -87,7 +87,6 @@ import { DataStorage } from '@/core/DataStorage';
 import { Animation_Rig } from '@/core/Animation_Rig';
 import { Animation_Character } from '@/core/Animation_Character';
 import { MainScene } from '@/core/MainScene';
-import { MathUtils } from 'three';
 
 export default defineComponent({
   components: {},

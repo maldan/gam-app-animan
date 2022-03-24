@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
 import Main from '../page/Main.vue';
 import Repo from '../page/Repo.vue';
+import Preview from '../page/Preview.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -12,6 +13,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/repo',
     name: 'Repo',
     component: Repo,
+  },
+  {
+    path: '/preview/:path',
+    name: 'Preview',
+    component: Preview,
   },
 ];
 
