@@ -1,6 +1,6 @@
 {
   "name": "@maldan/gam-app-animan",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Animan",
   "main": "index.js",
   "scripts": {},
