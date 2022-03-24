@@ -41,8 +41,8 @@ export default defineComponent({
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setAnimationLoop(animation);
 
-    //const ambientLight = new THREE.AmbientLight();
-    //scene.add(ambientLight);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
 
     const l = new THREE.DirectionalLight(0xffffff, 1);
     l.position.set(0, 0, 10);

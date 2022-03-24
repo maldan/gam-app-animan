@@ -51,8 +51,9 @@ export default defineComponent({
       this.$store.dispatch('modal/show', {
         name: 'upload/virtual-object',
         data: {},
-        onSuccess: () => {
-          this.$store.dispatch('repo/upload');
+        onSuccess: async () => {
+          await this.$store.dispatch('repo/upload');
+          window.location.reload();
         },
       });
     },

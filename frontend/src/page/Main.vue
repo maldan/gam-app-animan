@@ -164,7 +164,6 @@ export default defineComponent({
     camera.position.z = 5;
 
     const scene = new THREE.Scene();
-    await this.$store.dispatch('scene/setScene', scene);
 
     // Grid
     const grid = 5;

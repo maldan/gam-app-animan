@@ -1,63 +1,36 @@
-import { Animation_Character } from '@/core/Animation_Character';
 import { ActionContext } from 'vuex';
 import { MainTree } from '.';
-import { Animation_Sequence } from '@/core/Animation_Sequence';
-import * as THREE from 'three';
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
+import Axios from 'axios';
+import { IVirtualObject } from '@/Types';
+import { RepoActionContext } from '@/store/repo';
 
 export type SceneStore = {
-  //selectedCharacter?: Animation_Character;
-  //objectList: THREE.Object3D[];
-  //selectedObject: THREE.Object3D;
-  //scene: THREE.Scene;
+  characterList: IVirtualObject[];
 };
 export type SceneActionContext = ActionContext<SceneStore, MainTree>;
 
 export default {
   namespaced: true,
   state: {
-    //selectedCharacter: undefined,
-    selectedObject: undefined,
-    objectList: [],
-    scene: undefined,
+    characterList: [],
   },
   mutations: {
-    SET_SELECTED_OBJECT(state: SceneStore, obj: THREE.Object3D): void {
-      //state.selectedObject = obj;
-    },
-    /*SET_SELECTED_CHARACTER(state: SceneStore, character: Animation_Character): void {
-      state.selectedCharacter = character;
-    },*/
-    SET_ANIMATION(state: SceneStore, animation: Animation_Sequence): void {
-      //if (state.selectedObject?.userData?.tag === 'Character') {
-      //  state.selectedObject.userData.class.animation = animation;
-      //}
-    },
-    SET_SCENE(state: SceneStore, scene: THREE.Scene): void {
-      //state.scene = scene;
-    },
-    ADD_TO_SCENE(state: SceneStore, object: THREE.Object3D): void {
-      //state.scene.add(object);
-      //state.objectList.push(object);
-      //console.log(object);
+    SET_CHARACTER_LIST(state: SceneStore, list: IVirtualObject[]): void {
+      state.characterList = list;
     },
   },
   actions: {
-    /*selectCharacter(action: SceneActionContext, character: Animation_Character): void {
-      action.commit('SET_SELECTED_CHARACTER', character);
-    },*/
-    createAnimation(action: SceneActionContext): void {
-      action.commit('SET_ANIMATION', new Animation_Sequence({ frameCount: 48 }));
+    async getCharacterList(action: RepoActionContext): Promise<void> {
+      let list = (
+        await Axios.get(`${action.rootState.main.API_URL}/object/list?category=character`)
+      ).data.response as IVirtualObject[];
+
+      list = list.map((x) => {
+        x.modelPath = `${action.rootState.main.ROOT_URL}/` + x.modelPath;
+        if (x.previewPath) x.previewPath = `${action.rootState.main.ROOT_URL}/` + x.previewPath;
+        return x;
+      });
+      action.commit('SET_CHARACTER_LIST', list);
     },
-    setScene(action: SceneActionContext, scene: THREE.Scene): void {
-      action.commit('SET_SCENE', scene);
-    },
-    addToScene(action: SceneActionContext, object: THREE.Object3D): void {
-      action.commit('ADD_TO_SCENE', object);
-    },
-    selectObject(action: SceneActionContext, object: THREE.Object3D): void {
-      action.commit('SET_SELECTED_OBJECT', object);
-    },
-    loadCharacter(action: SceneActionContext, path: string): void {},
   },
 };
