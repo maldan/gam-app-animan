@@ -21,3 +21,8 @@ export interface IAnimation_Sequence {
   fps: number;
   isLoop: boolean;
 }
+
+export interface IVirtualObject {
+  name: string;
+  modelPath: string;
+}

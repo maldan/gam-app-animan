@@ -76,7 +76,6 @@ export class MainScene {
       (object) => {
         object.traverse(function (child) {
           if ((child as THREE.Mesh).isMesh) {
-            // (child as THREE.Mesh).material = material
             if ((child as THREE.Mesh).material) {
               ((child as THREE.Mesh).material as THREE.MeshPhongMaterial).shininess = 2;
               ((child as THREE.Mesh).material as THREE.MeshPhongMaterial).reflectivity = 0.1;
