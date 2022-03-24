@@ -19,9 +19,10 @@ export default {
     },
   },
   actions: {
-    async getList(action: RepoActionContext): Promise<void> {
-      let list = (await Axios.get(`${action.rootState.main.API_URL}/object/list`)).data
-        .response as IVirtualObject[];
+    async getList(action: RepoActionContext, category: string): Promise<void> {
+      let list = (
+        await Axios.get(`${action.rootState.main.API_URL}/object/list?category=${category}`)
+      ).data.response as IVirtualObject[];
       list = list.map((x) => {
         x.modelPath = `${action.rootState.main.ROOT_URL}/` + x.modelPath;
         if (x.previewPath) x.previewPath = `${action.rootState.main.ROOT_URL}/` + x.previewPath;
@@ -32,19 +33,21 @@ export default {
     async upload(action: RepoActionContext): Promise<void> {
       const formData = new FormData();
       formData.set('name', action.rootState.modal.data.name);
+      formData.set('type', action.rootState.modal.data.type.value);
       formData.set('model', action.rootState.modal.data.model[0]);
 
       await Axios.put(`${action.rootState.main.API_URL}/object`, formData);
     },
     async uploadPreview(
       action: RepoActionContext,
-      payload: { name: string; image: string },
+      payload: { name: string; category: string; image: string },
     ): Promise<void> {
       const f = await fetch(payload.image);
       const b = await f.blob();
 
       const formData = new FormData();
       formData.set('name', payload.name);
+      formData.set('category', payload.category);
       formData.append('preview', new File([b], 'File name', { type: 'image/jpeg' }), 'preview.jpg');
 
       await Axios.put(`${action.rootState.main.API_URL}/object/preview`, formData);

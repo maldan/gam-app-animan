@@ -3,6 +3,6 @@ package api
 type MainApi struct {
 }
 
-func (r MainApi) GetIndex(args ArgsEmpty) string {
+func (r MainApi) GetIndex() string {
 	return "Test"
 }

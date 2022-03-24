@@ -1,12 +1,14 @@
 <template>
   <div :class="$style.main">
+    <ui-button-group :items="items" v-model="category" @change="refresh" />
+
     <div :class="$style.list">
       <div
         class="clickable"
         :class="$style.preview"
         v-for="x in $store.state.repo.objectList"
         :key="x.modelPath"
-        @click="$router.push(`/preview/${x.name}`)"
+        @click="$router.push(`/preview/${x.category}/${x.name}`)"
       >
         <img :src="x.previewPath" alt="Preview" />
         <div :class="$style.title">{{ x.name }}</div>
@@ -23,20 +25,28 @@ import { Repo } from '@/core/Repo';
 export default defineComponent({
   components: {},
   async mounted() {
-    await this.$store.dispatch('repo/getList');
-
-    for (let i = 0; i < this.$store.state.repo.objectList.length; i++) {
-      const obj = this.$store.state.repo.objectList[i];
-      if (obj.previewPath !== '') return;
-
-      const preview = await Repo.s(obj);
-      await this.$store.dispatch('repo/uploadPreview', {
-        name: obj.name,
-        image: preview,
-      });
-    }
+    await this.refresh();
   },
   methods: {
+    async refresh() {
+      await this.$store.dispatch('repo/getList', this.category);
+
+      for (let i = 0; i < this.$store.state.repo.objectList.length; i++) {
+        const obj = this.$store.state.repo.objectList[i];
+        if (obj.previewPath !== '') continue;
+
+        const preview = await Repo.getPreview(obj);
+        await this.$store.dispatch('repo/uploadPreview', {
+          name: obj.name,
+          category: obj.category,
+          image: preview,
+        });
+
+        this.$store.state.repo.objectList[i].previewPath = this.$store.state.repo.objectList[
+          i
+        ].modelPath.replace(/\/[a-zA-Z0-9_]+\.fbx$/, '/preview.jpg');
+      }
+    },
     uploadModal() {
       this.$store.dispatch('modal/show', {
         name: 'upload/virtual-object',
@@ -48,7 +58,19 @@ export default defineComponent({
     },
   },
   data: () => {
-    return {};
+    return {
+      category: '',
+      items: [
+        {
+          text: 'Character',
+          id: 'character',
+        },
+        {
+          text: 'Nature',
+          id: 'nature',
+        },
+      ],
+    };
   },
 });
 </script>

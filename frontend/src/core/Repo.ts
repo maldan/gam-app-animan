@@ -5,7 +5,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { MathUtils } from 'three';
 
 export class Repo {
-  public static async s(virtualObject: IVirtualObject): Promise<string> {
+  public static async getPreview(virtualObject: IVirtualObject): Promise<string> {
     // init
     const camera = new THREE.PerspectiveCamera(45, 256 / 256, 0.001, 1024);
     camera.position.y = 2;
@@ -19,12 +19,9 @@ export class Repo {
     const renderer = new THREE.WebGLRenderer({ antialias: false, preserveDrawingBuffer: true });
     renderer.setSize(256, 256);
 
-    const mesh = new THREE.Mesh(
-      new THREE.PlaneGeometry(5, 5, 1, 1),
-      new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, color: 0x2b2b2b }),
-    );
-    mesh.rotateX(THREE.MathUtils.degToRad(-90));
-    scene.add(mesh);
+    // Grid
+    const grid = 5;
+    scene.add(new THREE.GridHelper(grid, grid * 2));
 
     // @ts-ignore
     document.body.appendChild(renderer.domElement);

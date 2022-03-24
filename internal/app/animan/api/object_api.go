@@ -10,10 +10,15 @@ import (
 type ObjectApi struct {
 }
 
-func (r ObjectApi) GetList() []core.VirtualObject {
+func (r ObjectApi) GetList(args struct {
+	Category string `json:"category"`
+}) []core.VirtualObject {
 	list := make([]core.VirtualObject, 0)
+	if args.Category == "" {
+		return list
+	}
 
-	fileList, _ := cmhp_file.List(core.DataDir + "/object")
+	fileList, _ := cmhp_file.List(core.DataDir + "/object/" + args.Category)
 
 	for _, file := range fileList {
 		if !file.IsDir() {
@@ -22,13 +27,14 @@ func (r ObjectApi) GetList() []core.VirtualObject {
 
 		// Preview
 		previewPath := ""
-		if cmhp_file.Exists(core.DataDir + "/object/" + file.Name() + "/preview.jpg") {
-			previewPath = "data/object/" + file.Name() + "/preview.jpg"
+		if cmhp_file.Exists(core.DataDir + "/object/" + args.Category + "/" + file.Name() + "/preview.jpg") {
+			previewPath = "data/object/" + args.Category + "/" + file.Name() + "/preview.jpg"
 		}
 
 		list = append(list, core.VirtualObject{
 			Name:        file.Name(),
-			ModelPath:   "data/object/" + file.Name() + "/model.fbx",
+			Category:    args.Category,
+			ModelPath:   "data/object/" + args.Category + "/" + file.Name() + "/model.fbx",
 			PreviewPath: previewPath,
 		})
 	}
@@ -36,15 +42,23 @@ func (r ObjectApi) GetList() []core.VirtualObject {
 	return list
 }
 
-func (r ObjectApi) PutPreview(args ArgsObjectPreview) {
-	err := cmhp_file.Write(core.DataDir+"/object/"+args.Name+"/preview.jpg", args.Preview.Data)
+func (r ObjectApi) PutPreview(args struct {
+	Name     string         `json:"name"`
+	Category string         `json:"category"`
+	Preview  rapi_core.File `json:"preview"`
+}) {
+	err := cmhp_file.Write(core.DataDir+"/object/"+args.Category+"/"+args.Name+"/preview.jpg", args.Preview.Data)
 	rapi_core.FatalIfError(err)
 }
 
-func (r ObjectApi) PutIndex(args ArgsObject) {
+func (r ObjectApi) PutIndex(args struct {
+	Name  string         `json:"name"`
+	Type  string         `json:"type"`
+	Model rapi_core.File `json:"model"`
+}) {
 	if args.Name == "" {
 		rapi_core.Fatal(rapi_core.Error{Description: "Incorrect Name"})
 	}
-	err := cmhp_file.Write(fmt.Sprintf("%v/object/%v/model.fbx", core.DataDir, args.Name), args.Model.Data)
+	err := cmhp_file.Write(fmt.Sprintf("%v/object/%v/%v/model.fbx", core.DataDir, args.Type, args.Name), args.Model.Data)
 	rapi_core.FatalIfError(err)
 }

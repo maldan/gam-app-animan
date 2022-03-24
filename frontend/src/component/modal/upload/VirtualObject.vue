@@ -1,8 +1,14 @@
 <template>
   <div :class="$style.virtualObject">
+    <!-- Name -->
     <div>Name</div>
     <ui-input v-model="$store.state.modal.data.name" />
 
+    <!-- Type -->
+    <div>Type</div>
+    <ui-select v-model="$store.state.modal.data.type" :items="items" />
+
+    <!-- FBX -->
     <div>Model fbx</div>
     <ui-input type="file" accept=".fbx" v-model="$store.state.modal.data.model" />
 
@@ -22,7 +28,12 @@ export default defineComponent({
   async mounted() {},
   methods: {},
   data: () => {
-    return {};
+    return {
+      items: [
+        { label: 'Character', value: 'character' },
+        { label: 'Nature', value: 'nature' },
+      ],
+    };
   },
 });
 </script>

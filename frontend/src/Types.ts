@@ -24,6 +24,7 @@ export interface IAnimation_Sequence {
 
 export interface IVirtualObject {
   name: string;
+  category: string;
   modelPath: string;
   previewPath: string;
 }

@@ -34,6 +34,7 @@ type AnimationSequence struct {
 
 type VirtualObject struct {
 	Name        string `json:"name"`
+	Category    string `json:"category"`
 	PreviewPath string `json:"previewPath"`
 	ModelPath   string `json:"modelPath"`
 }

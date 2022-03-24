@@ -1,6 +1,7 @@
 <template>
   <div :class="$style.main">
     <div id="sus"></div>
+    <div ref="stat"></div>
   </div>
 </template>
 
@@ -31,12 +32,10 @@ export default defineComponent({
     camera.position.z = 5;
 
     const scene = new THREE.Scene();
-    const mesh = new THREE.Mesh(
-      new THREE.PlaneGeometry(5, 5, 1, 1),
-      new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, color: 0x2b2b2b }),
-    );
-    mesh.rotateX(THREE.MathUtils.degToRad(-90));
-    scene.add(mesh);
+
+    // Grid
+    const grid = 5;
+    scene.add(new THREE.GridHelper(grid, grid * 2));
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -71,13 +70,13 @@ export default defineComponent({
     controls.autoRotate = false;
 
     const stats = Stats();
-    document.body.appendChild(stats.dom);
+    (this.$refs['stat'] as HTMLElement).appendChild(stats.dom);
 
     MainScene.scene = scene;
     MainScene.ui.main.ref = this;
 
     MainScene.loadCharacter(
-      `${this.$store.state.main.ROOT_URL}/data/object/${this.$route.params.path}/model.fbx`,
+      `${this.$store.state.main.ROOT_URL}/data/object/${this.$route.params.category}/${this.$route.params.name}/model.fbx`,
     );
   },
   methods: {},

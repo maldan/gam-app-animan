@@ -15,7 +15,7 @@ const routes: Array<RouteRecordRaw> = [
     component: Repo,
   },
   {
-    path: '/preview/:path',
+    path: '/preview/:category/:name',
     name: 'Preview',
     component: Preview,
   },

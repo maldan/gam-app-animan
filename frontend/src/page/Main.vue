@@ -166,12 +166,9 @@ export default defineComponent({
     const scene = new THREE.Scene();
     await this.$store.dispatch('scene/setScene', scene);
 
-    const mesh = new THREE.Mesh(
-      new THREE.PlaneGeometry(5, 5, 1, 1),
-      new THREE.MeshBasicMaterial({ side: THREE.DoubleSide, color: 0x2b2b2b }),
-    );
-    mesh.rotateX(THREE.MathUtils.degToRad(-90));
-    scene.add(mesh);
+    // Grid
+    const grid = 5;
+    scene.add(new THREE.GridHelper(grid, grid * 2));
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
