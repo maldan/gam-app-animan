@@ -1,3 +1,8 @@
+## [0.0.9] - 2022-02-25
+
+### Fixed
+-    Save and load animation
+
 ## [0.0.4] - 2021-05-12
 
 ### Fixed
