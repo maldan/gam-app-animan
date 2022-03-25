@@ -1,10 +1,13 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/maldan/gam-app-animan/internal/app/animan/core"
 	"github.com/maldan/go-cmhp/cmhp_data"
+	"github.com/maldan/go-cmhp/cmhp_file"
 	"github.com/maldan/go-rapi/rapi_core"
+	"strings"
 )
 
 type AnimationApi struct {
@@ -62,8 +65,10 @@ func WriteFrames(stream *cmhp_data.ByteArray, animation core.AnimationSequence) 
 	stream.WriteSection(core.ANIMATION_SECTION_MARKET, "FRAMES", frameSection)
 }
 
-func (r AnimationApi) GetIndex(path string) {
-	stream, err := cmhp_data.FromFile(path, true)
+func (r AnimationApi) GetIndex(args struct {
+	Name string `json:"name"`
+}) core.AnimationSequence {
+	stream, err := cmhp_data.FromFile(core.DataDir+"/animation/"+args.Name+".ka", true)
 	rapi_core.FatalIfError(err)
 
 	animation := core.AnimationSequence{}
@@ -97,41 +102,73 @@ func (r AnimationApi) GetIndex(path string) {
 
 					if keyType == 0 {
 						// Read position
-						x := stream.ReadFloat32()
-						y := stream.ReadFloat32()
-						z := stream.ReadFloat32()
+						x := section.ReadFloat32()
+						y := section.ReadFloat32()
+						z := section.ReadFloat32()
 						key.Position = core.Vector3{X: x, Y: y, Z: z}
 
 						// Read rotation
-						x = stream.ReadFloat32()
-						y = stream.ReadFloat32()
-						z = stream.ReadFloat32()
-						w := stream.ReadFloat32()
+						x = section.ReadFloat32()
+						y = section.ReadFloat32()
+						z = section.ReadFloat32()
+						w := section.ReadFloat32()
 						key.Rotation = core.Quaternion{X: x, Y: y, Z: z, W: w}
 
 						// Read scale
-						x = stream.ReadFloat32()
-						y = stream.ReadFloat32()
-						z = stream.ReadFloat32()
+						x = section.ReadFloat32()
+						y = section.ReadFloat32()
+						z = section.ReadFloat32()
 						key.Scale = core.Vector3{X: x, Y: y, Z: z}
 					}
 
 					// Set key
 					frame.Keys[keyName] = key
 				}
+
+				animation.Frames = append(animation.Frames, frame)
 			}
 
 			break
 		default:
 			fmt.Printf("Unknown section %v\n", sectionName)
+			rapi_core.Fatal(rapi_core.Error{Description: fmt.Sprintf("Unknown section %v\n", sectionName)})
+			break
+		}
+
+		if stream.IsEnd() {
 			break
 		}
 	}
+
+	return animation
 }
 
-func (r AnimationApi) PostIndex(animation core.AnimationSequence) {
-	stream := cmhp_data.Allocate(0, true)
+func (r AnimationApi) GetList() []string {
+	out := make([]string, 0)
+	fileList, err := cmhp_file.List(core.DataDir + "/animation")
+	rapi_core.FatalIfError(err)
 
+	for _, file := range fileList {
+		out = append(out, strings.Replace(file.Name(), ".ka", "", 1))
+	}
+
+	return out
+}
+
+func (r AnimationApi) PostIndex(args struct {
+	Name string `json:"name"`
+	Data string `json:"data"`
+}) {
+	animation := core.AnimationSequence{}
+	json.Unmarshal([]byte(args.Data), &animation)
+	// pp.Println(animation)
+
+	// Write animation data
+	stream := cmhp_data.Allocate(0, true)
 	WriteFileInfo(stream, animation)
 	WriteFrames(stream, animation)
+
+	// Animation
+	err := cmhp_file.Write(core.DataDir+"/animation/"+args.Name+".ka", stream.Data)
+	rapi_core.FatalIfError(err)
 }

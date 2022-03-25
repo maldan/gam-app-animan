@@ -2,7 +2,7 @@ import { ActionContext } from 'vuex';
 import { MainTree } from '.';
 import Axios from 'axios';
 import { IVirtualObject } from '@/Types';
-import { RepoActionContext } from '@/store/repo';
+import { Animation_Sequence } from '@/core/Animation_Sequence';
 
 export type SceneStore = {
   characterList: IVirtualObject[];
@@ -20,7 +20,7 @@ export default {
     },
   },
   actions: {
-    async getCharacterList(action: RepoActionContext): Promise<void> {
+    async getCharacterList(action: SceneActionContext): Promise<void> {
       let list = (
         await Axios.get(`${action.rootState.main.API_URL}/object/list?category=character`)
       ).data.response as IVirtualObject[];

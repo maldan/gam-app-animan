@@ -13,10 +13,30 @@ export class Animation_Sequence {
   public isLoop = true;
   public frames: Animation_Frame[] = [];
 
-  constructor(args: { frameCount: number }) {
-    this.frameCount = args.frameCount;
-    for (let i = 0; i < this.frameCount; i++) {
-      this.frames.push(new Animation_Frame());
+  constructor(args: {
+    frameCount?: number;
+    fps?: number;
+    frames?: { keys: Record<string, any> }[];
+  }) {
+    this.frameCount = args.frameCount || 48;
+    this.fps = args.fps || 24;
+
+    if (args.frames) {
+      const allKeys = {} as Record<string, unknown>;
+      for (let i = 0; i < this.frameCount; i++) {
+        this.frames.push(new Animation_Frame(args.frames[i].keys));
+
+        for (const xx in args.frames[i].keys) {
+          allKeys[xx] = 1;
+        }
+      }
+
+      // Key
+      for (const key in allKeys) this.interpolateKey(key);
+    } else {
+      for (let i = 0; i < this.frameCount; i++) {
+        this.frames.push(new Animation_Frame());
+      }
     }
   }
 
@@ -166,5 +186,14 @@ export class Animation_Sequence {
     if (value > this.frameCount - 1) value = 0;
     this._frameId = value;
     this.emit('change', value);
+  }
+
+  public toJSON(): unknown {
+    return {
+      version: 1,
+      frameCount: this.frameCount,
+      fps: this.fps,
+      frames: this.frames,
+    };
   }
 }

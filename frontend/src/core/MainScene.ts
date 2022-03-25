@@ -45,6 +45,17 @@ export class MainScene {
     }, 16);
   }
 
+  public static removeObject(obj: THREE.Object3D | undefined): void {
+    if (obj) this.scene.remove(obj);
+
+    this.selectedObject = undefined;
+
+    setTimeout(() => {
+      this.ui.main.refresh();
+      this.ui.timeline.refresh();
+    }, 16);
+  }
+
   public static selectObject(obj: THREE.Object3D | undefined): void {
     const previousSelected = this.selectedObject;
 
@@ -96,10 +107,10 @@ export class MainScene {
         this.addToScene(object);
       },
       (xhr) => {
-        console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
+        // console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
       },
       (error) => {
-        console.log(error);
+        // console.log(error);
       },
     );
   }

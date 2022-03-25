@@ -8,6 +8,7 @@
       @click="selectObject(x.uuid)"
     >
       {{ x.type }} {{ x.name }}
+      <ui-icon @click.stop="removeObject(x.uuid)" :class="$style.remove" name="trash" />
     </div>
   </div>
 </template>
@@ -44,6 +45,10 @@ export default defineComponent({
     isSelected(uuid: string): boolean {
       return MainScene.selectedObject?.uuid === uuid;
     },
+    removeObject(uuid: string) {
+      MainScene.removeObject(MainScene.scene.children.find((x) => x.uuid === uuid));
+      this.refresh();
+    },
     selectObject(uuid: string) {
       MainScene.selectObject(MainScene.scene.children.find((x) => x.uuid === uuid));
       this.refresh();
@@ -69,6 +74,12 @@ export default defineComponent({
     color: #999999;
     padding: 5px;
     margin-bottom: 1px;
+    display: flex;
+    align-items: center;
+
+    .remove {
+      margin-left: auto;
+    }
 
     &.selected {
       background: #33a833;

@@ -37,6 +37,10 @@ export class Animation_Character {
       // Skip anything except bone
       if (object.type !== 'Bone') return;
 
+      if (object.name.match(/([LR])$/)) {
+        object.name = object.name.replace(/(.*?)([LR])$/, '$1.$2');
+      }
+
       // Save bone
       if (this._boneList[object.name]) return;
       this._boneList[object.name] = object as THREE.Bone;
