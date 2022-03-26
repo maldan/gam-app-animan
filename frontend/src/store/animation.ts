@@ -39,6 +39,7 @@ export default {
           frames: animation.frames,
         });
         MainScene.ui.timeline.refresh();
+        MainScene.ui.main.refresh();
       }
     },
     async save(action: SceneActionContext, payload: { name: string; data: string }): Promise<void> {

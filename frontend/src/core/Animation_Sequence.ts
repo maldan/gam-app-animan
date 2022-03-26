@@ -177,6 +177,18 @@ export class Animation_Sequence {
     }
   }
 
+  public resize(value: number): void {
+    this.frames.length = value;
+    this.frameCount = value;
+    for (let i = 0; i < value; i++) {
+      if (!this.frames[i]) this.frames[i] = new Animation_Frame();
+    }
+  }
+
+  public get currentFrame(): Animation_Frame {
+    return this.frames[this._frameId];
+  }
+
   public get frameId(): number {
     return this._frameId;
   }

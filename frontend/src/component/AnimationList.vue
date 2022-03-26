@@ -46,6 +46,7 @@ export default defineComponent({
           frameCount: 48,
         });
         MainScene.ui.timeline.refresh();
+        MainScene.ui.main.refresh();
         this.isNewAnimation = true;
       }
     },

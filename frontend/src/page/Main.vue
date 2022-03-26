@@ -45,13 +45,13 @@
       :initData="{ x: 60, y: 75, width: 15, height: 20 }"
     >
       <template v-slot:body>
-        <blendshape />
+        <blend-shape />
       </template>
     </ui-window>
 
     <!-- Timeline -->
     <ui-window
-      v-if="isCharacterSelected()"
+      v-if="isCharacterSelected() && hasAnimation()"
       title="Timeline"
       :initData="{ x: 5, y: 75, width: 50, height: 20 }"
     >
@@ -262,6 +262,7 @@ export default defineComponent({
         character.setCurrentKey(rig.bone.name);
         character.animation?.interpolateKey(rig.bone.name);
         character.tick();
+        MainScene.ui.timeline.refresh();
       }
     });
     scene.add(DataStorage.manipulator);
@@ -279,6 +280,13 @@ export default defineComponent({
     isCharacterSelected() {
       if (this.r < 0) return;
       return MainScene.selectedObject?.userData.tag === 'Character';
+    },
+    hasAnimation() {
+      if (this.r < 0) return;
+      return (
+        MainScene.selectedObject?.userData.tag === 'Character' &&
+        MainScene.selectedObject?.userData.class.animation
+      );
     },
     toggleAnimation() {
       this.isPlayAnimation = !this.isPlayAnimation;
