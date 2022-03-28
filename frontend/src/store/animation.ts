@@ -45,5 +45,11 @@ export default {
     async save(action: SceneActionContext, payload: { name: string; data: string }): Promise<void> {
       await Axios.post(`${action.rootState.main.API_URL}/animation`, payload);
     },
+    async savePose(
+      action: SceneActionContext,
+      payload: { name: string; data: string },
+    ): Promise<void> {
+      await Axios.post(`${action.rootState.main.API_URL}/animation/pose`, payload);
+    },
   },
 };

@@ -21,20 +21,31 @@
     </ui-window>
 
     <!-- Character list -->
-    <ui-window title="Character list" :initData="{ x: 80, y: 5, width: 15, height: 20 }">
+    <ui-window title="Character list" :initData="{ x: 80, y: 2, width: 15, height: 20 }">
       <template v-slot:body>
         <character-list />
       </template>
     </ui-window>
 
-    <!-- Bone list -->
+    <!-- Rig list -->
     <ui-window
       v-if="isCharacterSelected()"
       title="Rig list"
-      :initData="{ x: 80, y: 35, width: 15, height: 40 }"
+      :initData="{ x: 80, y: 25, width: 15, height: 30 }"
     >
       <template v-slot:body>
         <rig-list />
+      </template>
+    </ui-window>
+
+    <!-- Pose list -->
+    <ui-window
+      v-if="isCharacterSelected()"
+      title="Pose list"
+      :initData="{ x: 80, y: 60, width: 15, height: 30 }"
+    >
+      <template v-slot:body>
+        <pose-list />
       </template>
     </ui-window>
 
@@ -167,7 +178,7 @@ export default defineComponent({
 
     // Grid
     const grid = 5;
-    scene.add(new THREE.GridHelper(grid, grid * 2));
+    scene.add(new THREE.GridHelper(grid, grid * 2, 0x999999, 0x666666));
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);

@@ -57,7 +57,7 @@ func WriteFrames(stream *cmhp_data.ByteArray, animation core.AnimationSequence) 
 			}
 
 			// Blend shape key
-			if keyValue.Type == 0 {
+			if keyValue.Type == 1 {
 				frameSection.WriteFloat32(keyValue.Value)
 			}
 		}
@@ -65,9 +65,7 @@ func WriteFrames(stream *cmhp_data.ByteArray, animation core.AnimationSequence) 
 	stream.WriteSection(core.ANIMATION_SECTION_MARKET, "FRAMES", frameSection)
 }
 
-func (r AnimationApi) GetIndex(args struct {
-	Name string `json:"name"`
-}) core.AnimationSequence {
+func (r AnimationApi) GetIndex(args ArgsAnimationName) core.AnimationSequence {
 	stream, err := cmhp_data.FromFile(core.DataDir+"/animation/"+args.Name+".ka", true)
 	rapi_core.FatalIfError(err)
 
@@ -119,6 +117,10 @@ func (r AnimationApi) GetIndex(args struct {
 						y = section.ReadFloat32()
 						z = section.ReadFloat32()
 						key.Scale = core.Vector3{X: x, Y: y, Z: z}
+					}
+
+					if keyType == 1 {
+						key.Value = section.ReadFloat32()
 					}
 
 					// Set key

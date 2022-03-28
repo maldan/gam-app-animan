@@ -5,6 +5,7 @@ import main, { MainStore } from './main';
 import scene, { SceneStore } from './scene';
 import repo, { RepoStore } from './repo';
 import animation, { AnimationStore } from './animation';
+import pose, { PoseStore } from './pose';
 
 export type MainTree = {
   main: MainStore;
@@ -12,8 +13,9 @@ export type MainTree = {
   scene: SceneStore;
   repo: RepoStore;
   animation: AnimationStore;
+  pose: PoseStore;
 };
 
 export default createStore({
-  modules: { main, modal, scene, repo, animation },
+  modules: { main, modal, scene, repo, animation, pose },
 });

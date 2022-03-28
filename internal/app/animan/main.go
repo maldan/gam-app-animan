@@ -41,6 +41,11 @@ func Start(frontFs embed.FS) {
 	// Set
 	core.DataDir = *dataDir
 
+	// Test
+	/*aa := api.AnimationApi{}.GetIndex(api.ArgsAnimationName{Name: "na"})
+	cmhp_print.Print(aa)
+	os.Exit(0)*/
+
 	// Start server
 	rapi.Start(rapi.Config{
 		Host: fmt.Sprintf("%s:%d", *host, *port),
@@ -54,6 +59,7 @@ func Start(frontFs embed.FS) {
 					"main":      api.MainApi{},
 					"animation": api.AnimationApi{},
 					"object":    api.ObjectApi{},
+					"pose":      api.PoseApi{},
 				},
 			},
 			"/data": rapi_file.FileHandler{
