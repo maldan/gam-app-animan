@@ -2,6 +2,7 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import { Animation_Character } from '@/core/Animation_Character';
 import * as THREE from 'three';
 import { DataStorage } from '@/core/DataStorage';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 export class UI {
   public scene = {
@@ -28,6 +29,12 @@ export class UI {
       this.ref?.refresh();
     },
   };
+  public blendShape = {
+    ref: undefined as any,
+    refresh(): void {
+      this.ref?.refresh();
+    },
+  };
 }
 
 export class MainScene {
@@ -35,6 +42,7 @@ export class MainScene {
   public static selectedObject?: THREE.Object3D;
   public static ui: UI = new UI();
   public static timelineTimer = 0;
+  public static isPlayAnimation = false;
 
   public static init(): void {}
 
@@ -77,11 +85,45 @@ export class MainScene {
     setTimeout(() => {
       this.ui.main.refresh();
       this.ui.timeline.refresh();
+      this.ui.blendShape.refresh();
     }, 16);
   }
 
   public static loadCharacter(path: string): void {
-    const fbxLoader = new FBXLoader();
+    // Instantiate a loader
+    const loader = new GLTFLoader();
+
+    loader.load(
+      path,
+
+      (gltf) => {
+        const object = gltf.scene.children[0] as THREE.Object3D;
+
+        object.traverse(function (child) {
+          if ((child as THREE.Mesh).isMesh) {
+            if ((child as THREE.Mesh).material) {
+              ((child as THREE.Mesh).material as THREE.MeshPhongMaterial).shininess = 2;
+              ((child as THREE.Mesh).material as THREE.MeshPhongMaterial).reflectivity = 0.1;
+              // ((child as THREE.Mesh).material as THREE.MeshPhongMaterial).wireframe = true;
+            }
+          }
+        });
+
+        const characterName = path.split('/').pop()?.replace('.glb', '') || 'Unknown';
+
+        const ch = new Animation_Character();
+        ch.init(characterName, object, this.scene);
+
+        object.userData.tag = 'Character';
+        object.userData.class = ch;
+        object.name = characterName;
+        console.log(object);
+        this.addToScene(object);
+      },
+      (xhr) => {},
+      (error) => {},
+    );
+    /*const fbxLoader = new FBXLoader();
     fbxLoader.load(
       path,
       (object) => {
@@ -112,6 +154,6 @@ export class MainScene {
       (error) => {
         // console.log(error);
       },
-    );
+    );*/
   }
 }

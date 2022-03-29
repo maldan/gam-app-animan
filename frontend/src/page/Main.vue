@@ -6,7 +6,7 @@
     <ui-window
       v-if="isCharacterSelected()"
       title="Animation list"
-      :initData="{ x: 5, y: 5, width: 15, height: 20 }"
+      :initData="{ x: 2, y: 5, width: 15, height: 20 }"
     >
       <template v-slot:body>
         <animation-list />
@@ -14,14 +14,14 @@
     </ui-window>
 
     <!-- Scene -->
-    <ui-window title="Scene Hierarchy" :initData="{ x: 5, y: 30, width: 15, height: 20 }">
+    <ui-window title="Scene Hierarchy" :initData="{ x: 2, y: 30, width: 15, height: 20 }">
       <template v-slot:body>
         <scene />
       </template>
     </ui-window>
 
     <!-- Character list -->
-    <ui-window title="Character list" :initData="{ x: 80, y: 2, width: 15, height: 20 }">
+    <ui-window title="Character list" :initData="{ x: 80, y: 5, width: 18, height: 20 }">
       <template v-slot:body>
         <character-list />
       </template>
@@ -31,7 +31,7 @@
     <ui-window
       v-if="isCharacterSelected()"
       title="Rig list"
-      :initData="{ x: 80, y: 25, width: 15, height: 30 }"
+      :initData="{ x: 80, y: 28, width: 18, height: 30 }"
     >
       <template v-slot:body>
         <rig-list />
@@ -42,7 +42,7 @@
     <ui-window
       v-if="isCharacterSelected()"
       title="Pose list"
-      :initData="{ x: 80, y: 60, width: 15, height: 30 }"
+      :initData="{ x: 80, y: 61, width: 18, height: 30 }"
     >
       <template v-slot:body>
         <pose-list />
@@ -64,11 +64,11 @@
     <ui-window
       v-if="isCharacterSelected() && hasAnimation()"
       title="Timeline"
-      :initData="{ x: 5, y: 75, width: 50, height: 20 }"
+      :initData="{ x: 2, y: 75, width: 50, height: 20 }"
     >
       <template v-slot:header>
         <div>Timeline</div>
-        <ui-button
+        <!-- <ui-button
           @click="toggleAnimation()"
           :text="isPlayAnimation ? 'Stop' : 'Play'"
           style="flex: none; padding: 5px; margin-left: 5px"
@@ -79,7 +79,7 @@
           @click="$refs['timeline'].setLayers(l)"
           :text="l"
           style="flex: none; padding: 5px; margin-left: 5px"
-        />
+        /> -->
       </template>
       <template v-slot:body>
         <timeline ref="timeline" />
@@ -128,6 +128,7 @@ export default defineComponent({
     document.addEventListener('keydown', (e: KeyboardEvent) => {
       if (e.key === 'r') DataStorage.manipulator.mode = 'rotate';
       if (e.key === 'g') DataStorage.manipulator.mode = 'translate';
+      if (e.key === 's') DataStorage.manipulator.mode = 'scale';
     });
 
     let prevTime = 0;
@@ -136,7 +137,7 @@ export default defineComponent({
       MainScene.timelineTimer += deltaTime;
 
       if (MainScene.selectedObject?.userData.tag === 'Character') {
-        if (MainScene.selectedObject?.userData.class.animation && this.isPlayAnimation) {
+        if (MainScene.selectedObject?.userData.class.animation && MainScene.isPlayAnimation) {
           MainScene.selectedObject?.userData.class.animation.tick();
         }
       }
@@ -221,8 +222,9 @@ export default defineComponent({
       DataStorage.isLockManipulator = true;
       DataStorage.manipulatorStartPosition = DataStorage.selectedObject.position.clone();
       DataStorage.manipulatorStartRotation = DataStorage.selectedObject.quaternion.clone();
+      DataStorage.manipulatorStartScale = DataStorage.selectedObject.scale.clone();
     });
-    DataStorage.manipulator.addEventListener('mouseUp', (e: any) => {
+    DataStorage.manipulator.addEventListener('mouseUp', () => {
       if (!DataStorage.selectedObject) return;
       DataStorage.isLockManipulator = false;
 
@@ -247,8 +249,19 @@ export default defineComponent({
 
         rig.positionOffset.add(dir.multiplyScalar(distance));*/
 
-        const diff = DataStorage.selectedObject.worldToLocal(DataStorage.manipulatorStartPosition);
-        rig.positionOffset.add(diff.multiplyScalar(-1));
+        if (DataStorage.manipulator.mode === 'translate') {
+          const diff = DataStorage.selectedObject.worldToLocal(
+            DataStorage.manipulatorStartPosition,
+          );
+          rig.positionOffset.add(diff.multiplyScalar(-1));
+        }
+
+        if (DataStorage.manipulator.mode === 'scale') {
+          const diff = DataStorage.selectedObject.scale
+            .clone()
+            .sub(DataStorage.manipulatorStartScale);
+          rig.scaleOffset.add(diff);
+        }
 
         /*const moveDiff = DataStorage.manipulatorStartPosition
           .clone()
@@ -264,22 +277,27 @@ export default defineComponent({
 
         rig.positionOffset.add(dir.multiplyScalar(distance * -1));*/
 
-        const rotDiff = DataStorage.manipulatorStartRotation
-          .clone()
-          .invert()
-          .multiply(DataStorage.selectedObject.quaternion);
-        rig.rotationOffset.multiply(rotDiff);
+        if (DataStorage.manipulator.mode === 'rotate') {
+          const rotDiff = DataStorage.manipulatorStartRotation
+            .clone()
+            .invert()
+            .multiply(DataStorage.selectedObject.quaternion);
+          rig.rotationOffset.multiply(rotDiff);
+        }
 
         character.setCurrentKey(rig.bone.name);
         character.animation?.interpolateKey(rig.bone.name);
         character.tick();
         MainScene.ui.timeline.refresh();
+        MainScene.ui.rig.refresh();
       }
     });
     scene.add(DataStorage.manipulator);
 
     const stats = Stats();
-    document.body.appendChild(stats.dom);
+    // document.body.appendChild(stats.dom);
+
+    renderer.outputEncoding = THREE.sRGBEncoding;
 
     MainScene.scene = scene;
     MainScene.ui.main.ref = this;
@@ -300,7 +318,7 @@ export default defineComponent({
       );
     },
     toggleAnimation() {
-      this.isPlayAnimation = !this.isPlayAnimation;
+      //this.isPlayAnimation = !this.isPlayAnimation;
       MainScene.timelineTimer = 0;
     },
   },
@@ -308,8 +326,7 @@ export default defineComponent({
     return {
       movement: { x: 0, y: 0, z: 0 },
       r: 0,
-      isPlayAnimation: false,
-      timelineLayers: ['All', 'Body', 'Hand', 'Head'],
+      // isPlayAnimation: false,
     };
   },
 });
@@ -317,5 +334,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .main {
+  // position: relative;
 }
 </style>

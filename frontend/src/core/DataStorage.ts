@@ -8,6 +8,7 @@ export class DataStorage {
 
   public static manipulatorStartPosition: THREE.Vector3;
   public static manipulatorStartRotation: THREE.Quaternion;
+  public static manipulatorStartScale: THREE.Vector3;
 
   public static isLockManipulator = false;
 

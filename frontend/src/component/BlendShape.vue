@@ -2,7 +2,7 @@
   <div :class="$style.blendShape">
     <div :class="$style.shape" v-for="(x, i) in blendShapeNameList" :key="x">
       <div>{{ x }}</div>
-      <ui-slider :class="$style.input" v-model="blendShapeValueList[i]" />
+      <ui-slider :class="$style.input" v-model="shapeList[i]" @change="changeShape(x, i, $event)" />
     </div>
   </div>
 </template>
@@ -16,6 +16,11 @@ export default defineComponent({
   props: {},
   components: {},
   computed: {
+    character(): Animation_Character {
+      // @ts-ignore
+      if (this.r < 0) return undefined;
+      return MainScene.selectedObject?.userData?.class;
+    },
     blendShapeNameList() {
       if (!MainScene.selectedObject) return [];
       const ch = MainScene.selectedObject.userData.class as Animation_Character;
@@ -27,10 +32,29 @@ export default defineComponent({
       return ch.blendShapeValueList || [];
     },
   },
-  async mounted() {},
-  methods: {},
+  async mounted() {
+    MainScene.ui.blendShape.ref = this;
+  },
+  methods: {
+    changeShape(name: string, index: number, value: number) {
+      this.character.setCurrentShapeKey(name, value);
+      this.character.tick();
+      this.blendShapeValueList[index] = value;
+      MainScene.ui.timeline.refresh();
+    },
+    refresh() {
+      this.r = Math.random();
+
+      for (let i = 0; i < this.blendShapeValueList.length; i++) {
+        this.shapeList[i] = this.blendShapeValueList[i];
+      }
+    },
+  },
   data: () => {
-    return {};
+    return {
+      r: 0,
+      shapeList: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] as number[],
+    };
   },
 });
 </script>

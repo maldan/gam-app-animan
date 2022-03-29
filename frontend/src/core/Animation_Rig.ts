@@ -8,6 +8,7 @@ export class Animation_Rig {
   public boneStartRotation: THREE.Quaternion = new THREE.Quaternion();
   public positionOffset: THREE.Vector3 = new THREE.Vector3();
   public rotationOffset: THREE.Quaternion = new THREE.Quaternion();
+  public scaleOffset: THREE.Vector3 = new THREE.Vector3();
 
   constructor(bone: THREE.Bone, helper: THREE.Object3D) {
     this.bone = bone;

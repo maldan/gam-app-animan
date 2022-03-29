@@ -44,21 +44,35 @@ export class Animation_Sequence {
     if (!this.frames[this._frameId]) return;
 
     for (const key in this.frames[this._frameId].keys) {
-      const value = this.frames[this._frameId].keys[key];
+      const currentKey = this.frames[this._frameId].keys[key];
 
-      if (ch.rig[key]) {
-        ch.rig[key].positionOffset = new THREE.Vector3(
-          value.position.x,
-          value.position.y,
-          value.position.z,
-        );
+      // Bone key
+      if (currentKey.type === 0) {
+        if (ch.rig[key]) {
+          ch.rig[key].positionOffset = new THREE.Vector3(
+            currentKey.position.x,
+            currentKey.position.y,
+            currentKey.position.z,
+          );
 
-        ch.rig[key].rotationOffset = new THREE.Quaternion(
-          value.rotation.x,
-          value.rotation.y,
-          value.rotation.z,
-          value.rotation.w,
-        );
+          ch.rig[key].rotationOffset = new THREE.Quaternion(
+            currentKey.rotation.x,
+            currentKey.rotation.y,
+            currentKey.rotation.z,
+            currentKey.rotation.w,
+          );
+
+          ch.rig[key].scaleOffset = new THREE.Vector3(
+            currentKey.scale.x,
+            currentKey.scale.y,
+            currentKey.scale.z,
+          );
+        }
+      }
+
+      // Shape key
+      if (currentKey.type === 1) {
+        ch.setBlendShape(key, currentKey.value);
       }
     }
 
@@ -131,8 +145,25 @@ export class Animation_Sequence {
         (i + 1) * stepSize,
       );
 
-      /*Quaternion.Lerp(Frames[fromId].Keys[keyName].Rotation,
-        Frames[toId].Keys[keyName].Rotation, (i + 1) * stepSize);*/
+      // Lerp scale
+      this.frames[fromId + i + 1].keys[keyName].scale = new THREE.Vector3(
+        this.frames[fromId].keys[keyName].scale.x,
+        this.frames[fromId].keys[keyName].scale.y,
+        this.frames[fromId].keys[keyName].scale.z,
+      ).lerp(
+        new THREE.Vector3(
+          this.frames[toId].keys[keyName].scale.x,
+          this.frames[toId].keys[keyName].scale.y,
+          this.frames[toId].keys[keyName].scale.z,
+        ),
+        (i + 1) * stepSize,
+      );
+
+      // Lerp value
+      this.frames[fromId + i + 1].keys[keyName].value =
+        this.frames[fromId].keys[keyName].value +
+        (this.frames[toId].keys[keyName].value - this.frames[fromId].keys[keyName].value) *
+          ((i + 1) * stepSize);
     }
   }
 

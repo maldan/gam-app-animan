@@ -1,4 +1,5 @@
 <template>
+  <ui-header :items="menu" style="position: relative; z-index: 2" />
   <router-view />
   <ui-modal-view />
 </template>
@@ -15,6 +16,10 @@ export default defineComponent({
       // @ts-ignore
       API_URL: process.env.VUE_APP_API_URL || `${window.location.origin}/api`,
       console: console,
+      menu: [
+        { name: 'Animation', url: '/' },
+        { name: 'Repo', url: '/repo' },
+      ],
     };
   },
 });

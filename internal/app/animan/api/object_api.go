@@ -34,7 +34,7 @@ func (r ObjectApi) GetList(args struct {
 		list = append(list, core.VirtualObject{
 			Name:        file.Name(),
 			Category:    args.Category,
-			ModelPath:   "data/object/" + args.Category + "/" + file.Name() + "/model.fbx",
+			ModelPath:   "data/object/" + args.Category + "/" + file.Name() + "/model.glb",
 			PreviewPath: previewPath,
 		})
 	}
@@ -59,6 +59,6 @@ func (r ObjectApi) PutIndex(args struct {
 	if args.Name == "" {
 		rapi_core.Fatal(rapi_core.Error{Description: "Incorrect Name"})
 	}
-	err := cmhp_file.Write(fmt.Sprintf("%v/object/%v/%v/model.fbx", core.DataDir, args.Type, args.Name), args.Model.Data)
+	err := cmhp_file.Write(fmt.Sprintf("%v/object/%v/%v/model.glb", core.DataDir, args.Type, args.Name), args.Model.Data)
 	rapi_core.FatalIfError(err)
 }

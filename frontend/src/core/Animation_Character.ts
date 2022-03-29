@@ -17,12 +17,12 @@ export class Animation_Character {
   private _scene!: THREE.Scene;
   private _obj!: THREE.Object3D;
 
-  public init(name: string, obj: THREE.Group, scene: THREE.Scene): void {
+  public init(name: string, obj: THREE.Object3D, scene: THREE.Scene): void {
     this.name = name;
     this._scene = scene;
     this._obj = obj;
     obj.children.forEach((value, index) => {
-      if (value.name === 'Skeleton') this.prepareSkeleton(value as THREE.Group);
+      if (value.type === 'Bone') this.prepareSkeleton(value as THREE.Object3D);
       if (value.name === 'Character_Body_Futa') value.visible = false;
       if (value.name === 'Character_Head') {
         const sm = value as THREE.SkinnedMesh;
@@ -32,7 +32,7 @@ export class Animation_Character {
     });
   }
 
-  private prepareSkeleton(skeleton: THREE.Group) {
+  private prepareSkeleton(skeleton: THREE.Object3D) {
     skeleton.traverse((object) => {
       // Skip anything except bone
       if (object.type !== 'Bone') return;
@@ -57,7 +57,7 @@ export class Animation_Character {
         size = 0.007;
 
       const boneHelper = new THREE.Mesh(
-        new THREE.BoxGeometry(size, size, size * 2),
+        new THREE.BoxGeometry(size, size * 2, size),
         new THREE.MeshBasicMaterial({
           color: 0xfefefe,
           depthTest: false,
@@ -83,6 +83,16 @@ export class Animation_Character {
     this.tick();
   }
 
+  public setCurrentShapeKey(keyName: string, value: number): void {
+    if (!this.animation) return;
+    const key = new Animation_Key();
+    key.type = 1;
+    key.value = value;
+
+    this.animation.setKey(this.animation.frameId, keyName, key);
+    this.animation.interpolateKey(keyName);
+  }
+
   public setCurrentKey(keyName: string): void {
     if (!this.animation) return;
 
@@ -97,6 +107,11 @@ export class Animation_Character {
       y: this._rigDict[keyName].rotationOffset.y,
       z: this._rigDict[keyName].rotationOffset.z,
       w: this._rigDict[keyName].rotationOffset.w,
+    };
+    key.scale = {
+      x: this._rigDict[keyName].scaleOffset.x,
+      y: this._rigDict[keyName].scaleOffset.y,
+      z: this._rigDict[keyName].scaleOffset.z,
     };
     this.animation.setKey(this.animation.frameId, keyName, key);
     this.animation.interpolateKey(keyName);
@@ -113,6 +128,12 @@ export class Animation_Character {
         newRotation.y,
         newRotation.z,
         newRotation.w,
+      );
+
+      this._boneList[rig.bone.name].scale.set(
+        1 + rig.scaleOffset.x,
+        1 + rig.scaleOffset.y,
+        1 + rig.scaleOffset.z,
       );
 
       rig.tick();
@@ -132,13 +153,24 @@ export class Animation_Character {
   }
 
   public setKeysVisibility(keys: string[]): void {
-    this._rigList.forEach((rig) => {
-      rig.boneHelper.visible = false;
-    });
+    if (keys.length === 0) {
+      this._rigList.forEach((rig) => {
+        rig.boneHelper.visible = true;
+      });
+    } else {
+      this._rigList.forEach((rig) => {
+        rig.boneHelper.visible = false;
+      });
+      this._rigList.forEach((rig) => {
+        rig.boneHelper.visible = keys.includes(rig.bone.name);
+      });
+    }
+  }
 
-    this._rigList.forEach((rig) => {
-      rig.boneHelper.visible = keys.includes(rig.bone.name);
-    });
+  public setBlendShape(name: string, value: number): void {
+    const index = this._shapeKeysName.indexOf(name);
+    if (index === -1) return;
+    this._shapeKeysValue[index] = value;
   }
 
   public get blendShapeNameList(): string[] {
@@ -167,6 +199,8 @@ export class Animation_Character {
       this._animation.on('change', () => {
         this._animation?.apply(this);
         MainScene.ui.timeline.refresh();
+        MainScene.ui.rig.refresh();
+        MainScene.ui.blendShape.refresh();
       });
   }
 }
