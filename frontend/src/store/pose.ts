@@ -3,7 +3,7 @@ import { MainTree } from '.';
 import Axios from 'axios';
 import { SceneActionContext } from '@/store/scene';
 import { MainScene } from '@/core/MainScene';
-import { Animation_Sequence } from '@/core/Animation_Sequence';
+import { Animation_Sequence } from '@/core/animation/Animation_Sequence';
 import { Animation_Character } from '@/core/Animation_Character';
 
 export type PoseStore = {

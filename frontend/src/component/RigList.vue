@@ -21,7 +21,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import * as THREE from 'three';
-import { Animation_Rig } from '@/core/Animation_Rig';
+import { Animation_Rig } from '@/core/animation/Animation_Rig';
 import { Animation_Character } from '@/core/Animation_Character';
 import { MainScene } from '@/core/MainScene';
 

@@ -1,36 +1,25 @@
 import { ActionContext } from 'vuex';
 import { MainTree } from '.';
-import Axios from 'axios';
-import { IVirtualObject } from '@/Types';
-import { Animation_Sequence } from '@/core/Animation_Sequence';
+import { AM_Object } from '@/core/am/AM_Object';
 
 export type SceneStore = {
-  characterList: IVirtualObject[];
+  objectList: AM_Object[];
 };
 export type SceneActionContext = ActionContext<SceneStore, MainTree>;
 
 export default {
   namespaced: true,
   state: {
-    characterList: [],
+    objectList: [],
   },
   mutations: {
-    SET_CHARACTER_LIST(state: SceneStore, list: IVirtualObject[]): void {
-      state.characterList = list;
+    ADD_OBJECT(state: SceneStore, obj: AM_Object): void {
+      state.objectList.push(obj);
     },
   },
   actions: {
-    async getCharacterList(action: SceneActionContext): Promise<void> {
-      let list = (
-        await Axios.get(`${action.rootState.main.API_URL}/object/list?category=character`)
-      ).data.response as IVirtualObject[];
-
-      list = list.map((x) => {
-        x.modelPath = `${action.rootState.main.ROOT_URL}/` + x.modelPath;
-        if (x.previewPath) x.previewPath = `${action.rootState.main.ROOT_URL}/` + x.previewPath;
-        return x;
-      });
-      action.commit('SET_CHARACTER_LIST', list);
+    addObject(action: SceneActionContext, obj: AM_Object): void {
+      action.commit('ADD_OBJECT', obj);
     },
   },
 };

@@ -19,7 +19,7 @@ export default defineComponent({
       renderer.setClearColor(0x333333);
       renderer.render(scene, camera);
       controls.update();
-      stats.update();
+      // stats.update();
     };
 
     // init
@@ -69,8 +69,8 @@ export default defineComponent({
     };
     controls.autoRotate = false;
 
-    const stats = Stats();
-    (this.$refs['stat'] as HTMLElement).appendChild(stats.dom);
+    //const stats = Stats();
+    //(this.$refs['stat'] as HTMLElement).appendChild(stats.dom);
 
     MainScene.scene = scene;
     MainScene.ui.main.ref = this;

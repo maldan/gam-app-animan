@@ -95,7 +95,6 @@ export class MainScene {
 
     loader.load(
       path,
-
       (gltf) => {
         const object = gltf.scene.children[0] as THREE.Object3D;
 
@@ -108,7 +107,6 @@ export class MainScene {
             }
           }
         });
-
         const characterName = path.split('/').pop()?.replace('.glb', '') || 'Unknown';
 
         const ch = new Animation_Character();
@@ -117,43 +115,10 @@ export class MainScene {
         object.userData.tag = 'Character';
         object.userData.class = ch;
         object.name = characterName;
-        console.log(object);
         this.addToScene(object);
       },
       (xhr) => {},
       (error) => {},
     );
-    /*const fbxLoader = new FBXLoader();
-    fbxLoader.load(
-      path,
-      (object) => {
-        object.traverse(function (child) {
-          if ((child as THREE.Mesh).isMesh) {
-            if ((child as THREE.Mesh).material) {
-              ((child as THREE.Mesh).material as THREE.MeshPhongMaterial).shininess = 2;
-              ((child as THREE.Mesh).material as THREE.MeshPhongMaterial).reflectivity = 0.1;
-              // ((child as THREE.Mesh).material as THREE.MeshPhongMaterial).wireframe = true;
-            }
-          }
-        });
-
-        const characterName = path.split('/').pop()?.replace('.fbx', '') || 'Unknown';
-
-        const ch = new Animation_Character();
-        ch.init(characterName, object, this.scene);
-
-        object.userData.tag = 'Character';
-        object.userData.class = ch;
-        object.name = characterName;
-
-        this.addToScene(object);
-      },
-      (xhr) => {
-        // console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
-      },
-      (error) => {
-        // console.log(error);
-      },
-    );*/
   }
 }

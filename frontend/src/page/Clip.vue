@@ -2,14 +2,10 @@
   <div class="main">
     <div id="sus"></div>
 
-    <!-- Animation list -->
-    <ui-window
-      v-if="isCharacterSelected()"
-      title="Animation list"
-      :initData="{ x: 2, y: 5, width: 15, height: 20 }"
-    >
+    <!-- Clip list -->
+    <ui-window title="Clip list" :initData="{ x: 2, y: 5, width: 15, height: 20 }">
       <template v-slot:body>
-        <animation-list />
+        <clip-list />
       </template>
     </ui-window>
 
@@ -61,26 +57,7 @@
     </ui-window>
 
     <!-- Timeline -->
-    <ui-window
-      v-if="isCharacterSelected() && hasAnimation()"
-      title="Timeline"
-      :initData="{ x: 2, y: 75, width: 50, height: 20 }"
-    >
-      <template v-slot:header>
-        <div>Timeline</div>
-        <!-- <ui-button
-          @click="toggleAnimation()"
-          :text="isPlayAnimation ? 'Stop' : 'Play'"
-          style="flex: none; padding: 5px; margin-left: 5px"
-        />
-        <ui-button
-          v-for="l in timelineLayers"
-          :key="l"
-          @click="$refs['timeline'].setLayers(l)"
-          :text="l"
-          style="flex: none; padding: 5px; margin-left: 5px"
-        /> -->
-      </template>
+    <ui-window title="Timeline" :initData="{ x: 2, y: 75, width: 50, height: 20 }">
       <template v-slot:body>
         <timeline ref="timeline" />
       </template>
@@ -95,7 +72,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import { DataStorage } from '@/core/DataStorage';
-import { Animation_Rig } from '@/core/Animation_Rig';
+import { Animation_Rig } from '@/core/animation/Animation_Rig';
 import { Animation_Character } from '@/core/Animation_Character';
 import { MainScene } from '@/core/MainScene';
 
@@ -179,7 +156,7 @@ export default defineComponent({
 
     // Grid
     const grid = 5;
-    scene.add(new THREE.GridHelper(grid, grid * 2, 0x999999, 0x666666));
+    scene.add(new THREE.GridHelper(grid, grid * 2, 0x666666, 0x222222));
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);

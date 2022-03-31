@@ -1,4 +1,4 @@
-import { Animation_Key } from '@/core/Animation_Key';
+import { Animation_Key } from '@/core/animation/Animation_Key';
 
 export class Animation_Frame {
   public keys: Record<string, Animation_Key> = {};

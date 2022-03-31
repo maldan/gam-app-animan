@@ -21,7 +21,7 @@ export default defineComponent({
   props: {},
   components: {},
   async mounted() {
-    await this.$store.dispatch('scene/getCharacterList');
+    // await this.$store.dispatch('scene/getCharacterList');
   },
   methods: {
     loadCharacter(character: IVirtualObject) {

@@ -3,6 +3,7 @@ import * as THREE from 'three';
 export class Animation_Key {
   public type = 0; // 0 - default, 1 - shape key
   public isAuto = false;
+  public name = '';
 
   public position = { x: 0, y: 0, z: 0 };
   public rotation = { x: 0, y: 0, z: 0, w: 1 };
@@ -11,6 +12,7 @@ export class Animation_Key {
 
   constructor(keys?: any) {
     if (keys) {
+      this.name = keys.name;
       this.type = keys.type;
       this.position = keys.position;
       this.rotation = keys.rotation;

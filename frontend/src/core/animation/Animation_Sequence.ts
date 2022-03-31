@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { Animation_Frame } from '@/core/Animation_Frame';
-import { Animation_Key } from '@/core/Animation_Key';
+import { Animation_Frame } from '@/core/animation/Animation_Frame';
+import { Animation_Key } from '@/core/animation/Animation_Key';
 import { Animation_Character } from '@/core/Animation_Character';
 import { MainScene } from '@/core/MainScene';
 

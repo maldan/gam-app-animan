@@ -42,6 +42,40 @@
       </div>
     </div>
 
+    <!-- Any keys -->
+    <div v-if="mode === 'any'">
+      <div :class="$style.line" v-for="(key, keyIndex) in keyList" :key="key.name">
+        <div
+          @click="selectKey(key.name)"
+          :class="[$style.title, selectedKeys.includes(key.name) ? $style.selected : null]"
+        >
+          {{ key.name }}
+        </div>
+        <div :class="[$style.keys, selectedKeys.includes(key.name) ? $style.selected : null]">
+          <div
+            class="clickable"
+            :class="[
+              $style.key,
+              animation?.frameId === frameId - 1 + offsetX ? $style.selected : '',
+              animation.frames[frameId - 1 + offsetX].keys[key.name] ? $style.has : '',
+              animation.frames[frameId - 1 + offsetX].keys[key.name]?.isAuto ? $style.auto : '',
+            ]"
+            v-for="frameId in Math.min(~~animation?.frameCount, maxFrames)"
+            :key="frameId"
+            @mousedown="dragFromFrameId = frameId - 1 + offsetX"
+            @mouseover="hoverFrameId = frameId - 1 + offsetX"
+            @mouseup="dragFrame"
+            @click="
+              currentKeyIndex = keyIndex;
+              goToFrame(frameId - 1 + offsetX);
+              selectKey(key.name);
+              previousKeyIndex = keyIndex;
+            "
+          ></div>
+        </div>
+      </div>
+    </div>
+
     <!-- Bone keys -->
     <div v-if="mode === 'bone'">
       <div :class="$style.line" v-for="(rig, rigIndex) in rigList" :key="rig.bone.name">
@@ -119,8 +153,8 @@ import { defineComponent } from 'vue';
 import { Animation_Character } from '@/core/Animation_Character';
 import { MainScene } from '@/core/MainScene';
 import { DataStorage } from '@/core/DataStorage';
-import { Animation_Sequence } from '@/core/Animation_Sequence';
-import { Animation_Key } from '@/core/Animation_Key';
+import { Animation_Sequence } from '@/core/animation/Animation_Sequence';
+import { Animation_Key } from '@/core/animation/Animation_Key';
 
 export default defineComponent({
   props: {},
@@ -139,6 +173,18 @@ export default defineComponent({
       const ch = MainScene.selectedObject.userData.class as Animation_Character;
       if (this.filterKeys.length === 0) return ch.blendShapeNameList;
       return ch.blendShapeNameList.filter((x) => this.filterKeys.includes(x));
+    },
+    keyList() {
+      if (this.r < 0) return [];
+      if (!MainScene.selectedObject) return [];
+
+      // If character selected
+      if (MainScene.selectedObject.userData.class instanceof Animation_Character) {
+        const ch = MainScene.selectedObject.userData.class as Animation_Character;
+        return ch.rigList;
+      }
+
+      return [];
     },
     animation(): Animation_Sequence {
       // @ts-ignore
@@ -349,7 +395,7 @@ export default defineComponent({
       frameCount: '48',
       maxFrames: 48,
       layers: ['All', 'Body', 'Leg', 'Hand', 'Head'],
-      mode: 'bone',
+      mode: 'any',
     };
   },
 });

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { Animation_Sequence } from '@/core/Animation_Sequence';
-import { Animation_Rig } from '@/core/Animation_Rig';
-import { Animation_Key } from '@/core/Animation_Key';
+import { Animation_Sequence } from '@/core/animation/Animation_Sequence';
+import { Animation_Rig } from '@/core/animation/Animation_Rig';
+import { Animation_Key } from '@/core/animation/Animation_Key';
 import { Quaternion } from 'three';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import { MainScene } from '@/core/MainScene';
@@ -46,7 +46,7 @@ export class Animation_Character {
       this._boneList[object.name] = object as THREE.Bone;
 
       // Create bone helper
-      let size = 0.02;
+      let size = 0.01;
       if (
         object.name.includes('Finger') ||
         object.name.includes('Toe') ||
@@ -57,7 +57,7 @@ export class Animation_Character {
         size = 0.007;
 
       const boneHelper = new THREE.Mesh(
-        new THREE.BoxGeometry(size, size * 2, size),
+        new THREE.BoxGeometry(size, size * 4, size),
         new THREE.MeshBasicMaterial({
           color: 0xfefefe,
           depthTest: false,

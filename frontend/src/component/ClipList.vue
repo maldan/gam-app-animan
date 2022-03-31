@@ -1,24 +1,5 @@
 <template>
-  <div :class="$style.animationList">
-    <ui-button
-      @click="$store.dispatch('animation/load', x)"
-      v-for="x in $store.state.animation.list"
-      :key="x"
-      :text="x"
-    />
-
-    <div :class="$style.new" v-if="isNewAnimation">
-      <ui-input
-        :class="$style.input"
-        v-model="animationName"
-        placeholder="Animation name..."
-        functionIcon="check"
-        :functionClick="saveAnimation"
-      />
-    </div>
-
-    <ui-button @click="createAnimation()" text="Create" />
-  </div>
+  <div :class="$style.animationList"></div>
 </template>
 
 <script lang="ts">
@@ -38,6 +19,9 @@ export default defineComponent({
   },
   async mounted() {
     await this.$store.dispatch('animation/getList');
+
+    MainScene.ui.main.refresh();
+    MainScene.ui.scene.refresh();
   },
   methods: {
     createAnimation() {
