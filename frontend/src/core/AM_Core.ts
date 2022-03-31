@@ -7,9 +7,10 @@ export interface ISyncObject {
   amObject: AM_Object;
 }
 
-export class Core {
+export class AM_Core {
   public static scene: THREE.Scene;
   public static syncList: ISyncObject[] = [];
+
   public static init(el: HTMLElement): void {
     // Camera
     const camera = new THREE.PerspectiveCamera(
@@ -28,7 +29,7 @@ export class Core {
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setAnimationLoop((time: number) => {
-      Core.tick();
+      AM_Core.tick();
       renderer.setClearColor(0x333333);
       renderer.render(scene, camera);
       controls.update();
@@ -77,12 +78,12 @@ export class Core {
   public static destroyObject(amObject: AM_Object): void {
     const x = this.syncList.find((x) => x.amObject === amObject);
     if (x) {
-      Core.scene.remove(x.threeObject);
+      AM_Core.scene.remove(x.threeObject);
     }
   }
 
   public static tick(): void {
-    for (let i = 0; i < Core.syncList.length; i++) {
+    for (let i = 0; i < AM_Core.syncList.length; i++) {
       // Core.syncList[i].
     }
   }

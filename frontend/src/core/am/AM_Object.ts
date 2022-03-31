@@ -1,8 +1,5 @@
-import { AM_IVector3, AM_IVector4 } from '@/core/am/AM_Vector';
-import * as THREE from 'three';
 import { AM_Key } from '@/core/animation/key/AM_Key';
 import { AM_AnimationController } from '@/core/animation/AM_AnimationController';
-import { Core } from '@/core/Core';
 
 export interface AM_IObjectInfo {
   name: string;

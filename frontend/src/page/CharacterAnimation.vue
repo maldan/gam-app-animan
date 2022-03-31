@@ -13,12 +13,12 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { Core } from '@/core/Core';
+import { AM_Core } from '@/core/AM_Core';
 
 export default defineComponent({
   components: {},
   async mounted() {
-    Core.init(this.$refs['scene'] as HTMLElement);
+    AM_Core.init(this.$refs['scene'] as HTMLElement);
   },
   methods: {},
   data: () => {
