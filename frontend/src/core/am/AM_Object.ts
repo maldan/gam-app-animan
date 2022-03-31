@@ -2,6 +2,14 @@ import { AM_IVector3, AM_IVector4 } from '@/core/am/AM_Vector';
 import * as THREE from 'three';
 import { AM_Key } from '@/core/animation/key/AM_Key';
 import { AM_AnimationController } from '@/core/animation/AM_AnimationController';
+import { Core } from '@/core/Core';
+
+export interface AM_IObjectInfo {
+  name: string;
+  category: string;
+  modelPath: string;
+  previewPath: string;
+}
 
 export class AM_Object {
   public uuid = '';
@@ -9,11 +17,11 @@ export class AM_Object {
   public animationController: AM_AnimationController = new AM_AnimationController();
   public exposedKeys = ['transform.position', 'transform.rotation', 'transform.scale'];
 
-  #_threeObject!: THREE.Object3D;
+  public position = { x: 0, y: 0, z: 0 };
 
-  constructor(o: THREE.Object3D) {
-    this.#_threeObject = o;
-  }
+  //#_threeObject!: THREE.Object3D;
+
+  constructor() {}
 
   public applyAnimation(): void {
     const keys = this.animationController.currentKeys;
@@ -31,6 +39,10 @@ export class AM_Object {
     if (prefix === 'transform') {
 
     }*/
+  }
+
+  /*public getThreeObject(): THREE.Object3D {
+    return this.#_threeObject;
   }
 
   public set position(value: AM_IVector3) {
@@ -51,5 +63,5 @@ export class AM_Object {
 
   public get scale(): AM_IVector3 {
     return { x: 0, y: 0, z: 0 };
-  }
+  }*/
 }

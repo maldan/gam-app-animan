@@ -1,32 +1,20 @@
 <template>
-  <div :class="$style.characterList">
-    <ui-button
-      @click="loadCharacter(ch)"
-      v-for="ch in $store.state.scene.characterList"
-      :key="ch.name"
-      :text="ch.name"
-      :class="$style.button"
-      icon="arrow_down"
-      iconPosition="left"
-    />
-  </div>
+  <div :class="$style.characterList">1</div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { MainScene } from '@/core/MainScene';
-import { IVirtualObject } from '@/Types';
 
 export default defineComponent({
   props: {},
   components: {},
   async mounted() {
-    // await this.$store.dispatch('scene/getCharacterList');
+    // await this.$store.dispatch('character/getList');
   },
   methods: {
-    loadCharacter(character: IVirtualObject) {
+    /*loadCharacter(character: IVirtualObject) {
       MainScene.loadCharacter(character.modelPath);
-    },
+    },*/
   },
   data: () => {
     return {};
