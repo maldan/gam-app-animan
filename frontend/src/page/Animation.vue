@@ -30,9 +30,9 @@ export default defineComponent({
           position: { x: 80, y: 5, width: 18, height: 20 },
         },
         {
-          title: 'Scene',
-          name: 'scene',
-          position: { x: 2, y: 30, width: 15, height: 20 },
+          title: 'Timeline',
+          name: 'timeline',
+          position: { x: 2, y: 70, width: 50, height: 25 },
         },
       ],
     };

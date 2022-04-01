@@ -10,6 +10,10 @@ export class AM_AnimationController {
   public frameId = 0;
   public animationList: AM_IAnimationPart[] = [];
 
+  public createAnimation(offset = 0): void {
+    this.animationList.push({ offset, animation: new AM_Animation() });
+  }
+
   public addAnimation(animation: AM_Animation, offset = 0): void {
     this.animationList.push({ offset, animation });
   }

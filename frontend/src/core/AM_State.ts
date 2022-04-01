@@ -33,6 +33,11 @@ export class AM_UI {
       this.ref?.refresh();
     },
   };
+  public refresh(): void {
+    this.main.refresh();
+    this.scene.refresh();
+    this.timeline.refresh();
+  }
 }
 
 export class AM_State {
@@ -43,12 +48,14 @@ export class AM_State {
 
   public static addObject(obj: AM_Object): void {
     this.objectList.push(obj);
-    this.ui.scene.refresh();
+    this.ui.refresh();
   }
 
   public static selectObject(obj: AM_Object): void {
+    this.selectedObject?.onUnselect();
     this.selectedObject = obj;
-    this.ui.scene.refresh();
+    this.selectedObject.onSelect();
+    this.ui.refresh();
   }
 
   public static removeObject(obj: AM_Object): void {

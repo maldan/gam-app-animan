@@ -42,6 +42,14 @@ export class AM_Object {
     }*/
   }
 
+  public onSelect(): void {
+    console.log('salected');
+  }
+
+  public onUnselect(): void {
+    console.log('un salected');
+  }
+
   public set position(value: AM_IVector3) {
     this.#_threeObject.position.set(value.x, value.y, value.z);
   }
