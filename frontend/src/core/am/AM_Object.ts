@@ -22,6 +22,10 @@ export class AM_Object {
   constructor(o: THREE.Object3D) {
     this.#_threeObject = o;
     AM_Core.scene.add(o);
+
+    /*this.animationController.on('change', () => {
+      this.applyAnimation();
+    });*/
   }
 
   public applyAnimation(): void {
@@ -30,11 +34,15 @@ export class AM_Object {
   }
 
   public applyKey(key: AM_Key): void {
-    // @ts-ignore
-    this[key.name] = key.value;
+    const prefix = key.name.split('.')[0];
+    const name = key.name.split('.')[1];
 
-    /*const prefix = key.split(':')[0].split('.')[0];
-    const name = key.split(':')[0].split('.')[1];
+    if (prefix === 'transform') {
+      // @ts-ignore
+      this[name] = key.value;
+    }
+
+    /*
     const type = key.split(':')[1];
 
     if (prefix === 'transform') {
@@ -68,6 +76,10 @@ export class AM_Object {
 
   public get scale(): AM_IVector3 {
     return { x: 0, y: 0, z: 0 };
+  }
+
+  public get model(): THREE.Object3D {
+    return this.#_threeObject;
   }
 
   public destroy(): void {

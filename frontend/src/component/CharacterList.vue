@@ -17,6 +17,7 @@ import { defineComponent } from 'vue';
 import { AM_API } from '@/core/AM_API';
 import { AM_IObjectInfo } from '@/core/am/AM_Object';
 import { AM_State } from '@/core/AM_State';
+import { AM_Core } from '@/core/AM_Core';
 
 export default defineComponent({
   props: {},
@@ -29,6 +30,7 @@ export default defineComponent({
       const ch = await AM_State.loadObject(obj.modelPath);
       AM_State.addObject(ch);
       AM_State.selectObject(ch);
+      AM_Core.setManipulatorTo(ch);
     },
   },
   data: () => {

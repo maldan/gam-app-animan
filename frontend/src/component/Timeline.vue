@@ -14,7 +14,17 @@
       <div :class="$style.line" v-for="key in keys" :key="key">
         <div :class="$style.name">{{ key }}</div>
         <div :class="$style.keys">
-          <div :class="$style.key" v-for="x in animationPart.animation.frameCount" :key="x"></div>
+          <div
+            @click="goToFrame(frameId - 1)"
+            class="clickable"
+            :class="[
+              $style.key,
+              animationPart.animation.frames[frameId - 1].keys[key] ? $style.has : null,
+              animationPart.animation.frameId === frameId - 1 ? $style.selected : null,
+            ]"
+            v-for="frameId in animationPart.animation.frameCount"
+            :key="frameId"
+          ></div>
         </div>
       </div>
     </div>
@@ -53,8 +63,18 @@ export default defineComponent({
       this.animationController?.createAnimation();
       this.refresh();
     },
-    selectAnimationPart(x: AM_IAnimationPart) {
+    selectAnimationPart(x: AM_IAnimationPart | undefined) {
       this.animationPart = x;
+      AM_State.selectedAnimation = x?.animation;
+      if (AM_State.selectedAnimation) {
+        AM_State.selectedAnimation.on('change', () => {
+          AM_State.selectedObject?.applyAnimation();
+        });
+      }
+    },
+    goToFrame(id: number) {
+      if (this.animationPart?.animation) this.animationPart.animation.frameId = id;
+      this.refresh();
     },
   },
   data: () => {

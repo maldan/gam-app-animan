@@ -4,8 +4,9 @@ import { AM_IVector3 } from '@/core/am/AM_Vector';
 export class AM_KeyVector3 extends AM_Key {
   private _value: AM_IVector3 = { x: 0, y: 0, z: 0 };
 
-  constructor(v: AM_IVector3) {
+  constructor(name: string, v: AM_IVector3) {
     super();
+    this.name = name;
     this._value = v;
   }
 

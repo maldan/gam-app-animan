@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { AM_Object } from '@/core/am/AM_Object';
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
+import { AM_State } from '@/core/AM_State';
+import { AM_KeyVector3 } from '@/core/animation/key/AM_KeyVector3';
 
 export interface ISyncObject {
   threeObject: THREE.Object3D;
@@ -9,6 +12,10 @@ export interface ISyncObject {
 
 export class AM_Core {
   public static scene: THREE.Scene;
+
+  private static _manipulator: TransformControls;
+  private static _isManipulatorLocked = false;
+  private static _manipulatorStartPosition: THREE.Vector3 = new THREE.Vector3();
 
   public static init(el: HTMLElement): void {
     // Camera
@@ -57,11 +64,45 @@ export class AM_Core {
     l2.position.set(0, -5, -10);
     scene.add(l2);
 
+    // Manipulator
+    this._manipulator = new TransformControls(camera, renderer.domElement);
+    this._manipulator.size = 0.5;
+    this._manipulator.setSpace('local');
+
+    this._manipulator.addEventListener('mouseDown', () => {
+      if (!this._manipulator) return;
+      this._isManipulatorLocked = true;
+      this._manipulatorStartPosition = this._manipulator.position.clone();
+    });
+    this._manipulator.addEventListener('mouseUp', () => {
+      if (!this._manipulator) return;
+      this._isManipulatorLocked = false;
+
+      if (this._manipulator.mode === 'translate') {
+        // const diff = AM_State.selectedObject?.model.worldToLocal(this._manipulatorStartPosition);
+        const pos = AM_State.selectedObject?.model.position;
+        if (AM_State.selectedAnimation && pos) {
+          AM_State.selectedAnimation.setCurrentKey(
+            new AM_KeyVector3('transform.position', { x: pos.x, y: pos.y, z: pos.z }),
+          );
+        }
+        // rig.positionOffset.add(diff.multiplyScalar(-1));
+      }
+
+      AM_State.ui.timeline.refresh();
+    });
+
+    scene.add(this._manipulator);
+
     // Inject html
     el.appendChild(renderer.domElement);
     renderer.domElement.style.position = 'absolute';
     renderer.domElement.style.left = '0';
     renderer.domElement.style.top = '0';
     renderer.domElement.style.zIndex = '0';
+  }
+
+  public static setManipulatorTo(obj: AM_Object): void {
+    this._manipulator.attach(obj.model);
   }
 }
