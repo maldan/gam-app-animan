@@ -28,8 +28,8 @@ export class AM_Object {
     });*/
   }
 
-  public applyAnimation(): void {
-    const keys = this.animationController.currentKeys;
+  public applyAnimation(controller: AM_AnimationController | undefined = undefined): void {
+    const keys = (controller || this.animationController).currentKeys;
     for (const key in keys) this.applyKey(keys[key]);
   }
 
@@ -68,6 +68,10 @@ export class AM_Object {
       y: this.#_threeObject.position.y,
       z: this.#_threeObject.position.z,
     };
+  }
+
+  public set rotation(value: AM_IVector4) {
+    this.#_threeObject.quaternion.set(value.x, value.y, value.z, value.w);
   }
 
   public get rotation(): AM_IVector4 {

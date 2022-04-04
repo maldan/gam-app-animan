@@ -16,11 +16,47 @@ export class AM_Animation {
     }
   }
 
+  public interpolateKey(keyName: string): void {
+    // Remove all auto keys
+    for (let i = 0; i < this.frameCount; i++)
+      if (this.frames[i].keys[keyName] != null && this.frames[i].keys[keyName].isAuto)
+        delete this.frames[i].keys[keyName];
+
+    let firstFrame = -1;
+    for (let i = 0; i < this.frameCount; i++) {
+      if (
+        firstFrame == -1 &&
+        this.frames[i].keys[keyName] &&
+        !this.frames[i].keys[keyName].isAuto
+      ) {
+        firstFrame = i;
+        continue;
+      }
+
+      if (firstFrame > -1 && this.frames[i].keys[keyName] && !this.frames[i].keys[keyName].isAuto) {
+        const len = Math.abs(firstFrame - i);
+        const newKeys = this.frames[firstFrame].keys[keyName].interpolate(
+          this.frames[firstFrame].keys[keyName],
+          this.frames[i].keys[keyName],
+          len,
+        );
+
+        // Set new keys
+        for (let j = 0; j < newKeys.length; j++)
+          this.frames[j + firstFrame + 1].keys[keyName] = newKeys[j];
+
+        firstFrame = i;
+      }
+    }
+  }
+
   public get frameId(): number {
     return this._frameId;
   }
 
   public set frameId(value: number) {
+    if (value <= 0) value = 0;
+    if (value >= this.frameCount - 1) value = this.frameCount - 1;
     this._frameId = value;
     this.emit('change', value);
   }
@@ -31,6 +67,7 @@ export class AM_Animation {
 
   public setCurrentKey(key: AM_Key): void {
     this.currentFrame.keys[key.name] = key;
+    this.interpolateKey(key.name);
   }
 
   public on(eventName: string, fn: (...data: unknown[]) => void): void {

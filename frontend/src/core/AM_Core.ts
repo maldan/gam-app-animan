@@ -4,6 +4,7 @@ import { AM_Object } from '@/core/am/AM_Object';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import { AM_State } from '@/core/AM_State';
 import { AM_KeyVector3 } from '@/core/animation/key/AM_KeyVector3';
+import { AM_KeyVector4 } from '@/core/animation/key/AM_KeyVector4';
 
 export interface ISyncObject {
   threeObject: THREE.Object3D;
@@ -78,15 +79,24 @@ export class AM_Core {
       if (!this._manipulator) return;
       this._isManipulatorLocked = false;
 
+      // Translate
       if (this._manipulator.mode === 'translate') {
-        // const diff = AM_State.selectedObject?.model.worldToLocal(this._manipulatorStartPosition);
         const pos = AM_State.selectedObject?.model.position;
         if (AM_State.selectedAnimation && pos) {
           AM_State.selectedAnimation.setCurrentKey(
             new AM_KeyVector3('transform.position', { x: pos.x, y: pos.y, z: pos.z }),
           );
         }
-        // rig.positionOffset.add(diff.multiplyScalar(-1));
+      }
+
+      // Rotate
+      if (this._manipulator.mode === 'rotate') {
+        const rot = AM_State.selectedObject?.model.quaternion;
+        if (AM_State.selectedAnimation && rot) {
+          AM_State.selectedAnimation.setCurrentKey(
+            new AM_KeyVector4('transform.rotation', { x: rot.x, y: rot.y, z: rot.z, w: rot.w }),
+          );
+        }
       }
 
       AM_State.ui.timeline.refresh();
@@ -100,6 +110,13 @@ export class AM_Core {
     renderer.domElement.style.left = '0';
     renderer.domElement.style.top = '0';
     renderer.domElement.style.zIndex = '0';
+
+    // Events
+    document.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'r') this._manipulator.mode = 'rotate';
+      if (e.key === 'g') this._manipulator.mode = 'translate';
+      if (e.key === 's') this._manipulator.mode = 'scale';
+    });
   }
 
   public static setManipulatorTo(obj: AM_Object): void {

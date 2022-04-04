@@ -4,7 +4,7 @@ export class AM_Key {
 
   constructor() {}
 
-  public interpolate(from: AM_Key, to: AM_Key): AM_Key[] {
+  public interpolate(from: AM_Key, to: AM_Key, len: number): AM_Key[] {
     return [];
   }
 

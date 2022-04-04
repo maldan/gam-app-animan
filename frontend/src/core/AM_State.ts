@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { AM_Object } from '@/core/am/AM_Object';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { AM_Animation } from '@/core/animation/AM_Animation';
+import { AM_AnimationController } from '@/core/animation/AM_AnimationController';
 
 export class AM_UI {
   public scene = {
@@ -47,6 +48,7 @@ export class AM_State {
   public static objectList: AM_Object[] = [];
   public static selectedObject?: AM_Object;
   public static selectedAnimation?: AM_Animation;
+  public static animationController: AM_AnimationController = new AM_AnimationController();
 
   public static addObject(obj: AM_Object): void {
     this.objectList.push(obj);
