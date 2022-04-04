@@ -8,7 +8,17 @@ export class AM_Key {
     return [];
   }
 
+  public set value(v: unknown) {}
+
   public get value(): unknown {
     return null;
+  }
+
+  public clone(): AM_Key {
+    const k = new AM_Key();
+    k.isAuto = this.isAuto;
+    k.name = this.name;
+    k.value = this.value;
+    return k;
   }
 }

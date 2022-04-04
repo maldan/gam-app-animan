@@ -37,4 +37,15 @@ export class AM_KeyVector4 extends AM_Key {
   public get value(): AM_IVector4 {
     return this._value;
   }
+
+  public clone(): AM_KeyVector4 {
+    const k = new AM_KeyVector4(this.name, {
+      x: this.value.x,
+      y: this.value.y,
+      z: this.value.z,
+      w: this.value.w,
+    });
+    k.isAuto = this.isAuto;
+    return k;
+  }
 }

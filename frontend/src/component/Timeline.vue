@@ -1,15 +1,41 @@
 <template>
   <div v-if="animationController" :class="$style.timeline">
     <!-- Animation list -->
-    <div v-if="!animationPart">
+    <div v-if="editMode === 'controller'">
       <ui-button @click="createAnimation" text="Add animation" style-type="small" />
 
-      <div @click="selectAnimationPart(x)" v-for="x in animationList" :key="x">{{ x.offset }}</div>
+      <!-- X -->
+      <div :class="$style.line">
+        <div :class="$style.keys">
+          <div
+            :class="[
+              $style.key,
+              animationController.frameId === frameId - 1 ? $style.selected : null,
+            ]"
+            v-for="frameId in animationController.frameCount"
+            :key="frameId"
+          ></div>
+        </div>
+      </div>
+
+      <div
+        class="clickable"
+        :class="$style.animationPart"
+        @click="selectAnimationPart(x)"
+        @mouseover="hoverAnimationPart = x"
+        @mouseout="hoverAnimationPart = undefined"
+        v-for="x in animationList"
+        :style="{
+          left: x.offset * frameWidth + 'px',
+          width: frameWidth * x.animation.frameCount + 'px',
+        }"
+        :key="x"
+      ></div>
     </div>
 
     <!-- Animation -->
-    <div v-if="animationPart">
-      <ui-button @click="selectAnimationPart(undefined)" text="Back" style-type="small" />
+    <div v-if="editMode === 'animation'">
+      <ui-button @click="backFromAnimation" text="Back" style-type="small" />
 
       <div :class="$style.line" v-for="key in keys" :key="key">
         <div :class="$style.name">{{ key }}</div>
@@ -47,7 +73,7 @@ export default defineComponent({
     },
     animationController(): AM_AnimationController | undefined {
       if (this.r < 0) return undefined;
-      if (this.$route.path) return AM_State.animationController;
+      // if (this.$route.path) return AM_State.animationController;
       return AM_State.selectedObject?.animationController;
     },
     animationList(): AM_IAnimationPart[] {
@@ -61,7 +87,9 @@ export default defineComponent({
     AM_State.ui.timeline.ref = this;
     AM_State.ui.timeline.refresh();
 
-    this.kd = (e: KeyboardEvent) => {
+    this.kdAnimation = (e: KeyboardEvent) => {
+      if (this.editMode !== 'animation') return;
+
       if (e.key === 'Shift') this.isShiftPressed = true;
 
       if (e.key === 'ArrowRight' && this.animation) {
@@ -115,19 +143,50 @@ export default defineComponent({
         this.refresh();
       }*/
     };
+    this.kdController = (e: KeyboardEvent) => {
+      if (this.editMode !== 'controller') return;
+      if (!this.animationController) return;
+
+      // Offset animation
+      if (e.key === 'ArrowRight' && this.hoverAnimationPart) {
+        this.hoverAnimationPart.offset += 1;
+        this.refresh();
+      }
+      if (e.key === 'ArrowLeft' && this.hoverAnimationPart) {
+        this.hoverAnimationPart.offset -= 1;
+        this.refresh();
+      }
+
+      // Offset animation controller
+      if (e.key === 'ArrowRight' && !this.hoverAnimationPart) {
+        this.animationController.frameId += 1;
+        this.refresh();
+      }
+      if (e.key === 'ArrowLeft' && !this.hoverAnimationPart) {
+        this.animationController.frameId -= 1;
+        this.refresh();
+      }
+    };
     this.ku = (e: KeyboardEvent) => {
       if (e.key === 'Shift') this.isShiftPressed = false;
     };
-    document.addEventListener('keydown', this.kd);
+    document.addEventListener('keydown', this.kdAnimation);
+    document.addEventListener('keydown', this.kdController);
     document.addEventListener('keyup', this.ku);
   },
   beforeUnmount() {
-    document.removeEventListener('keydown', this.kd);
+    document.removeEventListener('keydown', this.kdAnimation);
+    document.removeEventListener('keydown', this.kdController);
     document.removeEventListener('keyup', this.ku);
   },
   methods: {
     refresh() {
       this.r = Math.random();
+
+      this.animationController?.off('change');
+      this.animationController?.on('change', () => {
+        AM_State.selectedObject?.applyAnimation(this.animationController);
+      });
     },
     createAnimation() {
       this.animationController?.createAnimation();
@@ -136,25 +195,41 @@ export default defineComponent({
     selectAnimationPart(x: AM_IAnimationPart | undefined) {
       this.animationPart = x;
       AM_State.selectedAnimation = x?.animation;
-      if (AM_State.selectedAnimation) {
+      /*if (AM_State.selectedAnimation) {
         AM_State.selectedAnimation.on('change', () => {
           AM_State.selectedObject?.applyAnimation(this.animationController);
         });
-      }
+      }*/
+
+      if (x) this.editMode = 'animation';
+      else this.editMode = 'controller';
     },
     goToFrame(id: number) {
       if (this.animationPart?.animation) this.animationPart.animation.frameId = id;
       this.refresh();
     },
+    backFromAnimation() {
+      // Remove old listener
+      if (AM_State.selectedAnimation) AM_State.selectedAnimation.off('change');
+
+      this.selectAnimationPart(undefined);
+      this.animationController?.compile();
+      this.refresh();
+    },
   },
   data: () => {
     return {
-      kd: undefined as any,
+      kdAnimation: undefined as any,
+      kdController: undefined as any,
       ku: undefined as any,
       isShiftPressed: false,
 
       r: 0,
       animationPart: undefined as AM_IAnimationPart | undefined,
+      hoverAnimationPart: undefined as AM_IAnimationPart | undefined,
+      editMode: 'controller',
+
+      frameWidth: 9,
     };
   },
 });
@@ -165,9 +240,17 @@ export default defineComponent({
 @import '../gam_sdk_ui/vue/style/size';
 
 .timeline {
+  .animationPart {
+    height: 24px;
+    background: #35822d;
+    margin-bottom: 5px;
+    position: relative;
+  }
+
   .line {
     display: flex;
     margin-bottom: 1px;
+    min-height: 16px;
 
     .number {
       width: 8px;

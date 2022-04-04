@@ -5,6 +5,7 @@ import { TransformControls } from 'three/examples/jsm/controls/TransformControls
 import { AM_State } from '@/core/AM_State';
 import { AM_KeyVector3 } from '@/core/animation/key/AM_KeyVector3';
 import { AM_KeyVector4 } from '@/core/animation/key/AM_KeyVector4';
+import Stats from 'three/examples/jsm/libs/stats.module';
 
 export interface ISyncObject {
   threeObject: THREE.Object3D;
@@ -39,6 +40,7 @@ export class AM_Core {
       renderer.setClearColor(0x333333);
       renderer.render(scene, camera);
       controls.update();
+      stats.update();
     });
     renderer.outputEncoding = THREE.sRGBEncoding;
 
@@ -110,6 +112,10 @@ export class AM_Core {
     renderer.domElement.style.left = '0';
     renderer.domElement.style.top = '0';
     renderer.domElement.style.zIndex = '0';
+
+    const stats = Stats();
+    stats.domElement.style.cssText = 'position:absolute; bottom:10px; right:10px;';
+    el.appendChild(stats.dom);
 
     // Events
     document.addEventListener('keydown', (e: KeyboardEvent) => {

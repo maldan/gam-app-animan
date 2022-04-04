@@ -75,6 +75,10 @@ export class AM_Animation {
     this._eventList[eventName].push(fn);
   }
 
+  public off(eventName: string): void {
+    if (this._eventList[eventName]) this._eventList[eventName].length = 0;
+  }
+
   public emit(eventName: string, ...data: unknown[]): void {
     if (!this._eventList[eventName]) return;
     for (let i = 0; i < this._eventList[eventName].length; i++) {
