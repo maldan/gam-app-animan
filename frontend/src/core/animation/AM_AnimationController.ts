@@ -9,11 +9,12 @@ export interface AM_IAnimationPart {
 
 export class AM_AnimationController {
   public animationList: AM_IAnimationPart[] = [];
-  public frames: AM_Frame[] = [];
+  //public frames: AM_Frame[] = [];
 
-  public _frameId = 0;
-  private _frameCount = 0;
+  //public _frameId = 0;
+  //private _frameCount = 0;
   private _eventList: Record<string, ((...data: unknown[]) => void)[]> = {};
+  private _animation: AM_Animation = new AM_Animation();
 
   public createAnimation(offset = 0): void {
     this.animationList.push({ offset, animation: new AM_Animation() });
@@ -25,20 +26,20 @@ export class AM_AnimationController {
   }
 
   public compile(): void {
-    this.frames.length = 0;
+    this._animation.frames.length = 0;
 
     // Calculate total frames
-    this._frameCount = 0;
+    this._animation.frameCount = 0;
     for (let i = 0; i < this.animationList.length; i++) {
-      this._frameCount = Math.max(
-        this._frameCount,
+      this._animation.frameCount = Math.max(
+        this._animation.frameCount,
         this.animationList[i].offset + this.animationList[i].animation.frameCount,
       );
     }
 
     // Fill frames
-    for (let i = 0; i < this._frameCount; i++) {
-      this.frames[i] = new AM_Frame();
+    for (let i = 0; i < this._animation.frameCount; i++) {
+      this._animation.frames[i] = new AM_Frame();
     }
 
     // Fill keys
@@ -49,33 +50,38 @@ export class AM_AnimationController {
       for (let j = 0; j < an.animation.frames.length; j++) {
         for (const key in an.animation.frames[j].keys) {
           // Clone key
-          this.frames[j + an.offset].keys[key] = an.animation.frames[j].keys[key].clone();
+          this._animation.frames[j + an.offset].keys[key] =
+            an.animation.frames[j].keys[key].clone();
         }
       }
     }
   }
 
   public get frameId(): number {
-    return this._frameId;
+    return this._animation.frameId;
   }
 
   public set frameId(value: number) {
-    if (value <= 0) value = 0;
-    if (value >= this.frameCount - 1) value = this.frameCount - 1;
-    this._frameId = value;
+    //if (value <= 0) value = 0;
+    //if (value >= this.frameCount - 1) value = this.frameCount - 1;
+    this._animation.frameId = value;
     this.emit('change', value);
   }
 
-  public get currentFrame(): AM_Frame {
-    return this.frames[this._frameId];
+  public get animation(): AM_Animation {
+    return this._animation;
   }
 
-  public get currentKeys(): Record<string, AM_Key> {
-    return this.currentFrame.keys;
+  public get currentFrame(): AM_Frame {
+    return this._animation.currentFrame;
   }
+
+  /*public get currentKeys(): Record<string, AM_Key> {
+    return this.currentFrame.keys;
+  }*/
 
   public get frameCount(): number {
-    return this._frameCount;
+    return this._animation.frameCount;
   }
 
   public on(eventName: string, fn: (...data: unknown[]) => void): void {

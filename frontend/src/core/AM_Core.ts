@@ -4,8 +4,8 @@ import { AM_Object } from '@/core/am/AM_Object';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import { AM_State } from '@/core/AM_State';
 import { AM_KeyVector3 } from '@/core/animation/key/AM_KeyVector3';
-import { AM_KeyVector4 } from '@/core/animation/key/AM_KeyVector4';
 import Stats from 'three/examples/jsm/libs/stats.module';
+import { AM_KeyQuaternion } from '@/core/animation/key/AM_KeyQuaternion';
 
 export interface ISyncObject {
   threeObject: THREE.Object3D;
@@ -96,7 +96,7 @@ export class AM_Core {
         const rot = AM_State.selectedObject?.model.quaternion;
         if (AM_State.selectedAnimation && rot) {
           AM_State.selectedAnimation.setCurrentKey(
-            new AM_KeyVector4('transform.rotation', { x: rot.x, y: rot.y, z: rot.z, w: rot.w }),
+            new AM_KeyQuaternion('transform.rotation', { x: rot.x, y: rot.y, z: rot.z, w: rot.w }),
           );
         }
       }

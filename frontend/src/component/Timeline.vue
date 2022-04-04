@@ -34,7 +34,7 @@
     </div>
 
     <!-- Animation -->
-    <div v-if="editMode === 'animation'">
+    <div v-if="editMode === 'animation' && animation">
       <ui-button @click="backFromAnimation" text="Back" style-type="small" />
 
       <div :class="$style.line" v-for="key in keys" :key="key">
@@ -45,11 +45,11 @@
             class="clickable"
             :class="[
               $style.key,
-              animationPart.animation.frames[frameId - 1].keys[key] ? $style.has : null,
-              animationPart.animation.frameId === frameId - 1 ? $style.selected : null,
-              animationPart.animation.frames[frameId - 1].keys[key]?.isAuto ? $style.auto : null,
+              animation.frames[frameId - 1].keys[key] ? $style.has : null,
+              animation.frameId === frameId - 1 ? $style.selected : null,
+              animation.frames[frameId - 1].keys[key]?.isAuto ? $style.auto : null,
             ]"
-            v-for="frameId in animationPart.animation.frameCount"
+            v-for="frameId in animation.frameCount"
             :key="frameId"
           ></div>
         </div>
@@ -73,13 +73,13 @@ export default defineComponent({
     },
     animationController(): AM_AnimationController | undefined {
       if (this.r < 0) return undefined;
-      // if (this.$route.path) return AM_State.animationController;
       return AM_State.selectedObject?.animationController;
     },
     animationList(): AM_IAnimationPart[] {
       return this.animationController?.animationList || [];
     },
     animation(): AM_Animation | undefined {
+      if (this.r < 0) return undefined;
       return AM_State.selectedAnimation;
     },
   },
@@ -150,10 +150,12 @@ export default defineComponent({
       // Offset animation
       if (e.key === 'ArrowRight' && this.hoverAnimationPart) {
         this.hoverAnimationPart.offset += 1;
+        this.animationController.compile();
         this.refresh();
       }
       if (e.key === 'ArrowLeft' && this.hoverAnimationPart) {
         this.hoverAnimationPart.offset -= 1;
+        this.animationController.compile();
         this.refresh();
       }
 
@@ -183,29 +185,35 @@ export default defineComponent({
     refresh() {
       this.r = Math.random();
 
+      // Remove old
       this.animationController?.off('change');
-      this.animationController?.on('change', () => {
-        AM_State.selectedObject?.applyAnimation(this.animationController);
-      });
+      this.animation?.off('change');
+
+      if (this.editMode === 'controller') {
+        this.animationController?.on('change', () => {
+          AM_State.selectedObject?.applyAnimation(this.animationController?.animation);
+        });
+      } else {
+        this.animation?.on('change', () => {
+          AM_State.selectedObject?.applyAnimation(this.animation);
+        });
+      }
     },
     createAnimation() {
       this.animationController?.createAnimation();
       this.refresh();
     },
     selectAnimationPart(x: AM_IAnimationPart | undefined) {
-      this.animationPart = x;
+      this.hoverAnimationPart = undefined;
       AM_State.selectedAnimation = x?.animation;
-      /*if (AM_State.selectedAnimation) {
-        AM_State.selectedAnimation.on('change', () => {
-          AM_State.selectedObject?.applyAnimation(this.animationController);
-        });
-      }*/
 
       if (x) this.editMode = 'animation';
       else this.editMode = 'controller';
+
+      this.refresh();
     },
     goToFrame(id: number) {
-      if (this.animationPart?.animation) this.animationPart.animation.frameId = id;
+      if (this.animation) this.animation.frameId = id;
       this.refresh();
     },
     backFromAnimation() {
@@ -225,7 +233,7 @@ export default defineComponent({
       isShiftPressed: false,
 
       r: 0,
-      animationPart: undefined as AM_IAnimationPart | undefined,
+      //animationPart: undefined as AM_IAnimationPart | undefined,
       hoverAnimationPart: undefined as AM_IAnimationPart | undefined,
       editMode: 'controller',
 

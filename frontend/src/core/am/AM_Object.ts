@@ -3,6 +3,7 @@ import { AM_Key } from '@/core/animation/key/AM_Key';
 import { AM_AnimationController } from '@/core/animation/AM_AnimationController';
 import { AM_IVector3, AM_IVector4 } from '@/core/am/AM_Vector';
 import { AM_Core } from '@/core/AM_Core';
+import { AM_Animation } from '@/core/animation/AM_Animation';
 
 export interface AM_IObjectInfo {
   name: string;
@@ -28,8 +29,9 @@ export class AM_Object {
     });*/
   }
 
-  public applyAnimation(controller: AM_AnimationController | undefined = undefined): void {
-    const keys = (controller || this.animationController).currentKeys;
+  public applyAnimation(animation: AM_Animation | undefined): void {
+    if (!animation) return;
+    const keys = animation.currentFrame.keys;
     for (const key in keys) this.applyKey(keys[key]);
   }
 
