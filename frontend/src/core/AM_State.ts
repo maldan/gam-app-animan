@@ -2,7 +2,8 @@ import * as THREE from 'three';
 import { AM_Object } from '@/core/am/AM_Object';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { AM_Animation } from '@/core/animation/AM_Animation';
-import { AM_AnimationController } from '@/core/animation/AM_AnimationController';
+import { AM_AnimationController, AM_IAnimationPart } from '@/core/animation/AM_AnimationController';
+import { AM_Core } from '@/core/AM_Core';
 
 export class AM_UI {
   public scene = {
@@ -48,21 +49,31 @@ export class AM_State {
   public static objectList: AM_Object[] = [];
   public static selectedObject?: AM_Object;
   public static selectedAnimation?: AM_Animation;
+  public static selectedAnimationPart?: AM_IAnimationPart;
   public static animationController: AM_AnimationController = new AM_AnimationController();
+  public static isAnimationPlay = false;
+  public static animationTime = 0;
 
   public static addObject(obj: AM_Object): void {
     this.objectList.push(obj);
     this.ui.refresh();
   }
 
-  public static selectObject(obj: AM_Object): void {
+  public static selectObject(obj: AM_Object | undefined): void {
     this.selectedObject?.onUnselect();
     this.selectedObject = obj;
-    this.selectedObject.onSelect();
+    this.selectedObject?.onSelect();
     this.ui.refresh();
   }
 
-  public static removeObject(obj: AM_Object): void {
+  public static removeObject(obj: AM_Object | undefined): void {
+    if (!obj) return;
+
+    if (this.selectedObject === obj) {
+      AM_Core.setManipulatorTo(undefined);
+      this.selectObject(undefined);
+    }
+
     const index = this.objectList.indexOf(obj);
     if (index !== -1) this.objectList.splice(index, 1);
     if (obj) obj.destroy();

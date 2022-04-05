@@ -35,12 +35,25 @@ export class AM_Core {
 
     // Render
     const renderer = new THREE.WebGLRenderer({ antialias: true });
+    let prevTime = 0;
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setAnimationLoop((time: number) => {
+      const deltaTime = (time - prevTime) / 1000;
+      prevTime = time;
+
       renderer.setClearColor(0x333333);
       renderer.render(scene, camera);
       controls.update();
       stats.update();
+
+      // Play animation
+      if (AM_State.isAnimationPlay) {
+        AM_State.animationTime += deltaTime;
+        if (AM_State.animationController.frameCount > 0) {
+          AM_State.animationController.frameId =
+            ~~(AM_State.animationTime * 24) % AM_State.animationController.frameCount;
+        }
+      }
     });
     renderer.outputEncoding = THREE.sRGBEncoding;
 
@@ -125,7 +138,8 @@ export class AM_Core {
     });
   }
 
-  public static setManipulatorTo(obj: AM_Object): void {
-    this._manipulator.attach(obj.model);
+  public static setManipulatorTo(obj: AM_Object | undefined): void {
+    if (!obj) this._manipulator.detach();
+    else this._manipulator.attach(obj.model);
   }
 }

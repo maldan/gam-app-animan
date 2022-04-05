@@ -1,36 +1,78 @@
 <template>
   <div v-if="animationController" :class="$style.timeline">
     <!-- Animation list -->
-    <div v-if="editMode === 'controller'">
-      <ui-button @click="createAnimation" text="Add animation" style-type="small" />
+    <div :class="$style.controller" v-if="editMode === 'controller'">
+      <div :class="$style.left">
+        <!-- Header -->
+        <div class="button_group_round_compact" :class="$style.header">
+          <ui-button @click="createAnimation" text="Add animation" style-type="small" />
+          <ui-button @click="compileAnimation" text="Compile" style-type="small" />
+          <ui-button
+            @click="togglePlay"
+            :text="isAnimationPlay ? 'Stop' : 'Play'"
+            style-type="small"
+          />
+        </div>
 
-      <!-- X -->
-      <div :class="$style.line">
-        <div :class="$style.keys">
+        <!-- Timeline -->
+        <!-- Numbers -->
+        <div v-if="animationList.length" :class="[$style.line, $style.numbers]">
+          <div :class="$style.keys">
+            <div
+              :class="[$style.key]"
+              v-for="frameId in Math.min(animationController.frameCount, maxVisibleFrames)"
+              :key="frameId"
+            >
+              {{ (frameId - 1 + offsetX) % 5 === 0 ? frameId - 1 + offsetX : '' }}
+            </div>
+          </div>
+        </div>
+        <!-- Animation list -->
+        <div v-if="animationList.length" :class="$style.line">
+          <div :class="$style.keys">
+            <div
+              :class="[
+                $style.key,
+                animationController.frameId === frameId - 1 + offsetX ? $style.selected : null,
+              ]"
+              v-for="frameId in Math.min(animationController.frameCount, maxVisibleFrames)"
+              :key="frameId"
+            ></div>
+          </div>
+        </div>
+
+        <div
+          :class="$style.lines"
+          :style="{
+            width: Math.min(animationController.frameCount, maxVisibleFrames) * frameWidth + 'px',
+          }"
+        >
           <div
-            :class="[
-              $style.key,
-              animationController.frameId === frameId - 1 ? $style.selected : null,
-            ]"
-            v-for="frameId in animationController.frameCount"
-            :key="frameId"
-          ></div>
+            class="clickable"
+            :class="[$style.animationPart, x === selectedAnimationPart ? $style.selected : null]"
+            @click="selectAnimationPart(x)"
+            v-doubleclick="openAnimationPart.bind(this, x)"
+            @mouseover="hoverAnimationPart = x"
+            @mouseout="hoverAnimationPart = undefined"
+            v-for="x in animationList"
+            :style="{
+              left: (x.offset - offsetX) * frameWidth + 'px',
+              width: frameWidth * x.animation.frameCount + 'px',
+            }"
+            :key="x"
+          >
+            {{ x.animation.name }}
+          </div>
         </div>
       </div>
 
-      <div
-        class="clickable"
-        :class="$style.animationPart"
-        @click="selectAnimationPart(x)"
-        @mouseover="hoverAnimationPart = x"
-        @mouseout="hoverAnimationPart = undefined"
-        v-for="x in animationList"
-        :style="{
-          left: x.offset * frameWidth + 'px',
-          width: frameWidth * x.animation.frameCount + 'px',
-        }"
-        :key="x"
-      ></div>
+      <div :class="$style.right">
+        <div v-if="selectedAnimationPart">
+          <ui-number @change="refresh" v-model="selectedAnimationPart.offset" />
+          <ui-number @change="refresh" v-model="selectedAnimationPart.animation.frameCount" />
+          <ui-input @change="refresh" v-model="selectedAnimationPart.animation.name" />
+        </div>
+      </div>
     </div>
 
     <!-- Animation -->
@@ -78,9 +120,22 @@ export default defineComponent({
     animationList(): AM_IAnimationPart[] {
       return this.animationController?.animationList || [];
     },
+    visibleAnimationPartList(): AM_IAnimationPart[] {
+      const list = this.animationList;
+      return list;
+      // return this.animationController?.animationList || [];
+    },
     animation(): AM_Animation | undefined {
       if (this.r < 0) return undefined;
       return AM_State.selectedAnimation;
+    },
+    selectedAnimationPart(): AM_IAnimationPart | undefined {
+      if (this.r < 0) return undefined;
+      return AM_State.selectedAnimationPart;
+    },
+    isAnimationPlay(): boolean {
+      if (this.r < 0) return false;
+      return AM_State.isAnimationPlay;
     },
   },
   async mounted() {
@@ -192,11 +247,16 @@ export default defineComponent({
       if (this.editMode === 'controller') {
         this.animationController?.on('change', () => {
           AM_State.selectedObject?.applyAnimation(this.animationController?.animation);
+          this.refresh();
         });
       } else {
         this.animation?.on('change', () => {
           AM_State.selectedObject?.applyAnimation(this.animation);
         });
+      }
+
+      if (this.animationController) {
+        this.offsetX = Math.max(0, this.animationController.frameId - this.maxVisibleFrames + 1);
       }
     },
     createAnimation() {
@@ -204,12 +264,21 @@ export default defineComponent({
       this.refresh();
     },
     selectAnimationPart(x: AM_IAnimationPart | undefined) {
+      AM_State.selectedAnimationPart = x;
+      this.refresh();
+    },
+    openAnimationPart(x: AM_IAnimationPart | undefined) {
       this.hoverAnimationPart = undefined;
+      AM_State.selectedAnimationPart = undefined;
       AM_State.selectedAnimation = x?.animation;
 
       if (x) this.editMode = 'animation';
       else this.editMode = 'controller';
 
+      this.refresh();
+    },
+    compileAnimation() {
+      this.animationController?.compile();
       this.refresh();
     },
     goToFrame(id: number) {
@@ -220,8 +289,12 @@ export default defineComponent({
       // Remove old listener
       if (AM_State.selectedAnimation) AM_State.selectedAnimation.off('change');
 
-      this.selectAnimationPart(undefined);
+      this.openAnimationPart(undefined);
       this.animationController?.compile();
+      this.refresh();
+    },
+    togglePlay() {
+      AM_State.isAnimationPlay = !AM_State.isAnimationPlay;
       this.refresh();
     },
   },
@@ -233,11 +306,15 @@ export default defineComponent({
       isShiftPressed: false,
 
       r: 0,
-      //animationPart: undefined as AM_IAnimationPart | undefined,
       hoverAnimationPart: undefined as AM_IAnimationPart | undefined,
       editMode: 'controller',
 
       frameWidth: 9,
+
+      maxVisibleFrames: 32,
+
+      // Scroll
+      offsetX: 0,
     };
   },
 });
@@ -248,11 +325,59 @@ export default defineComponent({
 @import '../gam_sdk_ui/vue/style/size';
 
 .timeline {
-  .animationPart {
-    height: 24px;
-    background: #35822d;
-    margin-bottom: 5px;
-    position: relative;
+  .controller {
+    display: flex;
+
+    .animationPart {
+      height: 24px;
+      background: #9a6927;
+      // margin-bottom: 5px;
+      position: relative;
+      border: 1px solid #fefefe00;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      padding-left: 5px;
+
+      &.selected {
+        border: 1px solid #eca824;
+      }
+    }
+
+    .left {
+      flex: 1;
+
+      .header {
+        display: flex;
+        margin-bottom: 10px;
+      }
+
+      .line {
+        margin-bottom: 10px;
+      }
+
+      .lines {
+        background: #1b1b1b;
+        overflow: hidden;
+      }
+
+      .numbers {
+        font-size: 12px;
+        color: $text-gray;
+        margin-bottom: 3px;
+
+        .keys {
+          .key {
+            background: none;
+          }
+        }
+      }
+    }
+
+    .right {
+      width: 200px;
+    }
   }
 
   .line {

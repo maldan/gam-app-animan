@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { AM_Key } from '@/core/animation/key/AM_Key';
-import { AM_IVector3, AM_IVector4 } from '@/core/am/AM_Vector';
+import { AM_IVector4 } from '@/core/am/AM_Vector';
 
 export class AM_KeyQuaternion extends AM_Key {
   private _value: AM_IVector4 = { x: 0, y: 0, z: 0, w: 0 };

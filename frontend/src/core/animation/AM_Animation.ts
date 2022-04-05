@@ -2,28 +2,30 @@ import { AM_Frame } from '@/core/animation/AM_Frame';
 import { AM_Key } from '@/core/animation/key/AM_Key';
 
 export class AM_Animation {
-  public frameCount = 48;
+  // public frameCount = 48;
   public fps = 24;
   public isLoop = true;
   public frames: AM_Frame[] = [];
+  public name = '';
 
   private _frameId = 0;
+  private _frameCount = 48;
   private _eventList: Record<string, ((...data: unknown[]) => void)[]> = {};
 
   constructor() {
-    for (let i = 0; i < this.frameCount; i++) {
+    for (let i = 0; i < this._frameCount; i++) {
       this.frames[i] = new AM_Frame();
     }
   }
 
   public interpolateKey(keyName: string): void {
     // Remove all auto keys
-    for (let i = 0; i < this.frameCount; i++)
+    for (let i = 0; i < this._frameCount; i++)
       if (this.frames[i].keys[keyName] != null && this.frames[i].keys[keyName].isAuto)
         delete this.frames[i].keys[keyName];
 
     let firstFrame = -1;
-    for (let i = 0; i < this.frameCount; i++) {
+    for (let i = 0; i < this._frameCount; i++) {
       if (
         firstFrame == -1 &&
         this.frames[i].keys[keyName] &&
@@ -56,9 +58,23 @@ export class AM_Animation {
 
   public set frameId(value: number) {
     if (value <= 0) value = 0;
-    if (value >= this.frameCount - 1) value = this.frameCount - 1;
+    if (value >= this._frameCount - 1) value = this._frameCount - 1;
     this._frameId = value;
     this.emit('change', value);
+  }
+
+  public get frameCount(): number {
+    return this._frameCount;
+  }
+
+  public set frameCount(value: number) {
+    if (value <= 1) value = 1;
+    this._frameCount = value;
+
+    this.frames.length = value;
+    for (let i = 0; i < this._frameCount; i++) {
+      if (!this.frames[i]) this.frames[i] = new AM_Frame();
+    }
   }
 
   public get currentFrame(): AM_Frame {

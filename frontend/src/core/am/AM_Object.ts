@@ -31,6 +31,7 @@ export class AM_Object {
 
   public applyAnimation(animation: AM_Animation | undefined): void {
     if (!animation) return;
+    if (!animation.currentFrame) return;
     const keys = animation.currentFrame.keys;
     for (const key in keys) this.applyKey(keys[key]);
   }

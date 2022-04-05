@@ -64,8 +64,9 @@ export class AM_AnimationController {
   public set frameId(value: number) {
     //if (value <= 0) value = 0;
     //if (value >= this.frameCount - 1) value = this.frameCount - 1;
+    const changed = this._animation.frameId != value;
     this._animation.frameId = value;
-    this.emit('change', value);
+    if (changed) this.emit('change', value);
   }
 
   public get animation(): AM_Animation {
