@@ -28,7 +28,7 @@ export default defineComponent({
   methods: {
     async addToScene(obj: AM_IObjectInfo) {
       AM_State.removeObject(AM_State.selectedObject);
-      const ch = await AM_State.loadObject(obj.modelPath);
+      const ch = await AM_State.loadObject(obj.modelPath, 'character');
       ch.animationController = AM_State.animationController;
       AM_State.addObject(ch);
       AM_State.selectObject(ch);

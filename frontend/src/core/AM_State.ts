@@ -4,6 +4,8 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { AM_Animation } from '@/core/animation/AM_Animation';
 import { AM_AnimationController, AM_IAnimationPart } from '@/core/animation/AM_AnimationController';
 import { AM_Core } from '@/core/AM_Core';
+import { AM_Character } from '@/core/am/AM_Character';
+import { AM_Bone } from '@/core/am/AM_Bone';
 
 export class AM_UI {
   public scene = {
@@ -54,6 +56,10 @@ export class AM_State {
   public static isAnimationPlay = false;
   public static animationTime = 0;
 
+  // Bones
+  public static selectedBone?: AM_Bone;
+  public static hoverBone?: AM_Bone;
+
   public static addObject(obj: AM_Object): void {
     this.objectList.push(obj);
     this.ui.refresh();
@@ -80,7 +86,7 @@ export class AM_State {
     this.ui.scene.refresh();
   }
 
-  public static async loadObject(path: string): Promise<AM_Object> {
+  public static async loadObject(path: string, type = ''): Promise<AM_Object> {
     const loader = new GLTFLoader();
 
     return new Promise((resolve, reject) => {
@@ -109,10 +115,19 @@ export class AM_State {
           console.log(object);
           this.addToScene(object);*/
 
-          const obj = new AM_Object(object);
-          obj.uuid = object.uuid;
-          obj.name = object.name;
-          resolve(obj);
+          if (type === 'character') {
+            const obj = new AM_Character(object);
+
+            obj.uuid = object.uuid;
+            obj.name = object.name;
+            resolve(obj);
+          } else {
+            const obj = new AM_Object(object);
+
+            obj.uuid = object.uuid;
+            obj.name = object.name;
+            resolve(obj);
+          }
         },
         (xhr) => {},
         (error) => {

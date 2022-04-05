@@ -6,11 +6,7 @@ import { AM_State } from '@/core/AM_State';
 import { AM_KeyVector3 } from '@/core/animation/key/AM_KeyVector3';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { AM_KeyQuaternion } from '@/core/animation/key/AM_KeyQuaternion';
-
-export interface ISyncObject {
-  threeObject: THREE.Object3D;
-  amObject: AM_Object;
-}
+import { AM_Character } from '@/core/am/AM_Character';
 
 export class AM_Core {
   public static scene: THREE.Scene;
@@ -18,6 +14,7 @@ export class AM_Core {
   private static _manipulator: TransformControls;
   private static _isManipulatorLocked = false;
   private static _manipulatorStartPosition: THREE.Vector3 = new THREE.Vector3();
+  private static _manipulatorStartRotation: THREE.Quaternion = new THREE.Quaternion();
 
   public static init(el: HTMLElement): void {
     // Camera
@@ -54,6 +51,39 @@ export class AM_Core {
             ~~(AM_State.animationTime * 24) % AM_State.animationController.frameCount;
         }
       }
+
+      // Ray cast with bones
+      AM_State.hoverBone = undefined;
+      raycaster.setFromCamera(pointer, camera);
+      if (AM_State.selectedObject instanceof AM_Character) {
+        const bones = Object.values(AM_State.selectedObject.boneList);
+
+        // Fill bones with white color
+        bones.forEach((x) => {
+          // @ts-ignore
+          x.boneHelper.material.color.set(0xffffff);
+        });
+        if (AM_State.selectedBone) {
+          // @ts-ignore
+          AM_State.selectedBone.boneHelper.material.color.set(0xff0000);
+        }
+
+        // Check intersects with bones
+        const intersects = raycaster.intersectObjects(
+          bones.map((x) => x.boneHelper),
+          true,
+        );
+        if (intersects.length > 0) {
+          const object = intersects[0].object as THREE.Mesh;
+          if (object !== AM_State.selectedBone?.boneHelper) {
+            // @ts-ignore
+            object.material.color.set(0x00ff00);
+          }
+
+          // Set hover bone
+          AM_State.hoverBone = bones.find((x) => x.boneHelper === object);
+        }
+      }
     });
     renderer.outputEncoding = THREE.sRGBEncoding;
 
@@ -84,11 +114,16 @@ export class AM_Core {
     this._manipulator = new TransformControls(camera, renderer.domElement);
     this._manipulator.size = 0.5;
     this._manipulator.setSpace('local');
-
     this._manipulator.addEventListener('mouseDown', () => {
       if (!this._manipulator) return;
       this._isManipulatorLocked = true;
-      this._manipulatorStartPosition = this._manipulator.position.clone();
+      if (AM_State.selectedBone) {
+        this._manipulatorStartPosition = AM_State.selectedBone.boneHelper.position.clone();
+        this._manipulatorStartRotation = AM_State.selectedBone.boneHelper.quaternion.clone();
+      } else {
+        this._manipulatorStartPosition = this._manipulator.position.clone();
+        this._manipulatorStartRotation = this._manipulator.quaternion.clone();
+      }
     });
     this._manipulator.addEventListener('mouseUp', () => {
       if (!this._manipulator) return;
@@ -114,10 +149,23 @@ export class AM_Core {
         }
       }
 
+      if (AM_State.selectedBone) {
+        const rotDiff = this._manipulatorStartRotation
+          .clone()
+          .invert()
+          .multiply(AM_State.selectedBone.boneHelper.quaternion);
+
+        AM_State.selectedBone.rotationOffset.multiply(rotDiff);
+        AM_State.selectedObject?.update();
+      }
+
       AM_State.ui.timeline.refresh();
     });
-
     scene.add(this._manipulator);
+
+    // Ray cast
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
 
     // Inject html
     el.appendChild(renderer.domElement);
@@ -126,6 +174,7 @@ export class AM_Core {
     renderer.domElement.style.top = '0';
     renderer.domElement.style.zIndex = '0';
 
+    // Stats
     const stats = Stats();
     stats.domElement.style.cssText = 'position:absolute; bottom:10px; right:10px;';
     el.appendChild(stats.dom);
@@ -135,6 +184,28 @@ export class AM_Core {
       if (e.key === 'r') this._manipulator.mode = 'rotate';
       if (e.key === 'g') this._manipulator.mode = 'translate';
       if (e.key === 's') this._manipulator.mode = 'scale';
+    });
+    window.addEventListener('pointermove', (e: PointerEvent) => {
+      pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+      pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    });
+    window.addEventListener('mousedown', (e: MouseEvent) => {
+      if (this._isManipulatorLocked) return;
+      if (e.button === 0) {
+        /*DataStorage.selectedObject = undefined;
+        DataStorage.setManipulatorTo(undefined);
+        if (DataStorage.hoverObject) {
+          DataStorage.selectedObject = DataStorage.hoverObject;
+          DataStorage.setManipulatorTo(DataStorage.hoverObject);
+        }*/
+        AM_State.selectedBone = undefined;
+        this._manipulator.detach();
+
+        if (AM_State.hoverBone) {
+          AM_State.selectedBone = AM_State.hoverBone;
+          this._manipulator.attach(AM_State.selectedBone.boneHelper);
+        }
+      }
     });
   }
 

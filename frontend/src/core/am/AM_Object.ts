@@ -53,6 +53,8 @@ export class AM_Object {
     }*/
   }
 
+  public update(): void {}
+
   public onSelect(): void {
     console.log('salected');
   }
