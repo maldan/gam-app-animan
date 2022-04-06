@@ -32,7 +32,7 @@ export class AM_UI {
       this.ref?.refresh();
     },
   };
-  public blendShape = {
+  public shape = {
     ref: undefined as any,
     refresh(): void {
       this.ref?.refresh();
@@ -42,6 +42,7 @@ export class AM_UI {
     this.main.refresh();
     this.scene.refresh();
     this.timeline.refresh();
+    this.shape.refresh();
   }
 }
 

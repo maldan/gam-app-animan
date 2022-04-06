@@ -393,7 +393,7 @@ export default defineComponent({
     }
 
     .name {
-      min-width: 128px;
+      width: 128px;
       font-size: 14px;
       color: $text-gray;
       background: lighten($gray-dark, 5%);
@@ -401,6 +401,8 @@ export default defineComponent({
       margin-right: 5px;
       display: flex;
       align-items: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
 
       &.selected {
         border-right: 4px solid #26b518;
