@@ -8,6 +8,13 @@
       @click="selectObject(x)"
     >
       {{ x.type }} {{ x.name }}
+      <ui-icon
+        v-if="isCharacter(x)"
+        @click.stop="toggleMode(x)"
+        :class="$style.visibility"
+        name="eye"
+      />
+      <ui-icon @click.stop="toggleVisibility(x)" :class="$style.visibility" name="eye" />
       <ui-icon @click.stop="removeObject(x)" :class="$style.remove" name="trash" />
     </div>
     <desktop-ui-button @click="pickObject" text="Add" />
@@ -19,6 +26,7 @@ import { defineComponent } from 'vue';
 import { AM_State } from '@/core/AM_State';
 import { AM_Object } from '@/core/am/AM_Object';
 import { AM_API } from '@/core/AM_API';
+import { AM_Character } from '@/core/am/AM_Character';
 
 export default defineComponent({
   props: {},
@@ -37,6 +45,9 @@ export default defineComponent({
     refresh() {
       this.r = Math.random();
     },
+    isCharacter(obj: AM_Object): boolean {
+      return obj instanceof AM_Character;
+    },
     isSelected(obj: AM_Object): boolean {
       return AM_State.selectedObject === obj;
     },
@@ -45,6 +56,14 @@ export default defineComponent({
     },
     selectObject(obj: AM_Object) {
       AM_State.selectObject(obj);
+    },
+    toggleMode(obj: AM_Character) {
+      if (obj.interactionMode === 'object') obj.interactionMode = 'skeleton';
+      else obj.interactionMode = 'object';
+    },
+    toggleVisibility(obj: AM_Object) {
+      obj.visible = !obj.visible;
+      obj.update();
     },
     pickObject(): void {
       const store = this.$store;
@@ -89,8 +108,12 @@ export default defineComponent({
     display: flex;
     align-items: center;
 
-    .remove {
+    .visibility {
       margin-left: auto;
+    }
+
+    .remove {
+      margin-left: 5px;
     }
 
     &.selected {

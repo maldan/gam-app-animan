@@ -56,6 +56,7 @@ export class AM_State {
   public static animationController: AM_AnimationController = new AM_AnimationController();
   public static isAnimationPlay = false;
   public static animationTime = 0;
+  public static mode = '';
 
   // Bones
   public static selectedBone?: AM_Bone;
@@ -67,9 +68,13 @@ export class AM_State {
   }
 
   public static selectObject(obj: AM_Object | undefined): void {
+    // Obj changed
+    if (obj !== this.selectedObject) this.selectedAnimation = undefined;
+
     this.selectedObject?.onUnselect();
     this.selectedObject = obj;
     this.selectedObject?.onSelect();
+
     this.ui.refresh();
   }
 

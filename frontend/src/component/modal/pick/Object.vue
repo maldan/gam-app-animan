@@ -28,7 +28,9 @@ import { AM_IObjectInfo } from '@/core/am/AM_Object';
 export default defineComponent({
   props: {},
   components: {},
-  async mounted() {},
+  async mounted() {
+    await this.refresh();
+  },
   methods: {
     async refresh() {
       this.list = await AM_API.getObjectList(this.search);
@@ -36,7 +38,7 @@ export default defineComponent({
   },
   data: () => {
     return {
-      search: '',
+      search: 'character',
       list: [] as AM_IObjectInfo[],
     };
   },

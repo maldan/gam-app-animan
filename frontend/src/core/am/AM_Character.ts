@@ -3,6 +3,7 @@ import { AM_Object } from '@/core/am/AM_Object';
 import { AM_Core } from '@/core/AM_Core';
 import { AM_Bone } from '@/core/am/AM_Bone';
 import { SkinnedMesh } from 'three';
+import { AM_State } from '@/core/AM_State';
 
 export class AM_Character extends AM_Object {
   public exposedKeys = [
@@ -13,6 +14,7 @@ export class AM_Character extends AM_Object {
     'bone.Root.rotation',
     'bone.Root.scale',
   ];
+  public interactionMode = 'object';
 
   private _boneList: Record<string, AM_Bone> = {};
   private _shapeList: { name: string; value: number }[] = [];
@@ -79,6 +81,7 @@ export class AM_Character extends AM_Object {
           transparent: true,
         }),
       );
+      boneHelper.visible = false;
 
       // Create bone
       this._boneList[object.name] = new AM_Bone(object as THREE.Bone, boneHelper);
@@ -102,6 +105,19 @@ export class AM_Character extends AM_Object {
     });
   }
 
+  public onSelect(): void {
+    if (AM_State.selectedObject === this) {
+      for (const x in this.boneList)
+        this.boneList[x].boneHelper.visible = this.interactionMode === 'skeleton';
+
+      if (this.interactionMode === 'object') AM_Core.setManipulatorTo(this);
+    }
+  }
+
+  public onUnselect(): void {
+    for (const x in this.boneList) this.boneList[x].boneHelper.visible = false;
+  }
+
   public setShapeKey(name: string, value: number): void {
     const shapeIndex = this._shapeList.findIndex((x) => x.name === name);
     if (shapeIndex !== -1) {
@@ -121,6 +137,7 @@ export class AM_Character extends AM_Object {
 
   public update(): void {
     for (const x in this.boneList) {
+      // this.boneList[x].boneHelper.visible = this.visible;
       this.boneList[x].tick();
     }
   }

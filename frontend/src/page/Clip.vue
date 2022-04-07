@@ -14,10 +14,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { AM_Core } from '@/core/AM_Core';
+import { AM_State } from '@/core/AM_State';
 
 export default defineComponent({
   components: {},
   async mounted() {
+    AM_State.mode = 'clip';
     AM_Core.init(this.$refs['scene'] as HTMLElement);
   },
   methods: {},

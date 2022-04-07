@@ -56,12 +56,16 @@ export class AM_Object {
 
   public update(): void {}
 
-  public onSelect(): void {
-    console.log('salected');
+  public onSelect(): void {}
+
+  public onUnselect(): void {}
+
+  public set visible(status: boolean) {
+    this.#_threeObject.visible = status;
   }
 
-  public onUnselect(): void {
-    console.log('un salected');
+  public get visible(): boolean {
+    return this.#_threeObject.visible;
   }
 
   public set position(value: AM_IVector3) {

@@ -111,6 +111,7 @@ export default defineComponent({
   components: {},
   computed: {
     keys() {
+      if (this.r < 0) return [];
       return AM_State.selectedObject?.exposedKeys || [];
     },
     animationController(): AM_AnimationController | undefined {
@@ -118,12 +119,8 @@ export default defineComponent({
       return AM_State.selectedObject?.animationController;
     },
     animationList(): AM_IAnimationPart[] {
+      if (this.r < 0) return [];
       return this.animationController?.animationList || [];
-    },
-    visibleAnimationPartList(): AM_IAnimationPart[] {
-      const list = this.animationList;
-      return list;
-      // return this.animationController?.animationList || [];
     },
     animation(): AM_Animation | undefined {
       if (this.r < 0) return undefined;
@@ -257,6 +254,10 @@ export default defineComponent({
 
       if (this.animationController) {
         this.offsetX = Math.max(0, this.animationController.frameId - this.maxVisibleFrames + 1);
+      }
+
+      if (AM_State.selectedAnimation === undefined) {
+        this.editMode = 'controller';
       }
     },
     createAnimation() {

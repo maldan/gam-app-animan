@@ -46,9 +46,24 @@ export class AM_Core {
       // Play animation
       if (AM_State.isAnimationPlay) {
         AM_State.animationTime += deltaTime;
-        if (AM_State.animationController.frameCount > 0) {
-          AM_State.animationController.frameId =
-            ~~(AM_State.animationTime * 24) % AM_State.animationController.frameCount;
+
+        if (AM_State.mode === 'clip') {
+          for (let i = 0; i < AM_State.objectList.length; i++) {
+            const obj = AM_State.objectList[i];
+            if (obj.animationController.frameCount > 0) {
+              const isChanged =
+                obj.animationController.frameId !==
+                ~~(AM_State.animationTime * 24) % obj.animationController.frameCount;
+              obj.animationController.frameId =
+                ~~(AM_State.animationTime * 24) % obj.animationController.frameCount;
+              if (isChanged) obj.applyAnimation(obj.animationController.animation);
+            }
+          }
+        } else {
+          if (AM_State.animationController.frameCount > 0) {
+            AM_State.animationController.frameId =
+              ~~(AM_State.animationTime * 24) % AM_State.animationController.frameCount;
+          }
         }
       }
 
@@ -149,6 +164,7 @@ export class AM_Core {
         }
       }
 
+      // Bone mode
       if (AM_State.selectedBone) {
         const rotDiff = this._manipulatorStartRotation
           .clone()
