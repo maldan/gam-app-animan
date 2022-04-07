@@ -59,6 +59,7 @@ func Start(frontFs embed.FS) {
 					"main":      api.MainApi{},
 					"animation": api.AnimationApi{},
 					"repo":      api.RepoApi{},
+					"audio":     api.AudioApi{},
 					"pose":      api.PoseApi{},
 				},
 			},

@@ -40,6 +40,13 @@ type ObjectInfo struct {
 	ModelPath   string `json:"modelPath"`
 }
 
+type AudioInfo struct {
+	UUID      string `json:"uuid"`
+	Name      string `json:"name"`
+	Category  string `json:"category"`
+	AudioPath string `json:"audioPath"`
+}
+
 const ANIMATION_SECTION_MARKET uint32 = 1296649793
 
 var DataDir = ""

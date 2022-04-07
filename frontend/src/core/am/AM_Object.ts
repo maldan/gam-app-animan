@@ -13,6 +13,13 @@ export interface AM_IObjectInfo {
   previewPath: string;
 }
 
+export interface AM_IAudioInfo {
+  uuid: string;
+  name: string;
+  category: string;
+  audioPath: string;
+}
+
 export class AM_Object {
   public uuid = '';
   public name = '';

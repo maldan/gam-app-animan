@@ -21,7 +21,7 @@ export default defineComponent({
         { name: 'Animation', url: '/animation' },
         { name: 'Clip', url: '/clip' },
         { name: 'Repo', url: '/repo' },
-        // { name: 'Scene', url: '/scene' },
+        { name: 'Audio', url: '/audio' },
       ],
     };
   },
