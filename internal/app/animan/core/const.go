@@ -32,7 +32,8 @@ type AnimationSequence struct {
 	Frames     []AnimationFrame `json:"frames"`
 }
 
-type VirtualObject struct {
+type ObjectInfo struct {
+	UUID        string `json:"uuid"`
 	Name        string `json:"name"`
 	Category    string `json:"category"`
 	PreviewPath string `json:"previewPath"`

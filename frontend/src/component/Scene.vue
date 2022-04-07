@@ -10,6 +10,7 @@
       {{ x.type }} {{ x.name }}
       <ui-icon @click.stop="removeObject(x)" :class="$style.remove" name="trash" />
     </div>
+    <desktop-ui-button @click="pickObject" text="Add" />
   </div>
 </template>
 
@@ -17,6 +18,7 @@
 import { defineComponent } from 'vue';
 import { AM_State } from '@/core/AM_State';
 import { AM_Object } from '@/core/am/AM_Object';
+import { AM_API } from '@/core/AM_API';
 
 export default defineComponent({
   props: {},
@@ -43,6 +45,25 @@ export default defineComponent({
     },
     selectObject(obj: AM_Object) {
       AM_State.selectObject(obj);
+    },
+    pickObject(): void {
+      const store = this.$store;
+
+      this.$store.dispatch('modal/show', {
+        name: 'pick/object',
+        data: {
+          uuid: '',
+        },
+        onSuccess: async () => {
+          const info = await AM_API.getObjectByUUID(store.state.modal.data.uuid);
+          const obj = await AM_State.loadObject(
+            info.modelPath,
+            info.category === 'character' ? 'character' : '',
+          );
+          AM_State.addObject(obj);
+          AM_State.ui.refresh();
+        },
+      });
     },
   },
   data: () => {

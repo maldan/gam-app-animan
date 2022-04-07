@@ -67,7 +67,7 @@ export class AM_Character extends AM_Object {
         object.name.includes('Nose') ||
         object.name.includes('Tongue')
       )
-        size = 0.007;
+        size = 0.005;
 
       // Create helper
       const boneHelper = new THREE.Mesh(
@@ -75,7 +75,7 @@ export class AM_Character extends AM_Object {
         new THREE.MeshBasicMaterial({
           color: 0xfefefe,
           depthTest: false,
-          opacity: 0.3,
+          opacity: 0.15,
           transparent: true,
         }),
       );

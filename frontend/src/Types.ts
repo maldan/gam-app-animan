@@ -1,4 +1,4 @@
-export interface IAnimation_Key {
+/*export interface IAnimation_Key {
   type: number;
   isAuto: boolean;
   position: { x: number; y: number; z: number };
@@ -21,3 +21,4 @@ export interface IAnimation_Sequence {
   fps: number;
   isLoop: boolean;
 }
+*/

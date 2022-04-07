@@ -19,8 +19,8 @@ export default defineComponent({
       menu: [
         //{ name: 'Animation', url: '/' },
         { name: 'Animation', url: '/animation' },
-        //{ name: 'Clip', url: '/clip' },
-        //{ name: 'Repo', url: '/repo' },
+        { name: 'Clip', url: '/clip' },
+        { name: 'Repo', url: '/repo' },
         // { name: 'Scene', url: '/scene' },
       ],
     };

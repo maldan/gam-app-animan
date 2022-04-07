@@ -4,16 +4,58 @@ import (
 	"fmt"
 	"github.com/maldan/gam-app-animan/internal/app/animan/core"
 	"github.com/maldan/go-cmhp/cmhp_file"
+	"github.com/maldan/go-cmhp/cmhp_slice"
 	"github.com/maldan/go-rapi/rapi_core"
+	"os"
+	"strings"
 )
 
-type ObjectApi struct {
+type RepoApi struct {
 }
 
-func (r ObjectApi) GetList(args struct {
+func (r RepoApi) GetIndex(args struct {
+	UUID string `json:"uuid"`
+}) core.ObjectInfo {
+	obj := core.ObjectInfo{}
+
+	allFiles, _ := cmhp_file.ListAll(core.DataDir + "/object")
+	allFiles = cmhp_slice.Filter(allFiles, func(t cmhp_file.FileInfo) bool {
+		return strings.Contains(t.FullPath, "info.json")
+	})
+	wd, _ := os.Getwd()
+	wd = strings.ReplaceAll(wd, "\\", "/")
+
+	for _, file := range allFiles {
+		info := core.ObjectInfo{}
+		info.PreviewPath = strings.Replace(
+			strings.Replace(strings.ReplaceAll(file.FullPath, "/info.json", "/preview.jpg"), wd, "", 1),
+			"/db",
+			"data",
+			1,
+		)
+		info.ModelPath = strings.Replace(
+			strings.Replace(strings.ReplaceAll(file.FullPath, "/info.json", "/model.glb"), wd, "", 1),
+			"/db",
+			"data",
+			1,
+		)
+
+		cmhp_file.ReadJSON(file.FullPath, &info)
+
+		if info.UUID == args.UUID {
+			return info
+		}
+	}
+
+	rapi_core.Fatal(rapi_core.Error{Description: "File not found", Code: 404})
+
+	return obj
+}
+
+func (r RepoApi) GetList(args struct {
 	Category string `json:"category"`
-}) []core.VirtualObject {
-	list := make([]core.VirtualObject, 0)
+}) []core.ObjectInfo {
+	list := make([]core.ObjectInfo, 0)
 	if args.Category == "" {
 		return list
 	}
@@ -31,7 +73,13 @@ func (r ObjectApi) GetList(args struct {
 			previewPath = "data/object/" + args.Category + "/" + file.Name() + "/preview.jpg"
 		}
 
-		list = append(list, core.VirtualObject{
+		// Get file info
+		fileInfo := core.ObjectInfo{}
+		cmhp_file.ReadJSON(core.DataDir+"/object/"+args.Category+"/"+file.Name()+"/info.json", &fileInfo)
+
+		// Add to list
+		list = append(list, core.ObjectInfo{
+			UUID:        fileInfo.UUID,
 			Name:        file.Name(),
 			Category:    args.Category,
 			ModelPath:   "data/object/" + args.Category + "/" + file.Name() + "/model.glb",
@@ -42,7 +90,7 @@ func (r ObjectApi) GetList(args struct {
 	return list
 }
 
-func (r ObjectApi) PutPreview(args struct {
+func (r RepoApi) PutPreview(args struct {
 	Name     string         `json:"name"`
 	Category string         `json:"category"`
 	Preview  rapi_core.File `json:"preview"`
@@ -51,7 +99,7 @@ func (r ObjectApi) PutPreview(args struct {
 	rapi_core.FatalIfError(err)
 }
 
-func (r ObjectApi) PutIndex(args struct {
+func (r RepoApi) PutIndex(args struct {
 	Name  string         `json:"name"`
 	Type  string         `json:"type"`
 	Model rapi_core.File `json:"model"`

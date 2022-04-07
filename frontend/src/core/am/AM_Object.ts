@@ -6,6 +6,7 @@ import { AM_Core } from '@/core/AM_Core';
 import { AM_Animation } from '@/core/animation/AM_Animation';
 
 export interface AM_IObjectInfo {
+  uuid: string;
   name: string;
   category: string;
   modelPath: string;

@@ -156,9 +156,9 @@ export class AM_Core {
           .multiply(AM_State.selectedBone.boneHelper.quaternion);
 
         AM_State.selectedBone.rotationOffset.multiply(rotDiff);
-        AM_State.selectedObject?.update();
       }
 
+      AM_State.selectedObject?.update();
       AM_State.ui.timeline.refresh();
     });
     scene.add(this._manipulator);
