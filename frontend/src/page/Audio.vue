@@ -29,7 +29,7 @@ export default defineComponent({
     },
     isPlay(url: string) {
       if (!this.audioCache[url]) return false;
-      return !this.audioCache[url].paused;
+      return !(this.audioCache[url].ended || this.audioCache[url].paused);
     },
     togglePlay(url: string) {
       if (this.audioCache[url]) {
