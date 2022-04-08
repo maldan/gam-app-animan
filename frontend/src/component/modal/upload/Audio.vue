@@ -4,10 +4,6 @@
     <div>Name</div>
     <desktop-ui-input v-model="name" />
 
-    <!-- Category -->
-    <div>Category</div>
-    <ui-select v-model="category" :items="categoryList" />
-
     <!-- MP3 -->
     <div>MP3</div>
     <ui-input type="file" accept=".mp3" v-model="file" />
@@ -29,15 +25,13 @@ export default defineComponent({
   async mounted() {},
   methods: {
     async upload() {
-      await AM_API.uploadAudio(this.name, this.category.value, this.file[0]);
+      await AM_API.uploadAudio(this.name, this.file[0]);
       await this.$store.dispatch('modal/close');
     },
   },
   data: () => {
     return {
       name: '',
-      category: { label: '', value: '' },
-      categoryList: [{ label: 'Sex', value: 'sex' }],
       file: null as any,
     };
   },

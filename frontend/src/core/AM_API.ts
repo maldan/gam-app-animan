@@ -33,10 +33,9 @@ export class AM_API {
     );
   }
 
-  public static async uploadAudio(name: string, category: string, file: File): Promise<void> {
+  public static async uploadAudio(name: string, file: File): Promise<void> {
     const form = new FormData();
     form.append('name', name);
-    form.append('category', category);
     form.append('audio', file);
 
     await Axios.put(`${this.API_URL}/audio`, form);

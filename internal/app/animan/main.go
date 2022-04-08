@@ -63,7 +63,7 @@ func Start(frontFs embed.FS) {
 					"pose":      api.PoseApi{},
 				},
 			},
-			"/data": rapi_file.FileHandler{
+			"/db": rapi_file.FileHandler{
 				Root: core.DataDir,
 			},
 		},

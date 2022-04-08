@@ -1,15 +1,17 @@
 <template>
   <div :class="$style.main">
+    <desktop-ui-button @click="uploadModal" icon="arrow_up" text="Upload" />
+
     <div :class="$style.list">
-      <div :class="$style.preview" v-for="x in list" :key="x.audioPath">
+      <div :class="$style.audio" v-for="x in list" :key="x.audioPath">
         <div :class="$style.title">{{ x.name }}</div>
         <desktop-ui-button
+          :class="$style.button"
           @click="togglePlay(x.audioPath)"
           :text="isPlay(x.audioPath) ? 'Pause' : 'Play'"
         />
       </div>
     </div>
-    <desktop-ui-button @click="uploadModal" icon="arrow_up" text="Upload" />
   </div>
 </template>
 
@@ -67,27 +69,20 @@ export default defineComponent({
 
   .list {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(8, 1fr);
     gap: 10px;
-    // padding: 10px;
+    margin-top: 10px;
 
-    .preview {
+    .audio {
       display: flex;
-      flex-direction: column;
-      align-items: flex-start;
+      align-items: center;
       justify-content: center;
       background: #2b2b2b;
-      padding: 15px;
-      img {
-        width: 100%;
-      }
-      .title {
-        // margin-top: 15px;
-        background: #222222;
-        flex: 1;
-        width: 100%;
-        padding: 5px;
-        box-sizing: border-box;
+      padding: 10px;
+
+      .button {
+        flex: none;
+        margin-left: auto;
       }
     }
   }
