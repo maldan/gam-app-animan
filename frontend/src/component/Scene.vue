@@ -8,12 +8,6 @@
       @click="selectObject(x)"
     >
       {{ x.type }} {{ x.name }}
-      <ui-icon
-        v-if="isCharacter(x)"
-        @click.stop="toggleMode(x)"
-        :class="$style.visibility"
-        name="eye"
-      />
       <ui-icon @click.stop="toggleVisibility(x)" :class="$style.visibility" name="eye" />
       <ui-icon @click.stop="removeObject(x)" :class="$style.remove" name="trash" />
     </div>
@@ -27,6 +21,7 @@ import { AM_State } from '@/core/AM_State';
 import { AM_Object } from '@/core/am/AM_Object';
 import { AM_API } from '@/core/AM_API';
 import { AM_Character } from '@/core/am/AM_Character';
+import { AM_Bone } from '@/core/am/AM_Bone';
 
 export default defineComponent({
   props: {},
@@ -34,7 +29,7 @@ export default defineComponent({
   computed: {
     objectList() {
       if (this.r === 0) return [];
-      return AM_State.objectList;
+      return AM_State.objectList.filter((x) => !(x instanceof AM_Bone));
     },
   },
   async mounted() {
@@ -56,10 +51,6 @@ export default defineComponent({
     },
     selectObject(obj: AM_Object) {
       AM_State.selectObject(obj);
-    },
-    toggleMode(obj: AM_Character) {
-      /*if (obj.interactionMode === 'object') obj.interactionMode = 'skeleton';
-      else obj.interactionMode = 'object';*/
     },
     toggleVisibility(obj: AM_Object) {
       obj.visible = !obj.visible;

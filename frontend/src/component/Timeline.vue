@@ -8,7 +8,6 @@
           <desktop-ui-button @click="createAnimation" text="Add animation" />
           <desktop-ui-button @click="compileAnimation" text="Compile" />
           <desktop-ui-button @click="togglePlay" :text="isAnimationPlay ? 'Stop' : 'Play'" />
-          <desktop-ui-button @click="toggleInteractionMode" :text="interactionMode" />
         </div>
 
         <!-- Timeline -->
@@ -73,20 +72,69 @@
     </div>
 
     <!-- Animation -->
-    <div v-if="editMode === 'animation' && animation">
-      <ui-button @click="backFromAnimation" text="Back" style-type="small" />
+    <div :class="$style.animation" v-if="editMode === 'animation' && animation">
+      <div :class="$style.left" style="display: flex; margin-bottom: 10px; align-items: center">
+        <desktop-ui-button
+          @click="backFromAnimation"
+          text="Back"
+          style="flex: none; margin-right: 10px"
+        />
 
-      <div :class="$style.line" v-for="key in keys" :key="key">
-        <div :class="$style.name">{{ key }}</div>
+        <div class="button_group_round_compact">
+          <desktop-ui-button
+            @click="toggleKeyVisibility('position')"
+            text="P"
+            :isSelected="keyVisibility['position']"
+          />
+          <desktop-ui-button
+            @click="toggleKeyVisibility('rotation')"
+            text="R"
+            :isSelected="keyVisibility['rotation']"
+          />
+          <desktop-ui-button
+            @click="toggleKeyVisibility('scale')"
+            text="S"
+            :isSelected="keyVisibility['scale']"
+          />
+        </div>
+      </div>
+
+      <!-- Numbers -->
+      <div :class="[$style.line, $style.numbers]">
         <div :class="$style.keys">
           <div
-            @click="goToFrame(frameId - 1)"
+            :class="[$style.key]"
+            v-for="frameId in Math.min(animationController.frameCount, maxVisibleFrames)"
+            :key="frameId"
+          >
+            {{ (frameId - 1 + offsetX) % 5 === 0 ? frameId - 1 + offsetX : '' }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Keys -->
+      <div :class="$style.line" v-for="key in keys" :key="key">
+        <div
+          :class="[$style.name, selectedKeys.find((x) => x.key === key) ? $style.selected : null]"
+        >
+          {{ key }}
+        </div>
+        <div :class="$style.keys">
+          <div
+            @click="
+              goToFrame(frameId - 1);
+              clearKeySelection();
+              selectKey(key, frameId - 1);
+            "
             class="clickable"
             :class="[
               $style.key,
               animation.frames[frameId - 1].keys[key] ? $style.has : null,
-              animation.frameId === frameId - 1 ? $style.selected : null,
+              animation.frameId === frameId - 1 ? $style.current : null,
               animation.frames[frameId - 1].keys[key]?.isAuto ? $style.auto : null,
+              selectedKeys.find((x) => x.key === key && x.frameId === frameId - 1)
+                ? $style.selected
+                : null,
             ]"
             v-for="frameId in animation.frameCount"
             :key="frameId"
@@ -116,7 +164,18 @@ export default defineComponent({
     },
     keys(): string[] {
       if (this.r < 0) return [];
-      return this.selectedObject?.exposedKeys || [];
+      const keys = (this.selectedObject?.exposedKeys || []).filter((x) => {
+        if (!this.keyVisibility['position'] && x.match('.position')) return false;
+        if (!this.keyVisibility['rotation'] && x.match('.rotation')) return false;
+        if (!this.keyVisibility['scale'] && x.match('.scale')) return false;
+        return true;
+      });
+      const outKeys = [];
+      for (let i = 0; i < Math.min(this.maxVisibleKeys, keys.length); i++) {
+        const key = keys[i + this.offsetY];
+        outKeys.push(key);
+      }
+      return outKeys;
     },
     animationController(): AM_AnimationController | undefined {
       if (this.r < 0) return undefined;
@@ -149,18 +208,27 @@ export default defineComponent({
 
     this.kdAnimation = (e: KeyboardEvent) => {
       if (this.editMode !== 'animation') return;
+      if (!this.animation) return;
 
       if (e.key === 'Shift') this.isShiftPressed = true;
 
-      if (e.key === 'ArrowRight' && this.animation) {
+      if (e.key === 'ArrowRight') {
         this.animation.frameId += 1;
         this.refresh();
       }
-      if (e.key === 'ArrowLeft' && this.animation) {
+      if (e.key === 'ArrowLeft') {
         this.animation.frameId -= 1;
         this.refresh();
       }
 
+      // Delete key
+      if (e.key === 'Delete') {
+        for (let i = 0; i < this.selectedKeys.length; i++) {
+          delete this.animation.frames[this.selectedKeys[i].frameId].keys[this.selectedKeys[i].key];
+          this.animation.interpolateKey(this.selectedKeys[i].key);
+        }
+        this.refresh();
+      }
       /*if (!MainScene.selectedObject) return;
       if (MainScene.selectedObject?.userData.tag !== 'Character') return;
 
@@ -207,18 +275,6 @@ export default defineComponent({
       if (this.editMode !== 'controller') return;
       if (!this.animationController) return;
 
-      // Offset animation
-      if (e.key === 'ArrowRight' && this.hoverAnimationPart) {
-        this.hoverAnimationPart.offset += 1;
-        this.animationController.compile();
-        this.refresh();
-      }
-      if (e.key === 'ArrowLeft' && this.hoverAnimationPart) {
-        this.hoverAnimationPart.offset -= 1;
-        this.animationController.compile();
-        this.refresh();
-      }
-
       // Offset animation controller
       if (e.key === 'ArrowRight' && !this.hoverAnimationPart) {
         this.animationController.frameId += 1;
@@ -232,14 +288,22 @@ export default defineComponent({
     this.ku = (e: KeyboardEvent) => {
       if (e.key === 'Shift') this.isShiftPressed = false;
     };
+    this.wheel = (e: WheelEvent) => {
+      if (e.deltaY > 0) this.offsetY += 1;
+      else this.offsetY -= 1;
+      if (this.offsetY <= 0) this.offsetY = 0;
+      this.refresh();
+    };
     document.addEventListener('keydown', this.kdAnimation);
     document.addEventListener('keydown', this.kdController);
     document.addEventListener('keyup', this.ku);
+    document.addEventListener('wheel', this.wheel);
   },
   beforeUnmount() {
     document.removeEventListener('keydown', this.kdAnimation);
     document.removeEventListener('keydown', this.kdController);
     document.removeEventListener('keyup', this.ku);
+    document.removeEventListener('wheel', this.wheel);
   },
   methods: {
     refresh() {
@@ -256,7 +320,9 @@ export default defineComponent({
         });
       } else {
         this.animation?.on('change', () => {
-          AM_State.selectedObject?.applyAnimation(this.animation);
+          if (AM_State.selectedObject instanceof AM_Bone)
+            AM_State.selectedObject.parent.applyAnimation(this.animation);
+          else AM_State.selectedObject?.applyAnimation(this.animation);
         });
       }
 
@@ -310,12 +376,23 @@ export default defineComponent({
       AM_State.interactionMode = AM_State.interactionMode === 'pose' ? 'object' : 'pose';
       this.refresh();
     },
+    toggleKeyVisibility(key: string): void {
+      this.keyVisibility[key] = !this.keyVisibility[key];
+      this.refresh();
+    },
+    clearKeySelection() {
+      this.selectedKeys.length = 0;
+    },
+    selectKey(key: string, frameId: number): void {
+      this.selectedKeys.push({ key, frameId });
+    },
   },
   data: () => {
     return {
       kdAnimation: undefined as any,
       kdController: undefined as any,
       ku: undefined as any,
+      wheel: undefined as any,
       isShiftPressed: false,
 
       r: 0,
@@ -324,10 +401,20 @@ export default defineComponent({
 
       frameWidth: 9,
 
-      maxVisibleFrames: 32,
+      maxVisibleFrames: 48,
+      maxVisibleKeys: 12,
+
+      keyVisibility: {
+        position: true,
+        rotation: true,
+        scale: true,
+      } as Record<string, boolean>,
+
+      selectedKeys: [] as { key: string; frameId: number }[],
 
       // Scroll
       offsetX: 0,
+      offsetY: 0,
     };
   },
 });
@@ -338,6 +425,23 @@ export default defineComponent({
 @import '../gam_sdk_ui/vue/style/size';
 
 .timeline {
+  .controller,
+  .animation {
+    .left {
+      .numbers {
+        font-size: 12px;
+        color: $text-gray;
+        margin-bottom: 3px;
+
+        .keys {
+          .key {
+            background: none;
+          }
+        }
+      }
+    }
+  }
+
   .controller {
     display: flex;
 
@@ -374,18 +478,6 @@ export default defineComponent({
         background: #1b1b1b;
         overflow: hidden;
       }
-
-      .numbers {
-        font-size: 12px;
-        color: $text-gray;
-        margin-bottom: 3px;
-
-        .keys {
-          .key {
-            background: none;
-          }
-        }
-      }
     }
 
     .right {
@@ -398,12 +490,12 @@ export default defineComponent({
     margin-bottom: 1px;
     min-height: 16px;
 
-    .number {
+    /*.number {
       width: 8px;
       font-size: 12px;
       color: $text-gray;
       margin-right: 1px;
-    }
+    }*/
 
     .name {
       width: 128px;
@@ -437,14 +529,18 @@ export default defineComponent({
         background: #161616;
         margin-right: 1px;
 
-        &.selected {
+        &.current {
           background: #0000ff;
+        }
+
+        &.selected {
+          background: #18b14a;
         }
 
         &.has {
           background: #fe0000;
 
-          &.selected {
+          &.current {
             background: lighten(#0000ff, 30%);
           }
         }
@@ -452,7 +548,7 @@ export default defineComponent({
         &.auto {
           background: #feba33;
 
-          &.selected {
+          &.current {
             background: lighten(#0000ff, 50%);
           }
         }

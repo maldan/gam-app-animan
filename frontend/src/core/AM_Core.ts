@@ -145,7 +145,7 @@ export class AM_Core {
     });
     this._manipulator.addEventListener('mouseUp', () => {
       if (!this._manipulator) return;
-      this._isManipulatorLocked = false;
+      //this._isManipulatorLocked = false;
 
       // Rotate
       if (this._manipulator.mode === 'rotate') {
@@ -253,7 +253,10 @@ export class AM_Core {
       pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
     });
     document.addEventListener('click', (e: MouseEvent) => {
-      if (this._isManipulatorLocked) return;
+      if (this._isManipulatorLocked) {
+        this._isManipulatorLocked = false;
+        return;
+      }
       /*if (this._isManipulatorCanUnlock) {
         this._isManipulatorCanUnlock = false;
         this._isManipulatorLocked = false;

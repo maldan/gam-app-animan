@@ -8,14 +8,7 @@ import { AM_Key } from '@/core/animation/key/AM_Key';
 import { AM_IVector4 } from '@/core/am/AM_Vector';
 
 export class AM_Character extends AM_Object {
-  public exposedKeys = [
-    'transform.position',
-    'transform.rotation',
-    'transform.scale',
-    'bone.Root.position',
-    'bone.Root.rotation',
-    'bone.Root.scale',
-  ];
+  public exposedKeys = ['transform.position', 'transform.rotation', 'transform.scale'];
 
   private _boneList: Record<string, AM_Bone> = {};
   private _shapeList: { name: string; value: number }[] = [];
@@ -90,6 +83,10 @@ export class AM_Character extends AM_Object {
 
       // Add helper to scene
       AM_State.addObject(this._boneList[object.name]);
+
+      this.exposedKeys.push(`bone.${object.name}.position`);
+      this.exposedKeys.push(`bone.${object.name}.rotation`);
+      this.exposedKeys.push(`bone.${object.name}.scale`);
     });
   }
 
@@ -116,12 +113,9 @@ export class AM_Character extends AM_Object {
     }
 
     if (prefix === 'bone') {
-      // console.log(key.name.split('.'));
-      // @ts-ignore
-      // this[name] = key.value;
+      const boneName = key.name.split('.').slice(1, -1).join('.');
       const k = key.value as AM_IVector4;
-      this.boneList[name].rotationOffset = new THREE.Quaternion(k.x, k.y, k.z, k.w);
-      // this.boneList[name].update();
+      this.boneList[boneName].rotationOffset = new THREE.Quaternion(k.x, k.y, k.z, k.w);
     }
   }
 
