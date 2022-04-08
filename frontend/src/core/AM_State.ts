@@ -57,10 +57,11 @@ export class AM_State {
   public static isAnimationPlay = false;
   public static animationTime = 0;
   public static mode = '';
+  public static interactionMode: 'pose' | 'object' = 'object';
 
   // Bones
-  public static selectedBone?: AM_Bone;
-  public static hoverBone?: AM_Bone;
+  //public static selectedBone?: AM_Bone;
+  //public static hoverBone?: AM_Bone;
 
   public static addObject(obj: AM_Object): void {
     this.objectList.push(obj);
@@ -69,11 +70,17 @@ export class AM_State {
 
   public static selectObject(obj: AM_Object | undefined): void {
     // Obj changed
-    if (obj !== this.selectedObject) this.selectedAnimation = undefined;
+    if (obj instanceof AM_Bone) {
+      if (obj.parent !== this.selectedObject) this.selectedAnimation = undefined;
+    } else {
+      if (obj !== this.selectedObject) this.selectedAnimation = undefined;
+    }
 
     this.selectedObject?.onUnselect();
     this.selectedObject = obj;
     this.selectedObject?.onSelect();
+
+    AM_Core.setManipulatorTo(obj);
 
     this.ui.refresh();
   }

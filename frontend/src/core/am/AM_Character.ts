@@ -4,6 +4,8 @@ import { AM_Core } from '@/core/AM_Core';
 import { AM_Bone } from '@/core/am/AM_Bone';
 import { SkinnedMesh } from 'three';
 import { AM_State } from '@/core/AM_State';
+import { AM_Key } from '@/core/animation/key/AM_Key';
+import { AM_IVector4 } from '@/core/am/AM_Vector';
 
 export class AM_Character extends AM_Object {
   public exposedKeys = [
@@ -14,7 +16,6 @@ export class AM_Character extends AM_Object {
     'bone.Root.rotation',
     'bone.Root.scale',
   ];
-  public interactionMode = 'object';
 
   private _boneList: Record<string, AM_Bone> = {};
   private _shapeList: { name: string; value: number }[] = [];
@@ -81,41 +82,47 @@ export class AM_Character extends AM_Object {
           transparent: true,
         }),
       );
-      boneHelper.visible = false;
 
       // Create bone
-      this._boneList[object.name] = new AM_Bone(object as THREE.Bone, boneHelper);
-      this._boneList[object.name].tick();
+      this._boneList[object.name] = new AM_Bone(boneHelper, this, object as THREE.Bone);
+      this._boneList[object.name].name = object.name;
+      this._boneList[object.name].update();
 
       // Add helper to scene
-      AM_Core.scene.add(boneHelper);
-
-      // Add rig
-      /*const rig = new Animation_Rig(object as THREE.Bone, boneHelper);
-      this._rigList.push(rig);
-      this._rigDict[object.name] = rig;
-
-      // Add bone helper
-      boneHelper.name = 'BoneHelper';
-      boneHelper.userData.tag = 'BoneHelper';
-      boneHelper.userData.rig = rig;
-      boneHelper.userData.character = this;
-      boneHelper.visible = false;
-      this._scene.add(boneHelper);*/
+      AM_State.addObject(this._boneList[object.name]);
     });
   }
 
   public onSelect(): void {
-    if (AM_State.selectedObject === this) {
+    /*if (AM_State.selectedObject === this) {
       for (const x in this.boneList)
-        this.boneList[x].boneHelper.visible = this.interactionMode === 'skeleton';
+        this.boneList[x].boneHelper.visible = AM_State.interactionMode === 'pose';
 
-      if (this.interactionMode === 'object') AM_Core.setManipulatorTo(this);
-    }
+      if (AM_State.interactionMode === 'object') AM_Core.setManipulatorTo(this);
+    }*/
   }
 
   public onUnselect(): void {
-    for (const x in this.boneList) this.boneList[x].boneHelper.visible = false;
+    // for (const x in this.boneList) this.boneList[x].visible = false;
+  }
+
+  public applyKey(key: AM_Key): void {
+    const prefix = key.name.split('.')[0];
+    const name = key.name.split('.')[1];
+
+    if (prefix === 'transform') {
+      // @ts-ignore
+      this[name] = key.value;
+    }
+
+    if (prefix === 'bone') {
+      // console.log(key.name.split('.'));
+      // @ts-ignore
+      // this[name] = key.value;
+      const k = key.value as AM_IVector4;
+      this.boneList[name].rotationOffset = new THREE.Quaternion(k.x, k.y, k.z, k.w);
+      // this.boneList[name].update();
+    }
   }
 
   public setShapeKey(name: string, value: number): void {
@@ -138,7 +145,7 @@ export class AM_Character extends AM_Object {
   public update(): void {
     for (const x in this.boneList) {
       // this.boneList[x].boneHelper.visible = this.visible;
-      this.boneList[x].tick();
+      this.boneList[x].update();
     }
   }
 

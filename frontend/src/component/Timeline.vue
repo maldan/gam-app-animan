@@ -5,13 +5,10 @@
       <div :class="$style.left">
         <!-- Header -->
         <div class="button_group_round_compact" :class="$style.header">
-          <ui-button @click="createAnimation" text="Add animation" style-type="small" />
-          <ui-button @click="compileAnimation" text="Compile" style-type="small" />
-          <ui-button
-            @click="togglePlay"
-            :text="isAnimationPlay ? 'Stop' : 'Play'"
-            style-type="small"
-          />
+          <desktop-ui-button @click="createAnimation" text="Add animation" />
+          <desktop-ui-button @click="compileAnimation" text="Compile" />
+          <desktop-ui-button @click="togglePlay" :text="isAnimationPlay ? 'Stop' : 'Play'" />
+          <desktop-ui-button @click="toggleInteractionMode" :text="interactionMode" />
         </div>
 
         <!-- Timeline -->
@@ -105,18 +102,25 @@ import { defineComponent } from 'vue';
 import { AM_State } from '@/core/AM_State';
 import { AM_AnimationController, AM_IAnimationPart } from '@/core/animation/AM_AnimationController';
 import { AM_Animation } from '@/core/animation/AM_Animation';
+import { AM_Object } from '@/core/am/AM_Object';
+import { AM_Bone } from '@/core/am/AM_Bone';
 
 export default defineComponent({
   props: {},
   components: {},
   computed: {
-    keys() {
+    selectedObject(): AM_Object | undefined {
+      if (this.r < 0) return undefined;
+      if (AM_State.selectedObject instanceof AM_Bone) return AM_State.selectedObject.parent;
+      return AM_State.selectedObject;
+    },
+    keys(): string[] {
       if (this.r < 0) return [];
-      return AM_State.selectedObject?.exposedKeys || [];
+      return this.selectedObject?.exposedKeys || [];
     },
     animationController(): AM_AnimationController | undefined {
       if (this.r < 0) return undefined;
-      return AM_State.selectedObject?.animationController;
+      return this.selectedObject?.animationController;
     },
     animationList(): AM_IAnimationPart[] {
       if (this.r < 0) return [];
@@ -133,6 +137,10 @@ export default defineComponent({
     isAnimationPlay(): boolean {
       if (this.r < 0) return false;
       return AM_State.isAnimationPlay;
+    },
+    interactionMode(): string {
+      if (this.r < 0) return 'object';
+      return AM_State.interactionMode;
     },
   },
   async mounted() {
@@ -296,6 +304,10 @@ export default defineComponent({
     },
     togglePlay() {
       AM_State.isAnimationPlay = !AM_State.isAnimationPlay;
+      this.refresh();
+    },
+    toggleInteractionMode() {
+      AM_State.interactionMode = AM_State.interactionMode === 'pose' ? 'object' : 'pose';
       this.refresh();
     },
   },

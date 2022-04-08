@@ -58,8 +58,8 @@ export default defineComponent({
       AM_State.selectObject(obj);
     },
     toggleMode(obj: AM_Character) {
-      if (obj.interactionMode === 'object') obj.interactionMode = 'skeleton';
-      else obj.interactionMode = 'object';
+      /*if (obj.interactionMode === 'object') obj.interactionMode = 'skeleton';
+      else obj.interactionMode = 'object';*/
     },
     toggleVisibility(obj: AM_Object) {
       obj.visible = !obj.visible;

@@ -7,12 +7,14 @@ import { AM_KeyVector3 } from '@/core/animation/key/AM_KeyVector3';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { AM_KeyQuaternion } from '@/core/animation/key/AM_KeyQuaternion';
 import { AM_Character } from '@/core/am/AM_Character';
+import { AM_Bone } from '@/core/am/AM_Bone';
 
 export class AM_Core {
   public static scene: THREE.Scene;
 
   private static _manipulator: TransformControls;
   private static _isManipulatorLocked = false;
+  private static _isManipulatorCanUnlock = false;
   private static _manipulatorStartPosition: THREE.Vector3 = new THREE.Vector3();
   private static _manipulatorStartRotation: THREE.Quaternion = new THREE.Quaternion();
 
@@ -68,7 +70,7 @@ export class AM_Core {
       }
 
       // Ray cast with bones
-      AM_State.hoverBone = undefined;
+      /*AM_State.hoverBone = undefined;
       raycaster.setFromCamera(pointer, camera);
       if (AM_State.selectedObject instanceof AM_Character) {
         const bones = Object.values(AM_State.selectedObject.boneList);
@@ -98,7 +100,7 @@ export class AM_Core {
           // Set hover bone
           AM_State.hoverBone = bones.find((x) => x.boneHelper === object);
         }
-      }
+      }*/
     });
     renderer.outputEncoding = THREE.sRGBEncoding;
 
@@ -132,9 +134,10 @@ export class AM_Core {
     this._manipulator.addEventListener('mouseDown', () => {
       if (!this._manipulator) return;
       this._isManipulatorLocked = true;
-      if (AM_State.selectedBone) {
-        this._manipulatorStartPosition = AM_State.selectedBone.boneHelper.position.clone();
-        this._manipulatorStartRotation = AM_State.selectedBone.boneHelper.quaternion.clone();
+
+      if (AM_State.selectedObject instanceof AM_Bone) {
+        this._manipulatorStartPosition = AM_State.selectedObject.model.position.clone();
+        this._manipulatorStartRotation = AM_State.selectedObject.model.quaternion.clone();
       } else {
         this._manipulatorStartPosition = this._manipulator.position.clone();
         this._manipulatorStartRotation = this._manipulator.quaternion.clone();
@@ -144,8 +147,52 @@ export class AM_Core {
       if (!this._manipulator) return;
       this._isManipulatorLocked = false;
 
+      // Rotate
+      if (this._manipulator.mode === 'rotate') {
+        if (AM_State.selectedObject instanceof AM_Bone) {
+          const rotDiff = this._manipulatorStartRotation
+            .clone()
+            .invert()
+            .multiply(AM_State.selectedObject.model.quaternion);
+
+          AM_State.selectedObject.rotationOffset.multiply(rotDiff);
+          const rot = AM_State.selectedObject.rotationOffset;
+
+          if (AM_State.selectedAnimation) {
+            AM_State.selectedAnimation.setCurrentKey(
+              new AM_KeyQuaternion(`bone.${AM_State.selectedObject.name}.rotation`, {
+                x: rot.x,
+                y: rot.y,
+                z: rot.z,
+                w: rot.w,
+              }),
+            );
+          }
+        } else {
+          const rot = AM_State.selectedObject?.model.quaternion;
+          if (AM_State.selectedAnimation && rot) {
+            AM_State.selectedAnimation.setCurrentKey(
+              new AM_KeyQuaternion('transform.rotation', {
+                x: rot.x,
+                y: rot.y,
+                z: rot.z,
+                w: rot.w,
+              }),
+            );
+          }
+        }
+      }
+
+      if (AM_State.selectedObject instanceof AM_Bone) {
+        AM_State.selectedObject?.parent.update();
+      } else {
+        AM_State.selectedObject?.update();
+      }
+
+      AM_State.ui.timeline.refresh();
+
       // Translate
-      if (this._manipulator.mode === 'translate') {
+      /*if (this._manipulator.mode === 'translate') {
         const pos = AM_State.selectedObject?.model.position;
         if (AM_State.selectedAnimation && pos) {
           AM_State.selectedAnimation.setCurrentKey(
@@ -175,7 +222,7 @@ export class AM_Core {
       }
 
       AM_State.selectedObject?.update();
-      AM_State.ui.timeline.refresh();
+      AM_State.ui.timeline.refresh();*/
     });
     scene.add(this._manipulator);
 
@@ -205,22 +252,38 @@ export class AM_Core {
       pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
       pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
     });
-    window.addEventListener('mousedown', (e: MouseEvent) => {
+    document.addEventListener('click', (e: MouseEvent) => {
       if (this._isManipulatorLocked) return;
+      /*if (this._isManipulatorCanUnlock) {
+        this._isManipulatorCanUnlock = false;
+        this._isManipulatorLocked = false;
+      }*/
       if (e.button === 0) {
-        /*DataStorage.selectedObject = undefined;
-        DataStorage.setManipulatorTo(undefined);
-        if (DataStorage.hoverObject) {
-          DataStorage.selectedObject = DataStorage.hoverObject;
-          DataStorage.setManipulatorTo(DataStorage.hoverObject);
-        }*/
-        AM_State.selectedBone = undefined;
+        raycaster.setFromCamera(pointer, camera);
+
+        // Check intersects with bones
+        const intersects = raycaster.intersectObjects(
+          AM_State.objectList.map((x) => x.model),
+          true,
+        );
+        const bone = intersects.find((x) => x.object.userData.amObject instanceof AM_Bone);
+
+        // Has intersection
+        if (intersects[0] || bone) {
+          if (bone) AM_State.selectObject(bone.object.userData.amObject);
+          else AM_State.selectObject(intersects[0].object.userData.amObject);
+        } else {
+          AM_State.selectObject(undefined);
+        }
+
+        // console.log();
+        /*AM_State.selectedBone = undefined;
         this._manipulator.detach();
 
         if (AM_State.hoverBone) {
           AM_State.selectedBone = AM_State.hoverBone;
           this._manipulator.attach(AM_State.selectedBone.boneHelper);
-        }
+        }*/
       }
     });
   }

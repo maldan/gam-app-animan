@@ -32,9 +32,10 @@ export class AM_Object {
     this.#_threeObject = o;
     AM_Core.scene.add(o);
 
-    /*this.animationController.on('change', () => {
-      this.applyAnimation();
-    });*/
+    // Set object
+    o.traverse((object) => {
+      object.userData.amObject = this;
+    });
   }
 
   public applyAnimation(animation: AM_Animation | undefined): void {
@@ -42,6 +43,7 @@ export class AM_Object {
     if (!animation.currentFrame) return;
     const keys = animation.currentFrame.keys;
     for (const key in keys) this.applyKey(keys[key]);
+    this.update();
   }
 
   public applyKey(key: AM_Key): void {
@@ -52,13 +54,6 @@ export class AM_Object {
       // @ts-ignore
       this[name] = key.value;
     }
-
-    /*
-    const type = key.split(':')[1];
-
-    if (prefix === 'transform') {
-
-    }*/
   }
 
   public update(): void {}
