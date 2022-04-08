@@ -9,8 +9,68 @@ import { AM_KeyQuaternion } from '@/core/animation/key/AM_KeyQuaternion';
 import { AM_Character } from '@/core/am/AM_Character';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { MathUtils } from 'three';
+import { AM_Core } from '@/core/AM_Core';
 
 export class AM_Preview {
+  public static async init(el: HTMLElement, modelPath: string): Promise<void> {
+    // Camera
+    const camera = new THREE.PerspectiveCamera(
+      45,
+      window.innerWidth / window.innerHeight,
+      0.001,
+      64,
+    );
+    camera.position.y = 2;
+    camera.position.z = 5;
+
+    // Scene
+    const scene = new THREE.Scene();
+    AM_Core.scene = scene;
+
+    // Render
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setAnimationLoop(() => {
+      renderer.setClearColor(0x333333);
+      renderer.render(scene, camera);
+      controls.update();
+    });
+    renderer.outputEncoding = THREE.sRGBEncoding;
+
+    // Scene control
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.mouseButtons = {
+      // @ts-ignore
+      LEFT: null,
+      MIDDLE: THREE.MOUSE.ROTATE,
+      // @ts-ignore
+      RIGHT: null,
+    };
+    controls.autoRotate = false;
+
+    // Grid
+    const grid = 5;
+    scene.add(new THREE.GridHelper(grid, grid * 2, 0x666666, 0x222222));
+
+    // Light
+    const l = new THREE.DirectionalLight(0xffffff, 1);
+    l.position.set(0, 5, 10);
+    scene.add(l);
+    const l2 = new THREE.DirectionalLight(0xffffff, 1);
+    l2.position.set(0, -5, -10);
+    scene.add(l2);
+
+    // Inject html
+    el.appendChild(renderer.domElement);
+    renderer.domElement.style.position = 'absolute';
+    renderer.domElement.style.left = '0';
+    renderer.domElement.style.top = '0';
+    renderer.domElement.style.zIndex = '0';
+
+    // Load model
+    const obj = await AM_State.loadObject(modelPath);
+  }
+
   public static async getPreview(virtualObject: { modelPath: string }): Promise<string> {
     // init
     const camera = new THREE.PerspectiveCamera(45, 256 / 256, 0.001, 1024);

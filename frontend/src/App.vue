@@ -20,7 +20,7 @@ export default defineComponent({
         //{ name: 'Animation', url: '/' },
         { name: 'Animation', url: '/animation' },
         { name: 'Clip', url: '/clip' },
-        { name: 'Repo', url: '/repo' },
+        { name: 'Object', url: '/object' },
         { name: 'Audio', url: '/audio' },
       ],
     };

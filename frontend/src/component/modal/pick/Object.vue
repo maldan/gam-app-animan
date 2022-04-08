@@ -33,7 +33,7 @@ export default defineComponent({
   },
   methods: {
     async refresh() {
-      this.list = await AM_API.getObjectList(this.search);
+      this.list = await AM_API.getObjectList();
     },
   },
   data: () => {

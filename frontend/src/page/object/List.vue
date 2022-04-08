@@ -1,26 +1,27 @@
 <template>
   <div :class="$style.main">
-    <ui-button-group :items="items" v-model="category" @change="refresh" />
+    <desktop-ui-button @click="uploadModal" icon="arrow_up" text="Upload" />
 
     <div :class="$style.list">
       <div
         class="clickable"
         :class="$style.preview"
-        v-for="x in $store.state.repo.objectList"
+        v-for="x in list"
         :key="x.modelPath"
-        @click="$router.push(`/preview/${x.category}/${x.name}`)"
+        @click="$router.push(`/object/${x.uuid}`)"
       >
         <img :src="x.previewPath" alt="Preview" />
         <div :class="$style.title">{{ x.name }}</div>
       </div>
     </div>
-    <ui-button @click="uploadModal" icon="arrow_up" text="Upload" />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { AM_Preview } from '@/core/AM_Preview';
+import { AM_IObjectInfo } from '@/core/am/AM_Object';
+import { AM_API } from '@/core/AM_API';
 
 export default defineComponent({
   components: {},
@@ -29,19 +30,14 @@ export default defineComponent({
   },
   methods: {
     async refresh() {
-      await this.$store.dispatch('repo/getList', this.category);
-      for (let i = 0; i < this.$store.state.repo.objectList.length; i++) {
-        const obj = this.$store.state.repo.objectList[i];
+      this.list = await AM_API.getObjectList();
+      for (let i = 0; i < this.list.length; i++) {
+        const obj = this.list[i];
         if (obj.previewPath !== '') continue;
         const preview = await AM_Preview.getPreview(obj);
-        await this.$store.dispatch('repo/uploadPreview', {
-          name: obj.name,
-          category: obj.category,
-          image: preview,
-        });
-        this.$store.state.repo.objectList[i].previewPath = this.$store.state.repo.objectList[
-          i
-        ].modelPath.replace(/\/[a-zA-Z0-9_]+\.glb$/, '/preview.jpg');
+
+        await AM_API.uploadObjectPreview(obj.category + '/' + obj.name, preview);
+        obj.previewPath = obj.modelPath.replace(/\/[a-zA-Z0-9_]+\.glb$/, '/preview.jpg');
       }
     },
     uploadModal() {
@@ -57,17 +53,7 @@ export default defineComponent({
   },
   data: () => {
     return {
-      category: '',
-      items: [
-        {
-          text: 'Character',
-          id: 'character',
-        },
-        {
-          text: 'Nature',
-          id: 'nature',
-        },
-      ],
+      list: [] as AM_IObjectInfo[],
     };
   },
 });
@@ -81,7 +67,7 @@ export default defineComponent({
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 10px;
-    // padding: 10px;
+    margin-top: 10px;
 
     .preview {
       display: flex;

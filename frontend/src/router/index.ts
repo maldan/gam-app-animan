@@ -1,7 +1,8 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
 import Animation from '../page/Animation.vue';
 import Clip from '../page/Clip.vue';
-import Repo from '../page/Repo.vue';
+import ObjectList from '../page/object/List.vue';
+import ObjectPreview from '../page/object/Preview.vue';
 import Audio from '../page/Audio.vue';
 
 const routes: Array<RouteRecordRaw> = [
@@ -16,9 +17,14 @@ const routes: Array<RouteRecordRaw> = [
     component: Clip,
   },
   {
-    path: '/repo',
-    name: 'Repo',
-    component: Repo,
+    path: '/object',
+    name: 'Object List',
+    component: ObjectList,
+  },
+  {
+    path: '/object/:uuid',
+    name: 'Object Preview',
+    component: ObjectPreview,
   },
   {
     path: '/audio',

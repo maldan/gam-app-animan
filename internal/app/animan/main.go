@@ -58,7 +58,7 @@ func Start(frontFs embed.FS) {
 				Controller: map[string]interface{}{
 					"main":      api.MainApi{},
 					"animation": api.AnimationApi{},
-					"repo":      api.RepoApi{},
+					"object":    api.ObjectApi{},
 					"audio":     api.AudioApi{},
 					"pose":      api.PoseApi{},
 				},
