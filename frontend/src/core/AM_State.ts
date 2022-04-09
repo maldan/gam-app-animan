@@ -70,11 +70,11 @@ export class AM_State {
 
   public static selectObject(obj: AM_Object | undefined): void {
     // Obj changed
-    if (obj instanceof AM_Bone) {
+    /*if (obj instanceof AM_Bone) {
       if (obj.parent !== this.selectedObject) this.selectedAnimation = undefined;
     } else {
       if (obj !== this.selectedObject) this.selectedAnimation = undefined;
-    }
+    }*/
 
     this.selectedObject?.onUnselect();
     this.selectedObject = obj;

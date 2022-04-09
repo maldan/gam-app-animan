@@ -30,6 +30,8 @@ export class AM_Bone extends AM_Object {
     const gr = new THREE.Quaternion();
     this.bone.getWorldQuaternion(gr);
 
+    // this.position.y += 0.5;
+
     this.position = { x: gp.x, y: gp.y, z: gp.z };
     this.rotation = { x: gr.x, y: gr.y, z: gr.z, w: gr.w };
     //this.position.set(gp.x, gp.y, gp.z);

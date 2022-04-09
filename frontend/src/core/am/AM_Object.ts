@@ -87,11 +87,20 @@ export class AM_Object {
   }
 
   public get rotation(): AM_IVector4 {
-    return { x: 0, y: 0, z: 0, w: 1 };
+    return {
+      x: this.#_threeObject.quaternion.x,
+      y: this.#_threeObject.quaternion.y,
+      z: this.#_threeObject.quaternion.z,
+      w: this.#_threeObject.quaternion.w,
+    };
   }
 
   public get scale(): AM_IVector3 {
-    return { x: 0, y: 0, z: 0 };
+    return {
+      x: this.#_threeObject.scale.x,
+      y: this.#_threeObject.scale.y,
+      z: this.#_threeObject.scale.z,
+    };
   }
 
   public get model(): THREE.Object3D {

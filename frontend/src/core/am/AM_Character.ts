@@ -117,6 +117,11 @@ export class AM_Character extends AM_Object {
       const k = key.value as AM_IVector4;
       this.boneList[boneName].rotationOffset = new THREE.Quaternion(k.x, k.y, k.z, k.w);
     }
+
+    if (prefix === 'shape') {
+      const shapeName = key.name.split('.').slice(1).join('.');
+      this.setShapeKey(shapeName, key.value as number);
+    }
   }
 
   public setShapeKey(name: string, value: number): void {

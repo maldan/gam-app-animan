@@ -1,147 +1,7 @@
 <template>
   <div v-if="animationController" :class="$style.timeline">
-    <!-- Animation list -->
-    <div :class="$style.controller" v-if="editMode === 'controller'">
-      <div :class="$style.left">
-        <!-- Header -->
-        <div class="button_group_round_compact" :class="$style.header">
-          <desktop-ui-button @click="createAnimation" text="Add animation" />
-          <desktop-ui-button @click="compileAnimation" text="Compile" />
-          <desktop-ui-button @click="togglePlay" :text="isAnimationPlay ? 'Stop' : 'Play'" />
-        </div>
-
-        <!-- Timeline -->
-        <!-- Numbers -->
-        <div v-if="animationList.length" :class="[$style.line, $style.numbers]">
-          <div :class="$style.keys">
-            <div
-              :class="[$style.key]"
-              v-for="frameId in Math.min(animationController.frameCount, maxVisibleFrames)"
-              :key="frameId"
-            >
-              {{ (frameId - 1 + offsetX) % 5 === 0 ? frameId - 1 + offsetX : '' }}
-            </div>
-          </div>
-        </div>
-        <!-- Animation list -->
-        <div v-if="animationList.length" :class="$style.line">
-          <div :class="$style.keys">
-            <div
-              :class="[
-                $style.key,
-                animationController.frameId === frameId - 1 + offsetX ? $style.selected : null,
-              ]"
-              v-for="frameId in Math.min(animationController.frameCount, maxVisibleFrames)"
-              :key="frameId"
-            ></div>
-          </div>
-        </div>
-
-        <div
-          :class="$style.lines"
-          :style="{
-            width: Math.min(animationController.frameCount, maxVisibleFrames) * frameWidth + 'px',
-          }"
-        >
-          <div
-            class="clickable"
-            :class="[$style.animationPart, x === selectedAnimationPart ? $style.selected : null]"
-            @click="selectAnimationPart(x)"
-            v-doubleclick="openAnimationPart.bind(this, x)"
-            @mouseover="hoverAnimationPart = x"
-            @mouseout="hoverAnimationPart = undefined"
-            v-for="x in animationList"
-            :style="{
-              left: (x.offset - offsetX) * frameWidth + 'px',
-              width: frameWidth * x.animation.frameCount + 'px',
-            }"
-            :key="x"
-          >
-            {{ x.animation.name }}
-          </div>
-        </div>
-      </div>
-
-      <div :class="$style.right">
-        <div v-if="selectedAnimationPart">
-          <ui-number @change="refresh" v-model="selectedAnimationPart.offset" />
-          <ui-number @change="refresh" v-model="selectedAnimationPart.animation.frameCount" />
-          <ui-input @change="refresh" v-model="selectedAnimationPart.animation.name" />
-        </div>
-      </div>
-    </div>
-
-    <!-- Animation -->
-    <div :class="$style.animation" v-if="editMode === 'animation' && animation">
-      <div :class="$style.left" style="display: flex; margin-bottom: 10px; align-items: center">
-        <desktop-ui-button
-          @click="backFromAnimation"
-          text="Back"
-          style="flex: none; margin-right: 10px"
-        />
-
-        <div class="button_group_round_compact">
-          <desktop-ui-button
-            @click="toggleKeyVisibility('position')"
-            text="P"
-            :isSelected="keyVisibility['position']"
-          />
-          <desktop-ui-button
-            @click="toggleKeyVisibility('rotation')"
-            text="R"
-            :isSelected="keyVisibility['rotation']"
-          />
-          <desktop-ui-button
-            @click="toggleKeyVisibility('scale')"
-            text="S"
-            :isSelected="keyVisibility['scale']"
-          />
-        </div>
-      </div>
-
-      <!-- Numbers -->
-      <div :class="[$style.line, $style.numbers]">
-        <div :class="$style.keys">
-          <div
-            :class="[$style.key]"
-            v-for="frameId in Math.min(animationController.frameCount, maxVisibleFrames)"
-            :key="frameId"
-          >
-            {{ (frameId - 1 + offsetX) % 5 === 0 ? frameId - 1 + offsetX : '' }}
-          </div>
-        </div>
-      </div>
-
-      <!-- Keys -->
-      <div :class="$style.line" v-for="key in keys" :key="key">
-        <div
-          :class="[$style.name, selectedKeys.find((x) => x.key === key) ? $style.selected : null]"
-        >
-          {{ key }}
-        </div>
-        <div :class="$style.keys">
-          <div
-            @click="
-              goToFrame(frameId - 1);
-              clearKeySelection();
-              selectKey(key, frameId - 1);
-            "
-            class="clickable"
-            :class="[
-              $style.key,
-              animation.frames[frameId - 1].keys[key] ? $style.has : null,
-              animation.frameId === frameId - 1 ? $style.current : null,
-              animation.frames[frameId - 1].keys[key]?.isAuto ? $style.auto : null,
-              selectedKeys.find((x) => x.key === key && x.frameId === frameId - 1)
-                ? $style.selected
-                : null,
-            ]"
-            v-for="frameId in animation.frameCount"
-            :key="frameId"
-          ></div>
-        </div>
-      </div>
-    </div>
+    <timeline-controller ref="controller" v-if="!animation" />
+    <timeline-animation ref="animation" v-if="animation" />
   </div>
 </template>
 
@@ -158,6 +18,19 @@ export default defineComponent({
   components: {},
   computed: {
     selectedObject(): AM_Object | undefined {
+      if (this.r < 0) return undefined;
+      if (AM_State.selectedObject instanceof AM_Bone) return AM_State.selectedObject.parent;
+      return AM_State.selectedObject;
+    },
+    animationController(): AM_AnimationController | undefined {
+      if (this.r < 0) return undefined;
+      return this.selectedObject?.animationController;
+    },
+    animation(): AM_Animation | undefined {
+      if (this.r < 0) return undefined;
+      return AM_State.selectedAnimation;
+    },
+    /*selectedObject(): AM_Object | undefined {
       if (this.r < 0) return undefined;
       if (AM_State.selectedObject instanceof AM_Bone) return AM_State.selectedObject.parent;
       return AM_State.selectedObject;
@@ -200,13 +73,13 @@ export default defineComponent({
     interactionMode(): string {
       if (this.r < 0) return 'object';
       return AM_State.interactionMode;
-    },
+    },*/
   },
   async mounted() {
     AM_State.ui.timeline.ref = this;
     AM_State.ui.timeline.refresh();
 
-    this.kdAnimation = (e: KeyboardEvent) => {
+    /*this.kdAnimation = (e: KeyboardEvent) => {
       if (this.editMode !== 'animation') return;
       if (!this.animation) return;
 
@@ -229,47 +102,6 @@ export default defineComponent({
         }
         this.refresh();
       }
-      /*if (!MainScene.selectedObject) return;
-      if (MainScene.selectedObject?.userData.tag !== 'Character') return;
-
-      if (e.key === 'ArrowRight') {
-        this.animation.frameId += 1;
-        this.refresh();
-      }
-      if (e.key === 'ArrowLeft') {
-        this.animation.frameId -= 1;
-        this.refresh();
-      }
-      // Copy
-      if (e.ctrlKey && e.key === 'c') {
-        this.bufferKeys.length = 0;
-        for (let i = 0; i < this.selectedKeys.length; i++) {
-          const key = this.animation.currentFrame.keys[this.selectedKeys[i]];
-          if (key.isAuto) continue;
-          this.bufferKeys.push({
-            name: this.selectedKeys[i],
-            key,
-          });
-        }
-      }
-      // Paste
-      if (e.ctrlKey && e.key === 'v') {
-        for (let i = 0; i < this.bufferKeys.length; i++) {
-          this.animation.currentFrame.keys[this.bufferKeys[i].name] =
-            this.bufferKeys[i].key.clone();
-          this.animation.interpolateKey(this.bufferKeys[i].name);
-        }
-        // this.bufferKeys.length = 0;
-        this.refresh();
-      }
-      // Delete key
-      if (e.key === 'Delete') {
-        for (let i = 0; i < this.selectedKeys.length; i++) {
-          delete this.animation.currentFrame.keys[this.selectedKeys[i]];
-          this.animation.interpolateKey(this.selectedKeys[i]);
-        }
-        this.refresh();
-      }*/
     };
     this.kdController = (e: KeyboardEvent) => {
       if (this.editMode !== 'controller') return;
@@ -297,16 +129,24 @@ export default defineComponent({
     document.addEventListener('keydown', this.kdAnimation);
     document.addEventListener('keydown', this.kdController);
     document.addEventListener('keyup', this.ku);
-    document.addEventListener('wheel', this.wheel);
+    document.addEventListener('wheel', this.wheel);*/
   },
   beforeUnmount() {
-    document.removeEventListener('keydown', this.kdAnimation);
+    /*document.removeEventListener('keydown', this.kdAnimation);
     document.removeEventListener('keydown', this.kdController);
     document.removeEventListener('keyup', this.ku);
-    document.removeEventListener('wheel', this.wheel);
+    document.removeEventListener('wheel', this.wheel);*/
   },
   methods: {
     refresh() {
+      this.r = Math.random();
+
+      // @ts-ignore
+      this.$refs['controller']?.refresh();
+      // @ts-ignore
+      this.$refs['animation']?.refresh();
+    },
+    /*refresh() {
       this.r = Math.random();
 
       // Remove old
@@ -385,19 +225,22 @@ export default defineComponent({
     },
     selectKey(key: string, frameId: number): void {
       this.selectedKeys.push({ key, frameId });
-    },
+    },*/
   },
   data: () => {
     return {
-      kdAnimation: undefined as any,
+      r: 0,
+      editMode: 'controller',
+
+      /*kdAnimation: undefined as any,
       kdController: undefined as any,
       ku: undefined as any,
       wheel: undefined as any,
       isShiftPressed: false,
 
-      r: 0,
+
       hoverAnimationPart: undefined as AM_IAnimationPart | undefined,
-      editMode: 'controller',
+
 
       frameWidth: 9,
 
@@ -414,15 +257,15 @@ export default defineComponent({
 
       // Scroll
       offsetX: 0,
-      offsetY: 0,
+      offsetY: 0,*/
     };
   },
 });
 </script>
 
 <style lang="scss" module>
-@import '../gam_sdk_ui/vue/style/color';
-@import '../gam_sdk_ui/vue/style/size';
+@import 'src/gam_sdk_ui/vue/style/color';
+@import 'src/gam_sdk_ui/vue/style/size';
 
 .timeline {
   .controller,
@@ -464,20 +307,6 @@ export default defineComponent({
 
     .left {
       flex: 1;
-
-      .header {
-        display: flex;
-        margin-bottom: 10px;
-      }
-
-      .line {
-        margin-bottom: 10px;
-      }
-
-      .lines {
-        background: #1b1b1b;
-        overflow: hidden;
-      }
     }
 
     .right {
@@ -490,7 +319,7 @@ export default defineComponent({
     margin-bottom: 1px;
     min-height: 16px;
 
-    /*.number {
+    /*.numbers {
       width: 8px;
       font-size: 12px;
       color: $text-gray;

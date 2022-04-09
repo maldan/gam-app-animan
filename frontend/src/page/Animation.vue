@@ -3,11 +3,16 @@
     <div ref="scene"></div>
 
     <!-- Window list -->
-    <ui-window v-for="x in windowList" :key="x.name" :title="x.title" :initData="x.position">
+    <desktop-ui-window
+      v-for="x in windowList"
+      :key="x.name"
+      :title="x.title"
+      :initData="x.position"
+    >
       <template v-slot:body>
         <component :is="x.name" />
       </template>
-    </ui-window>
+    </desktop-ui-window>
   </div>
 </template>
 

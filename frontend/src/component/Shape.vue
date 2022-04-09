@@ -3,7 +3,7 @@
     <div :class="$style.shape" v-for="(x, i) in shapeList" :key="x">
       <div :class="$style.name">{{ x.name }}</div>
       <div :class="$style.value">
-        <ui-slider v-model="shapeValues[i]" @change="setShapeKey(x.name, $event)" />
+        <desktop-ui-slider v-model="shapeValues[i]" @change="setShapeKey(x.name, $event)" />
       </div>
     </div>
   </div>
@@ -13,6 +13,8 @@
 import { defineComponent } from 'vue';
 import { AM_State } from '@/core/AM_State';
 import { AM_Character } from '@/core/am/AM_Character';
+import { AM_KeyQuaternion } from '@/core/animation/key/AM_KeyQuaternion';
+import { AM_KeyFloat } from '@/core/animation/key/AM_KeyFloat';
 
 export default defineComponent({
   props: {},
@@ -25,6 +27,7 @@ export default defineComponent({
     },
     shapeList() {
       if (this.r < 0) return [];
+      if (!AM_State.selectedAnimation) return [];
       if (AM_State.selectedObject instanceof AM_Character) return AM_State.selectedObject.shapeList;
       return [];
     },
@@ -36,11 +39,20 @@ export default defineComponent({
   methods: {
     refresh() {
       this.r = Math.random();
+      this.$nextTick(() => {
+        for (let i = 0; i < this.shapeList.length; i++) {
+          this.shapeValues[i] = this.shapeList[i].value;
+        }
+      });
     },
     setShapeKey(name: string, value: number) {
       if (!this.character) return;
+      if (!AM_State.selectedAnimation) return;
 
       this.character.setShapeKey(name, value);
+      AM_State.selectedAnimation.setCurrentKey(new AM_KeyFloat(`shape.${name}`, value));
+
+      AM_State.ui.refresh();
     },
   },
   data: () => {
@@ -53,6 +65,9 @@ export default defineComponent({
 </script>
 
 <style lang="scss" module>
+@import 'src/gam_sdk_ui/vue/style/color';
+@import 'src/gam_sdk_ui/vue/style/size';
+
 .shapeList {
   display: flex;
   flex-direction: column;
@@ -61,14 +76,18 @@ export default defineComponent({
 
   .shape {
     display: flex;
+    align-items: center;
+    margin-bottom: 5px;
 
     .name {
-      width: 128px;
+      flex: 1;
       overflow: hidden;
+      font-size: 12px;
+      color: $text-gray;
     }
 
     .value {
-      flex: 1;
+      width: 64px;
     }
   }
 }
