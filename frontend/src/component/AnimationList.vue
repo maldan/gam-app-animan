@@ -1,0 +1,51 @@
+<template>
+  <div :class="$style.animationList">
+    <desktop-ui-button
+      @click="loadAnimation(x)"
+      v-for="x in list"
+      :key="x"
+      :text="x"
+      :class="$style.button"
+      icon="arrow_down"
+      iconPosition="left"
+    />
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent } from 'vue';
+import { AM_API } from '@/core/AM_API';
+import { AM_State } from '@/core/AM_State';
+
+export default defineComponent({
+  props: {},
+  components: {},
+  async mounted() {
+    this.list = await AM_API.getAnimationList();
+  },
+  methods: {
+    async loadAnimation(name: string) {
+      const animation = await AM_API.getAnimation(name);
+      AM_State.animationController.animationList = [{ offset: 0, animation }];
+      AM_State.animationController.compile();
+      AM_State.ui.refresh();
+    },
+  },
+  data: () => {
+    return {
+      list: [] as string[],
+    };
+  },
+});
+</script>
+
+<style lang="scss" module>
+.animationList {
+  display: flex;
+  flex-direction: column;
+
+  .button {
+    margin-bottom: 5px;
+  }
+}
+</style>

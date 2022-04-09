@@ -1,9 +1,7 @@
 package api
 
 import (
-	"encoding/json"
 	"github.com/maldan/gam-app-animan/internal/app/animan/core"
-	"github.com/maldan/go-cmhp/cmhp_data"
 	"github.com/maldan/go-cmhp/cmhp_file"
 	"github.com/maldan/go-rapi/rapi_core"
 	"strings"
@@ -12,6 +10,7 @@ import (
 type PoseApi struct {
 }
 
+/*
 func (r PoseApi) GetIndex(args ArgsAnimationName) core.AnimationFrame {
 	stream, err := cmhp_data.FromFile(core.DataDir+"/pose/"+args.Name+".kp", true)
 	rapi_core.FatalIfError(err)
@@ -54,7 +53,7 @@ func (r PoseApi) GetIndex(args ArgsAnimationName) core.AnimationFrame {
 	}
 
 	return pose
-}
+}*/
 
 func (r PoseApi) GetList() []string {
 	out := make([]string, 0)
@@ -68,6 +67,7 @@ func (r PoseApi) GetList() []string {
 	return out
 }
 
+/*
 func (r PoseApi) PostIndex(args struct {
 	Name string `json:"name"`
 	Data string `json:"data"`
@@ -117,4 +117,4 @@ func (r PoseApi) PostIndex(args struct {
 	// Pose
 	err := cmhp_file.Write(core.DataDir+"/pose/"+args.Name+".kp", stream.Data)
 	rapi_core.FatalIfError(err)
-}
+}*/

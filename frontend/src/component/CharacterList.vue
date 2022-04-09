@@ -1,6 +1,6 @@
 <template>
   <div :class="$style.characterList">
-    <ui-button
+    <desktop-ui-button
       @click="addToScene(ch)"
       v-for="ch in list"
       :key="ch.name"
@@ -49,8 +49,7 @@ export default defineComponent({
   flex-direction: column;
 
   .button {
-    padding: 5px;
-    border-radius: 0;
+    margin-bottom: 5px;
   }
 }
 </style>

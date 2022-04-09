@@ -63,6 +63,18 @@ export class AM_State {
   //public static selectedBone?: AM_Bone;
   //public static hoverBone?: AM_Bone;
 
+  public static init(): void {
+    AM_State.animationController.off('change');
+    AM_State.animationController.on('change', () => {
+      this.objectList
+        .filter((x) => x instanceof AM_Character)
+        .forEach((x) => {
+          x.applyAnimation(this.animationController?.animation);
+        });
+      this.ui.timeline.refresh();
+    });
+  }
+
   public static addObject(obj: AM_Object): void {
     this.objectList.push(obj);
     this.ui.refresh();

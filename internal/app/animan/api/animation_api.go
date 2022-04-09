@@ -6,7 +6,9 @@ import (
 	"github.com/maldan/gam-app-animan/internal/app/animan/core"
 	"github.com/maldan/go-cmhp/cmhp_data"
 	"github.com/maldan/go-cmhp/cmhp_file"
+	"github.com/maldan/go-cmhp/cmhp_slice"
 	"github.com/maldan/go-rapi/rapi_core"
+	"os"
 	"strings"
 )
 
@@ -30,35 +32,46 @@ func WriteFrames(stream *cmhp_data.ByteArray, animation core.AnimationSequence) 
 		frameSection.WriteUInt16(uint16(len(animation.Frames[i].Keys)))
 
 		// Write each key
-		for keyName, keyValue := range animation.Frames[i].Keys {
+		for _, key := range animation.Frames[i].Keys {
 			// Key name
-			frameSection.WriteUTF8(keyName)
+			frameSection.WriteUTF8(key.Name)
 
 			// Key type
-			frameSection.WriteUInt8(uint8(keyValue.Type))
+			frameSection.WriteUInt8(uint8(key.Type))
 
-			// Transform key
-			if keyValue.Type == 0 {
-				// Write position
-				frameSection.WriteFloat32(keyValue.Position.X)
-				frameSection.WriteFloat32(keyValue.Position.Y)
-				frameSection.WriteFloat32(keyValue.Position.Z)
-
-				// Write rotation
-				frameSection.WriteFloat32(keyValue.Rotation.X)
-				frameSection.WriteFloat32(keyValue.Rotation.Y)
-				frameSection.WriteFloat32(keyValue.Rotation.Z)
-				frameSection.WriteFloat32(keyValue.Rotation.W)
-
-				// Write scale
-				frameSection.WriteFloat32(keyValue.Scale.X)
-				frameSection.WriteFloat32(keyValue.Scale.Y)
-				frameSection.WriteFloat32(keyValue.Scale.Z)
+			// Bool key
+			if key.Type == 0 {
+				if key.VBool {
+					frameSection.WriteUInt8(1)
+				} else {
+					frameSection.WriteUInt8(0)
+				}
 			}
 
-			// Blend shape key
-			if keyValue.Type == 1 {
-				frameSection.WriteFloat32(keyValue.Value)
+			// Float key
+			if key.Type == 1 {
+				frameSection.WriteFloat32(key.VFloat)
+			}
+
+			// Vector2 key
+			if key.Type == 2 {
+				frameSection.WriteFloat32(key.VVector3.X)
+				frameSection.WriteFloat32(key.VVector3.Y)
+			}
+
+			// Vector3 key
+			if key.Type == 3 {
+				frameSection.WriteFloat32(key.VVector3.X)
+				frameSection.WriteFloat32(key.VVector3.Y)
+				frameSection.WriteFloat32(key.VVector3.Z)
+			}
+
+			// Quaternion key
+			if key.Type == 4 {
+				frameSection.WriteFloat32(key.VQuaternion.X)
+				frameSection.WriteFloat32(key.VQuaternion.Y)
+				frameSection.WriteFloat32(key.VQuaternion.Z)
+				frameSection.WriteFloat32(key.VQuaternion.W)
 			}
 		}
 	}
@@ -69,7 +82,9 @@ func (r AnimationApi) GetIndex(args ArgsAnimationName) core.AnimationSequence {
 	stream, err := cmhp_data.FromFile(core.DataDir+"/animation/"+args.Name+".ka", true)
 	rapi_core.FatalIfError(err)
 
-	animation := core.AnimationSequence{}
+	animation := core.AnimationSequence{
+		Name: args.Name,
+	}
 
 	for {
 		sectionName, section, err := stream.ReadSection(core.ANIMATION_SECTION_MARKET)
@@ -87,7 +102,7 @@ func (r AnimationApi) GetIndex(args ArgsAnimationName) core.AnimationSequence {
 
 			for i := 0; i < int(animation.FrameCount); i++ {
 				// Create frame
-				frame := core.AnimationFrame{Keys: map[string]core.AnimationKey{}}
+				frame := core.AnimationFrame{Keys: make([]core.AnimationKey, 0)}
 
 				// Read keys of frame
 				keysAmount := int(section.ReadUint16())
@@ -96,35 +111,48 @@ func (r AnimationApi) GetIndex(args ArgsAnimationName) core.AnimationSequence {
 					// Read key
 					keyName := section.ReadUTF8()
 					keyType := section.ReadUint8()
-					key := core.AnimationKey{}
+					key := core.AnimationKey{
+						Name: keyName,
+						Type: keyType,
+					}
 
+					// Bool key
 					if keyType == 0 {
-						// Read position
-						x := section.ReadFloat32()
-						y := section.ReadFloat32()
-						z := section.ReadFloat32()
-						key.Position = core.Vector3{X: x, Y: y, Z: z}
-
-						// Read rotation
-						x = section.ReadFloat32()
-						y = section.ReadFloat32()
-						z = section.ReadFloat32()
-						w := section.ReadFloat32()
-						key.Rotation = core.Quaternion{X: x, Y: y, Z: z, W: w}
-
-						// Read scale
-						x = section.ReadFloat32()
-						y = section.ReadFloat32()
-						z = section.ReadFloat32()
-						key.Scale = core.Vector3{X: x, Y: y, Z: z}
+						x := section.ReadUint8()
+						if x == 1 {
+							key.VBool = true
+						} else {
+							key.VBool = false
+						}
 					}
 
+					// Float key
 					if keyType == 1 {
-						key.Value = section.ReadFloat32()
+						key.VFloat = section.ReadFloat32()
 					}
 
-					// Set key
-					frame.Keys[keyName] = key
+					// Vector2 key
+					if keyType == 2 {
+						key.VVector2.X = section.ReadFloat32()
+						key.VVector2.Y = section.ReadFloat32()
+					}
+
+					// Vector3 key
+					if keyType == 3 {
+						key.VVector3.X = section.ReadFloat32()
+						key.VVector3.Y = section.ReadFloat32()
+						key.VVector3.Z = section.ReadFloat32()
+					}
+
+					// Quaternion key
+					if keyType == 4 {
+						key.VQuaternion.X = section.ReadFloat32()
+						key.VQuaternion.Y = section.ReadFloat32()
+						key.VQuaternion.Z = section.ReadFloat32()
+						key.VQuaternion.W = section.ReadFloat32()
+					}
+
+					frame.Keys = append(frame.Keys, key)
 				}
 
 				animation.Frames = append(animation.Frames, frame)
@@ -146,24 +174,35 @@ func (r AnimationApi) GetIndex(args ArgsAnimationName) core.AnimationSequence {
 }
 
 func (r AnimationApi) GetList() []string {
-	out := make([]string, 0)
-	fileList, err := cmhp_file.List(core.DataDir + "/animation")
-	rapi_core.FatalIfError(err)
+	list := make([]string, 0)
+
+	fileList, _ := cmhp_file.ListAll(core.DataDir + "/animation")
+	fileList = cmhp_slice.Filter(fileList, func(t cmhp_file.FileInfo) bool {
+		return strings.Contains(t.Name, ".ka")
+	})
+
+	// Get working directory
+	wd, _ := os.Getwd()
+	wd = strings.ReplaceAll(wd, "\\", "/")
 
 	for _, file := range fileList {
-		out = append(out, strings.Replace(file.Name(), ".ka", "", 1))
+		// Add to list
+		list = append(
+			list,
+			strings.Replace(
+				strings.Replace(strings.Replace(file.FullPath, ".ka", "", 1), wd, "", 1), "/db/animation/", "", 1,
+			),
+		)
 	}
 
-	return out
+	return list
 }
 
-func (r AnimationApi) PostIndex(args struct {
-	Name string `json:"name"`
-	Data string `json:"data"`
+func (r AnimationApi) PutIndex(args struct {
+	Animation string `json:"animation"`
 }) {
 	animation := core.AnimationSequence{}
-	json.Unmarshal([]byte(args.Data), &animation)
-	// pp.Println(animation)
+	json.Unmarshal([]byte(args.Animation), &animation)
 
 	// Write animation data
 	stream := cmhp_data.Allocate(0, true)
@@ -171,6 +210,6 @@ func (r AnimationApi) PostIndex(args struct {
 	WriteFrames(stream, animation)
 
 	// Animation
-	err := cmhp_file.Write(core.DataDir+"/animation/"+args.Name+".ka", stream.Data)
+	err := cmhp_file.Write(core.DataDir+"/animation/"+animation.Name+".ka", stream.Data)
 	rapi_core.FatalIfError(err)
 }

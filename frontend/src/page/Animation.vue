@@ -25,12 +25,18 @@ export default defineComponent({
   components: {},
   async mounted() {
     AM_State.mode = 'animation';
+    AM_State.init();
     AM_Core.init(this.$refs['scene'] as HTMLElement);
   },
   methods: {},
   data: () => {
     return {
       windowList: [
+        {
+          title: 'Animation list',
+          name: 'animation-list',
+          position: { x: 2, y: 5, width: 18, height: 20 },
+        },
         {
           title: 'Character list',
           name: 'character-list',

@@ -154,5 +154,9 @@ export class AM_Character extends AM_Object {
 
   public destroy(): void {
     super.destroy();
+
+    for (const x in this.boneList) {
+      this.boneList[x].destroy();
+    }
   }
 }

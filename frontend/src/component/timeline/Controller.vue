@@ -3,10 +3,19 @@
   <div :class="$style.controller">
     <div :class="$style.left">
       <!-- Header -->
-      <div class="button_group_round_compact" :class="$style.header">
-        <desktop-ui-button @click="createAnimation" text="Add animation" />
-        <desktop-ui-button @click="compileAnimation" text="Compile" />
-        <desktop-ui-button @click="togglePlay" :text="isAnimationPlay ? 'Stop' : 'Play'" />
+      <div :class="$style.header">
+        <div class="button_group_round_compact">
+          <desktop-ui-button @click="createAnimation" text="Add animation" />
+          <desktop-ui-button @click="compileAnimation" text="Compile" />
+          <desktop-ui-button @click="togglePlay" :text="isAnimationPlay ? 'Stop' : 'Play'" />
+        </div>
+
+        <desktop-ui-button
+          v-if="animationList && animationList[0]?.animation.name"
+          @click="saveAnimation"
+          text="Save"
+          style="flex: none; margin-left: 10px"
+        />
       </div>
 
       <!-- Numbers -->
@@ -88,6 +97,7 @@ import { AM_AnimationController, AM_IAnimationPart } from '@/core/animation/AM_A
 import { AM_Animation } from '@/core/animation/AM_Animation';
 import { AM_Object } from '@/core/am/AM_Object';
 import { AM_Bone } from '@/core/am/AM_Bone';
+import { AM_API } from '@/core/AM_API';
 
 export default defineComponent({
   props: {},
@@ -138,11 +148,11 @@ export default defineComponent({
     refresh() {
       this.r = Math.random();
 
-      this.animationController?.off('change');
+      /*this.animationController?.off('change');
       this.animationController?.on('change', () => {
         AM_State.selectedObject?.applyAnimation(this.animationController?.animation);
         this.refresh();
-      });
+      });*/
 
       if (this.animationController) {
         this.offsetX = Math.max(0, this.animationController.frameId - this.maxVisibleFrames + 1);
@@ -170,6 +180,14 @@ export default defineComponent({
     togglePlay() {
       AM_State.isAnimationPlay = !AM_State.isAnimationPlay;
       this.refresh();
+    },
+    async saveAnimation(): Promise<void> {
+      if (this.animationController && this.animationController.animationList.length) {
+        await AM_API.saveAnimation(
+          this.animationController.animationList[0].animation.name,
+          this.animationController.animation,
+        );
+      }
     },
   },
   data: () => {

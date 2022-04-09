@@ -14,21 +14,24 @@ type Quaternion struct {
 }
 
 type AnimationKey struct {
-	Type     int        `json:"type"`
-	Position Vector3    `json:"position"`
-	Rotation Quaternion `json:"rotation"`
-	Scale    Vector3    `json:"scale"`
-	Value    float32    `json:"value"`
+	Name        string     `json:"name"`
+	Type        uint8      `json:"type"`
+	VBool       bool       `json:"vBool"`
+	VFloat      float32    `json:"vFloat"`
+	VVector2    Vector3    `json:"vVector2"`
+	VVector3    Vector3    `json:"vVector3"`
+	VQuaternion Quaternion `json:"vQuaternion"`
 }
 
 type AnimationFrame struct {
-	Keys map[string]AnimationKey `json:"keys"`
+	Keys []AnimationKey `json:"keys"`
 }
 
 type AnimationSequence struct {
 	Version    uint8            `json:"version"`
 	FrameCount uint32           `json:"frameCount"`
 	FPS        uint8            `json:"fps"`
+	Name       string           `json:"name"`
 	Frames     []AnimationFrame `json:"frames"`
 }
 
