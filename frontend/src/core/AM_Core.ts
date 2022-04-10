@@ -150,7 +150,6 @@ export class AM_Core {
     });
     this._manipulator.addEventListener('mouseUp', () => {
       if (!this._manipulator) return;
-      //this._isManipulatorLocked = false;
 
       // Rotate
       if (this._manipulator.mode === 'rotate') {
@@ -183,6 +182,19 @@ export class AM_Core {
                 z: rot.z,
                 w: rot.w,
               }),
+            );
+          }
+        }
+      }
+
+      // Translate
+      if (this._manipulator.mode === 'translate') {
+        if (AM_State.selectedObject instanceof AM_Bone) {
+        } else {
+          const pos = AM_State.selectedObject?.model.position;
+          if (AM_State.selectedAnimation && pos) {
+            AM_State.selectedAnimation.setCurrentKey(
+              new AM_KeyVector3('transform.position', { x: pos.x, y: pos.y, z: pos.z }),
             );
           }
         }

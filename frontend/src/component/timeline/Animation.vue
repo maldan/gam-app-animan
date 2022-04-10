@@ -151,10 +151,22 @@ export default defineComponent({
 
       if (e.key === 'ArrowRight') {
         this.animation.frameId += 1;
+
+        if (AM_State.mode === 'clip') {
+          const offset = this.animation.controller?.getAnimationOffset(this.animation) ?? 0;
+          AM_State.globalFrameId = offset + this.animation.frameId;
+        }
+
         this.refresh();
       }
       if (e.key === 'ArrowLeft') {
         this.animation.frameId -= 1;
+
+        if (AM_State.mode === 'clip') {
+          const offset = this.animation.controller?.getAnimationOffset(this.animation) ?? 0;
+          AM_State.globalFrameId = offset + this.animation.frameId;
+        }
+
         this.refresh();
       }
 

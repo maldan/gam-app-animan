@@ -12,18 +12,25 @@ export class AM_AnimationController {
   private _animation: AM_Animation = new AM_Animation();
 
   public createAnimation(offset = 0): void {
-    this.animationList.push({ offset, animation: new AM_Animation() });
+    const animation = new AM_Animation();
+    animation.controller = this;
+    this.animationList.push({ offset, animation });
     this.compile();
   }
 
   public appendAnimation(animation: AM_Animation, offset = 0): void {
+    animation.controller = this;
     this.animationList.push({ offset, animation });
     this.compile();
   }
 
-  public addAnimation(animation: AM_Animation, offset = 0): void {
-    this.animationList.push({ offset, animation });
+  public getAnimationOffset(animation: AM_Animation): number {
+    const anm = this.animationList.find((x) => x.animation === animation);
+    return anm?.offset ?? 0;
   }
+  /*public addAnimation(animation: AM_Animation, offset = 0): void {
+    this.animationList.push({ offset, animation });
+  }*/
 
   public compile(): void {
     this._animation.frames.length = 0;

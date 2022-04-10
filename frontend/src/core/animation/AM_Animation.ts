@@ -1,5 +1,6 @@
 import { AM_Frame } from '@/core/animation/AM_Frame';
 import { AM_Key } from '@/core/animation/key/AM_Key';
+import { AM_AnimationController } from '@/core/animation/AM_AnimationController';
 
 export class AM_Animation {
   // public frameCount = 48;
@@ -11,6 +12,8 @@ export class AM_Animation {
   private _frameId = 0;
   private _frameCount = 48;
   private _eventList: Record<string, ((...data: unknown[]) => void)[]> = {};
+
+  public controller?: AM_AnimationController;
 
   constructor() {
     for (let i = 0; i < this._frameCount; i++) {
