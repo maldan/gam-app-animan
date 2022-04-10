@@ -18,6 +18,7 @@ import { AM_API } from '@/core/AM_API';
 import { AM_IObjectInfo } from '@/core/am/AM_Object';
 import { AM_State } from '@/core/AM_State';
 import { AM_Core } from '@/core/AM_Core';
+import { AM_Character } from '@/core/am/AM_Character';
 
 export default defineComponent({
   props: {},
@@ -27,7 +28,11 @@ export default defineComponent({
   },
   methods: {
     async addToScene(obj: AM_IObjectInfo) {
-      AM_State.removeObject(AM_State.selectedObject);
+      const chList = AM_State.objectList.filter((x) => x instanceof AM_Character);
+      chList.forEach((x) => {
+        AM_State.removeObject(x);
+      });
+
       const ch = await AM_State.loadObject(obj.modelPath, 'character');
       ch.animationController = AM_State.animationController;
       AM_State.addObject(ch);

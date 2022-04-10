@@ -17,6 +17,7 @@ export class AM_Core {
   private static _isManipulatorCanUnlock = false;
   private static _manipulatorStartPosition: THREE.Vector3 = new THREE.Vector3();
   private static _manipulatorStartRotation: THREE.Quaternion = new THREE.Quaternion();
+  private static _renderer: THREE.WebGLRenderer;
 
   public static init(el: HTMLElement): void {
     // Camera
@@ -33,15 +34,15 @@ export class AM_Core {
     this.scene = scene;
 
     // Render
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
     let prevTime = 0;
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setAnimationLoop((time: number) => {
+    this._renderer = new THREE.WebGLRenderer({ antialias: true });
+    this._renderer.setSize(window.innerWidth, window.innerHeight);
+    this._renderer.setAnimationLoop((time: number) => {
       const deltaTime = (time - prevTime) / 1000;
       prevTime = time;
 
-      renderer.setClearColor(0x333333);
-      renderer.render(scene, camera);
+      this._renderer.setClearColor(0x333333);
+      this._renderer.render(scene, camera);
       controls.update();
       stats.update();
 
@@ -102,10 +103,10 @@ export class AM_Core {
         }
       }*/
     });
-    renderer.outputEncoding = THREE.sRGBEncoding;
+    this._renderer.outputEncoding = THREE.sRGBEncoding;
 
     // Scene control
-    const controls = new OrbitControls(camera, renderer.domElement);
+    const controls = new OrbitControls(camera, this._renderer.domElement);
     controls.mouseButtons = {
       // @ts-ignore
       LEFT: null,
@@ -128,7 +129,7 @@ export class AM_Core {
     scene.add(l2);
 
     // Manipulator
-    this._manipulator = new TransformControls(camera, renderer.domElement);
+    this._manipulator = new TransformControls(camera, this._renderer.domElement);
     this._manipulator.size = 0.5;
     this._manipulator.setSpace('local');
     this._manipulator.addEventListener('mouseDown', () => {
@@ -231,11 +232,11 @@ export class AM_Core {
     const pointer = new THREE.Vector2();
 
     // Inject html
-    el.appendChild(renderer.domElement);
-    renderer.domElement.style.position = 'absolute';
-    renderer.domElement.style.left = '0';
-    renderer.domElement.style.top = '0';
-    renderer.domElement.style.zIndex = '0';
+    el.appendChild(this._renderer.domElement);
+    this._renderer.domElement.style.position = 'absolute';
+    this._renderer.domElement.style.left = '0';
+    this._renderer.domElement.style.top = '0';
+    this._renderer.domElement.style.zIndex = '0';
 
     // Stats
     const stats = Stats();
@@ -289,6 +290,10 @@ export class AM_Core {
         }*/
       }
     });
+  }
+
+  public static destroy(): void {
+    this._renderer.dispose();
   }
 
   public static setManipulatorTo(obj: AM_Object | undefined): void {

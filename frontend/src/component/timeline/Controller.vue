@@ -7,15 +7,7 @@
         <div class="button_group_round_compact">
           <desktop-ui-button @click="createAnimation" text="Add animation" />
           <desktop-ui-button @click="compileAnimation" text="Compile" />
-          <desktop-ui-button @click="togglePlay" :text="isAnimationPlay ? 'Stop' : 'Play'" />
         </div>
-
-        <desktop-ui-button
-          v-if="animationList && animationList[0]?.animation.name"
-          @click="saveAnimation"
-          text="Save"
-          style="flex: none; margin-left: 10px"
-        />
       </div>
 
       <!-- Numbers -->
@@ -177,18 +169,18 @@ export default defineComponent({
 
       AM_State.ui.refresh();
     },
-    togglePlay() {
+    /*togglePlay() {
       AM_State.isAnimationPlay = !AM_State.isAnimationPlay;
       this.refresh();
-    },
-    async saveAnimation(): Promise<void> {
+    },*/
+    /*async saveAnimation(): Promise<void> {
       if (this.animationController && this.animationController.animationList.length) {
         await AM_API.saveAnimation(
           this.animationController.animationList[0].animation.name,
           this.animationController.animation,
         );
       }
-    },
+    },*/
   },
   data: () => {
     return {

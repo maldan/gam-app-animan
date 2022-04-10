@@ -38,11 +38,18 @@ export class AM_UI {
       this.ref?.refresh();
     },
   };
+  public project = {
+    ref: undefined as any,
+    refresh(): void {
+      this.ref?.refresh();
+    },
+  };
   public refresh(): void {
     this.main.refresh();
     this.scene.refresh();
     this.timeline.refresh();
     this.shape.refresh();
+    this.project.refresh();
   }
 }
 
@@ -59,10 +66,6 @@ export class AM_State {
   public static mode = '';
   public static interactionMode: 'pose' | 'object' = 'object';
 
-  // Bones
-  //public static selectedBone?: AM_Bone;
-  //public static hoverBone?: AM_Bone;
-
   public static init(): void {
     AM_State.animationController.off('change');
     AM_State.animationController.on('change', () => {
@@ -73,6 +76,10 @@ export class AM_State {
         });
       this.ui.timeline.refresh();
     });
+  }
+
+  public static destroy(): void {
+    AM_State.animationController.off('change');
   }
 
   public static addObject(obj: AM_Object): void {

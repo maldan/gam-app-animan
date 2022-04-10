@@ -25,6 +25,26 @@
           text="S"
           :isSelected="keyVisibility['scale']"
         />
+        <desktop-ui-button
+          @click="toggleKeyVisibility('boneFingers')"
+          text="Finger"
+          :isSelected="keyVisibility['boneFingers']"
+        />
+        <desktop-ui-button
+          @click="toggleKeyVisibility('boneToes')"
+          text="Toe"
+          :isSelected="keyVisibility['boneToes']"
+        />
+        <desktop-ui-button
+          @click="toggleKeyVisibility('left')"
+          text="L"
+          :isSelected="keyVisibility['left']"
+        />
+        <desktop-ui-button
+          @click="toggleKeyVisibility('right')"
+          text="R"
+          :isSelected="keyVisibility['right']"
+        />
       </div>
     </div>
 
@@ -51,6 +71,15 @@
             clearKeySelection();
             selectKey(key, frameId - 1);
           "
+          @mouseover="
+            hoverKeyName = key;
+            hoverFrameId = frameId - 1;
+          "
+          @mousedown="
+            dragKeyName = key;
+            dragFrameId = frameId - 1;
+          "
+          @mouseup="dragKey"
           class="clickable"
           :class="[
             $style.key,
@@ -96,6 +125,10 @@ export default defineComponent({
         if (!this.keyVisibility['position'] && x.match('.position')) return false;
         if (!this.keyVisibility['rotation'] && x.match('.rotation')) return false;
         if (!this.keyVisibility['scale'] && x.match('.scale')) return false;
+        if (!this.keyVisibility['boneFingers'] && x.match('bone.Finger_')) return false;
+        if (!this.keyVisibility['boneToes'] && x.match('bone.Toe_')) return false;
+        if (!this.keyVisibility['left'] && x.match('.L.')) return false;
+        if (!this.keyVisibility['right'] && x.match('.R.')) return false;
         return true;
       });
       const outKeys = [];
@@ -198,6 +231,21 @@ export default defineComponent({
       this.animationController?.compile();
       AM_State.ui.refresh();
     },
+    dragKey() {
+      if (this.dragFrameId === this.hoverFrameId) return;
+      if (!this.animation) return;
+      const fromKey = this.animation?.frames?.[this.dragFrameId]?.keys[this.dragKeyName];
+      if (!fromKey) return;
+      if (fromKey.isAuto) return;
+      if (!this.animation?.frames[this.hoverFrameId]) return;
+
+      // Remove previous
+      delete this.animation.frames[this.dragFrameId].keys[this.dragKeyName];
+      // Set new
+      this.animation.frames[this.hoverFrameId].keys[this.hoverKeyName] = fromKey.clone();
+      this.animation.interpolateKey(fromKey.name);
+      AM_State.ui.timeline.refresh();
+    },
   },
   data: () => {
     return {
@@ -214,10 +262,19 @@ export default defineComponent({
       maxVisibleFrames: 48,
       maxVisibleKeys: 12,
 
+      dragKeyName: '',
+      dragFrameId: 0,
+      hoverKeyName: '',
+      hoverFrameId: 0,
+
       keyVisibility: {
         position: true,
         rotation: true,
         scale: true,
+        boneFingers: true,
+        boneToes: true,
+        left: true,
+        right: true,
       } as Record<string, boolean>,
 
       selectedKeys: [] as { key: string; frameId: number }[],

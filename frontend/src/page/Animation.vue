@@ -28,6 +28,10 @@ export default defineComponent({
     AM_State.init();
     AM_Core.init(this.$refs['scene'] as HTMLElement);
   },
+  beforeUnmount() {
+    AM_Core.destroy();
+    AM_State.destroy();
+  },
   methods: {},
   data: () => {
     return {
@@ -41,6 +45,11 @@ export default defineComponent({
           title: 'Character list',
           name: 'character-list',
           position: { x: 80, y: 5, width: 18, height: 20 },
+        },
+        {
+          title: 'Project',
+          name: 'project',
+          position: { x: 80, y: 27, width: 18, height: 15 },
         },
         {
           title: 'Timeline',

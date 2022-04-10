@@ -3,11 +3,16 @@
     <div ref="scene"></div>
 
     <!-- Window list -->
-    <ui-window v-for="x in windowList" :key="x.name" :title="x.title" :initData="x.position">
+    <desktop-ui-window
+      v-for="x in windowList"
+      :key="x.name"
+      :title="x.title"
+      :initData="x.position"
+    >
       <template v-slot:body>
         <component :is="x.name" />
       </template>
-    </ui-window>
+    </desktop-ui-window>
   </div>
 </template>
 
@@ -20,7 +25,12 @@ export default defineComponent({
   components: {},
   async mounted() {
     AM_State.mode = 'clip';
+    AM_State.init();
     AM_Core.init(this.$refs['scene'] as HTMLElement);
+  },
+  beforeUnmount() {
+    AM_Core.destroy();
+    AM_State.destroy();
   },
   methods: {},
   data: () => {

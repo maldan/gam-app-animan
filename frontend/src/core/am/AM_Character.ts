@@ -148,6 +148,12 @@ export class AM_Character extends AM_Object {
     }
   }
 
+  public resetPose(): void {
+    for (const x in this.boneList) {
+      this.boneList[x].reset();
+    }
+  }
+
   public get boneList(): Record<string, AM_Bone> {
     return this._boneList;
   }
