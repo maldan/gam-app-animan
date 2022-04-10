@@ -13,9 +13,7 @@ import (
 type ObjectApi struct {
 }
 
-func (r ObjectApi) GetIndex(args struct {
-	UUID string `json:"uuid"`
-}) core.ObjectInfo {
+func (r ObjectApi) GetIndex(args core.ObjectInfo) core.ObjectInfo {
 	obj := core.ObjectInfo{}
 
 	allFiles, _ := cmhp_file.ListAll(core.DataDir + "/object")
@@ -42,7 +40,7 @@ func (r ObjectApi) GetIndex(args struct {
 
 		cmhp_file.ReadJSON(file.FullPath, &info)
 
-		if info.UUID == args.UUID {
+		if info.ResourceId == args.ResourceId {
 			return info
 		}
 	}
@@ -141,7 +139,7 @@ func (r ObjectApi) UpdateObjectInfo(pathDir string) {
 	// Open file info
 	info := core.ObjectInfo{}
 	cmhp_file.ReadJSON(pathDir+"/info.json", &info)
-	info.UUID, _ = cmhp_file.HashSha1(pathDir + "/model.glb")
+	info.ResourceId, _ = cmhp_file.HashSha1(pathDir + "/model.glb")
 
 	// Calculate name
 	nameTuple := strings.Split(pathDir, "/")

@@ -1,10 +1,10 @@
 <template>
   <div :class="$style.objectList">
-    <ui-input @change="refresh" placeholder="Search..." v-model="search" />
+    <desktop-ui-input @change="refresh" placeholder="Search..." v-model="search" />
     <div :class="$style.list">
       <div
         @click="
-          $store.state.modal.data.uuid = x.uuid;
+          $store.state.modal.data.resourceId = x.resourceId;
           $store.dispatch('modal/ok');
         "
         class="clickable"

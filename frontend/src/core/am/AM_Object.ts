@@ -6,7 +6,8 @@ import { AM_Animation } from '@/core/animation/AM_Animation';
 import { AM_IVector3, AM_IVector4 } from '@/core/AM_Type';
 
 export class AM_Object {
-  public uuid = '';
+  public id = '';
+  public resourceId = '';
   public name = '';
   public animationController: AM_AnimationController = new AM_AnimationController();
   public exposedKeys = ['transform.position', 'transform.rotation', 'transform.scale'];

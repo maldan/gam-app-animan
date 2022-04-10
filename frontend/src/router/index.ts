@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
 import Animation from '../page/Animation.vue';
-import Clip from '../page/Clip.vue';
+import ClipEditor from '../page/clip/Editor.vue';
+import ClipList from '../page/clip/List.vue';
 import ObjectList from '../page/object/List.vue';
 import ObjectPreview from '../page/object/Preview.vue';
 import Audio from '../page/Audio.vue';
@@ -13,8 +14,13 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/clip',
-    name: 'Clip',
-    component: Clip,
+    name: 'Clip List',
+    component: ClipList,
+  },
+  {
+    path: '/clip/:resourceId',
+    name: 'Clip Editor',
+    component: ClipEditor,
   },
   {
     path: '/object',
@@ -22,7 +28,7 @@ const routes: Array<RouteRecordRaw> = [
     component: ObjectList,
   },
   {
-    path: '/object/:uuid',
+    path: '/object/:resourceId',
     name: 'Object Preview',
     component: ObjectPreview,
   },

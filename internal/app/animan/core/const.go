@@ -41,12 +41,13 @@ type AnimationPart struct {
 }
 
 type AnimationController struct {
-	ObjectUUID    string          `json:"objectUUID"`
+	ObjectId      string          `json:"objectId"`
 	AnimationList []AnimationPart `json:"animationList"`
 }
 
 type ObjectInfo struct {
-	UUID        string     `json:"uuid"`
+	Id          string     `json:"id"`
+	ResourceId  string     `json:"resourceId"`
 	Name        string     `json:"name"`
 	Category    string     `json:"category"`
 	PreviewPath string     `json:"previewPath"`
@@ -57,10 +58,17 @@ type ObjectInfo struct {
 }
 
 type AudioInfo struct {
-	UUID      string `json:"uuid"`
-	Name      string `json:"name"`
-	Category  string `json:"category"`
-	AudioPath string `json:"audioPath"`
+	ResourceId string `json:"resourceId"`
+	Name       string `json:"name"`
+	Category   string `json:"category"`
+	AudioPath  string `json:"audioPath"`
+}
+
+type ClipInfo struct {
+	ResourceId string `json:"resourceId"`
+	Name       string `json:"name"`
+	Category   string `json:"category"`
+	ClipPath   string `json:"clipPath"`
 }
 
 type Clip struct {

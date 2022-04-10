@@ -1,14 +1,14 @@
 <template>
   <div :class="$style.main">
-    <desktop-ui-button @click="uploadModal" icon="arrow_up" text="Upload" />
+    <desktop-ui-button @click="create" icon="plus" text="New" />
 
     <div :class="$style.list">
       <div
         class="clickable"
         :class="$style.preview"
         v-for="x in list"
-        :key="x.modelPath"
-        @click="$router.push(`/object/${x.resourceId}`)"
+        :key="x.clipPath"
+        @click="$router.push(`/clip/${x.resourceId}`)"
       >
         <img :src="x.previewPath" alt="Preview" />
         <div :class="$style.title">{{ x.name }}</div>
@@ -21,7 +21,7 @@
 import { defineComponent } from 'vue';
 import { AM_Preview } from '@/core/AM_Preview';
 import { AM_API } from '@/core/AM_API';
-import { AM_IObjectInfo } from '@/core/AM_Type';
+import { AM_IClip, AM_IClipInfo, AM_IObjectInfo } from '@/core/AM_Type';
 
 export default defineComponent({
   components: {},
@@ -30,30 +30,32 @@ export default defineComponent({
   },
   methods: {
     async refresh() {
-      this.list = await AM_API.getObjectList();
-      for (let i = 0; i < this.list.length; i++) {
+      this.list = await AM_API.getClipList();
+      /*for (let i = 0; i < this.list.length; i++) {
         const obj = this.list[i];
         if (obj.previewPath !== '') continue;
         const preview = await AM_Preview.getPreview(obj);
 
         await AM_API.uploadObjectPreview(obj.category + '/' + obj.name, preview);
         obj.previewPath = obj.modelPath.replace(/\/[a-zA-Z0-9_]+\.glb$/, '/preview.jpg');
-      }
+      }*/
     },
-    uploadModal() {
+    create() {
       this.$store.dispatch('modal/show', {
-        name: 'upload/virtual-object',
-        data: {},
+        name: 'create/clip',
+        data: {
+          name: '',
+        },
         onSuccess: async () => {
-          await this.$store.dispatch('repo/upload');
-          window.location.reload();
+          const info = await AM_API.createClip(this.$store.state.modal.data.name);
+          await this.$router.push(`/clip/${info.resourceId}`);
         },
       });
     },
   },
   data: () => {
     return {
-      list: [] as AM_IObjectInfo[],
+      list: [] as AM_IClipInfo[],
     };
   },
 });

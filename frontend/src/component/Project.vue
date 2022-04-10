@@ -1,7 +1,7 @@
 <template>
   <div :class="$style.project">
     <!-- Animation -->
-    <div v-if="mode === 'animation'" :class="$style.panel">
+    <div v-if="!isLoading && mode === 'animation'" :class="$style.panel">
       <desktop-ui-button
         @click="saveAnimation"
         v-if="animationList && animationList[0]?.animation.name"
@@ -12,11 +12,13 @@
     </div>
 
     <!-- Clip -->
-    <div v-if="mode === 'clip'" :class="$style.panel">
-      <desktop-ui-input v-model="clipName" style="margin-bottom: 5px" placeholder="Clip name..." />
-      <desktop-ui-button @click="saveClip" text="Save Clip" style="margin-bottom: 5px" />
+    <div v-if="!isLoading && mode === 'clip'" :class="$style.panel">
+      <div>Clip name: {{ clipInfo?.name }}</div>
+      <desktop-ui-button @click="saveClip" text="Save" style="margin-bottom: 5px" />
       <desktop-ui-button @click="togglePlay" :text="isAnimationPlay ? 'Stop' : 'Play'" />
     </div>
+
+    <div v-if="isLoading">...</div>
   </div>
 </template>
 
@@ -27,6 +29,7 @@ import { AM_AnimationController, AM_IAnimationPart } from '@/core/animation/AM_A
 import { AM_Object } from '@/core/am/AM_Object';
 import { AM_Bone } from '@/core/am/AM_Bone';
 import { AM_API } from '@/core/AM_API';
+import { AM_IClipInfo } from '@/core/AM_Type';
 
 export default defineComponent({
   props: {},
@@ -53,6 +56,10 @@ export default defineComponent({
       if (this.r < 0) return '';
       return AM_State.mode;
     },
+    clipInfo(): AM_IClipInfo | undefined {
+      if (this.r < 0) return undefined;
+      return AM_State.clipInfo;
+    },
   },
   async mounted() {
     AM_State.ui.project.ref = this;
@@ -67,12 +74,14 @@ export default defineComponent({
       this.refresh();
     },
     async saveClip(): Promise<void> {
-      if (!this.clipName) return;
+      if (!AM_State.clipInfo) return;
 
+      this.isLoading = true;
       await AM_API.saveClip(
-        this.clipName,
+        AM_State.clipInfo.name,
         AM_State.objectList.filter((x) => !(x instanceof AM_Bone)),
       );
+      this.isLoading = false;
     },
     async saveAnimation(): Promise<void> {
       if (this.animationController && this.animationController.animationList.length) {
@@ -87,7 +96,7 @@ export default defineComponent({
   data: () => {
     return {
       r: 0,
-      clipName: '',
+      isLoading: false,
     };
   },
 });

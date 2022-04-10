@@ -22,18 +22,19 @@ export default defineComponent({
   props: {},
   components: {},
   async mounted() {
-    this.list = await AM_API.getClipList();
+    // this.list = await AM_API.getClipList();
   },
   methods: {
     async loadClip(name: string) {
       const clip = await AM_API.getClip(name);
       for (let i = 0; i < clip.objectList.length; i++) {
-        const objectInfo = await AM_API.getObjectByUUID(clip.objectList[i].uuid);
+        const objectInfo = await AM_API.getObject(clip.objectList[i].resourceId);
         const obj = await AM_State.loadObject(
           objectInfo.modelPath,
           objectInfo.category === 'character' ? 'character' : '',
-          objectInfo.uuid,
         );
+        obj.id = clip.objectList[i].id;
+        obj.resourceId = clip.objectList[i].resourceId;
 
         obj.position = clip.objectList[i].position;
         obj.rotation = clip.objectList[i].rotation;
@@ -42,7 +43,7 @@ export default defineComponent({
       }
 
       for (let i = 0; i < clip.animationList.length; i++) {
-        const obj = AM_State.objectList.find((x) => x.uuid === clip.animationList[i].objectUUID);
+        const obj = AM_State.objectList.find((x) => x.id === clip.animationList[i].objectId);
         if (!obj) continue;
         obj.animationController.animationList.length = 0;
 

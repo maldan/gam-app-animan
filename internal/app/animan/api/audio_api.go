@@ -14,10 +14,8 @@ type AudioApi struct {
 }
 
 // GetIndex get info about audio file by uuid
-func (r AudioApi) GetIndex(args struct {
-	UUID string `json:"uuid"`
-}) core.ObjectInfo {
-	obj := core.ObjectInfo{}
+func (r AudioApi) GetIndex(args core.AudioInfo) core.AudioInfo {
+	obj := core.AudioInfo{}
 
 	allFiles, _ := cmhp_file.ListAll(core.DataDir + "/audio")
 	allFiles = cmhp_slice.Filter(allFiles, func(t cmhp_file.FileInfo) bool {
@@ -27,8 +25,8 @@ func (r AudioApi) GetIndex(args struct {
 	wd = strings.ReplaceAll(wd, "\\", "/")
 
 	for _, file := range allFiles {
-		info := core.ObjectInfo{}
-		info.PreviewPath = strings.Replace(
+		info := core.AudioInfo{}
+		/*info.PreviewPath = strings.Replace(
 			strings.Replace(strings.ReplaceAll(file.FullPath, "/info.json", "/preview.jpg"), wd, "", 1),
 			"/db",
 			"data",
@@ -39,11 +37,11 @@ func (r AudioApi) GetIndex(args struct {
 			"/db",
 			"data",
 			1,
-		)
+		)*/
 
 		cmhp_file.ReadJSON(file.FullPath, &info)
 
-		if info.UUID == args.UUID {
+		if info.ResourceId == args.ResourceId {
 			return info
 		}
 	}
@@ -95,7 +93,7 @@ func (r AudioApi) UpdateAudioInfo(pathDir string) {
 	// Open file info
 	info := core.AudioInfo{}
 	cmhp_file.ReadJSON(pathDir+"/info.json", &info)
-	info.UUID, _ = cmhp_file.HashSha1(pathDir + "/sound.mp3")
+	info.ResourceId, _ = cmhp_file.HashSha1(pathDir + "/sound.mp3")
 
 	// Calculate name
 	nameTuple := strings.Split(pathDir, "/")

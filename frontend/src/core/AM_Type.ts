@@ -1,5 +1,6 @@
 export interface AM_IObjectInfo {
-  uuid: string;
+  id: string;
+  resourceId: string;
   name: string;
   category: string;
   modelPath: string;
@@ -10,10 +11,17 @@ export interface AM_IObjectInfo {
 }
 
 export interface AM_IAudioInfo {
-  uuid: string;
+  resourceId: string;
   name: string;
   category: string;
   audioPath: string;
+}
+
+export interface AM_IClipInfo {
+  resourceId: string;
+  name: string;
+  category: string;
+  clipPath: string;
 }
 
 export interface AM_IVector2 {
@@ -58,7 +66,7 @@ export interface AM_IClip {
   name: string;
   objectList: AM_IObjectInfo[];
   animationList: {
-    objectUUID: string;
+    objectId: string;
     animationList: { offset: number; animation: AM_IAnimation }[];
   }[];
 }

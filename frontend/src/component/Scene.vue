@@ -76,16 +76,17 @@ export default defineComponent({
       this.$store.dispatch('modal/show', {
         name: 'pick/object',
         data: {
-          uuid: '',
+          resourceId: '',
         },
         onSuccess: async () => {
-          const uuid = store.state.modal.data.uuid;
-          const info = await AM_API.getObjectByUUID(uuid);
+          const resourceId = store.state.modal.data.resourceId;
+          const info = await AM_API.getObject(resourceId);
           const obj = await AM_State.loadObject(
             info.modelPath,
             info.category === 'character' ? 'character' : '',
-            uuid,
           );
+          obj.resourceId = resourceId;
+
           AM_State.addObject(obj);
           AM_State.ui.refresh();
         },

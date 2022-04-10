@@ -8,6 +8,7 @@ import {
   AM_IAnimation,
   AM_IAudioInfo,
   AM_IClip,
+  AM_IClipInfo,
   AM_IObjectInfo,
   AM_IVector3,
   AM_IVector4,
@@ -17,8 +18,8 @@ export class AM_API {
   public static API_URL = process.env.VUE_APP_API_URL || `${window.location.origin}/api`;
   public static ROOT_URL = process.env.VUE_APP_ROOT_URL || `${window.location.origin}`;
 
-  public static async getObjectByUUID(uuid: string): Promise<AM_IObjectInfo> {
-    const obj = (await Axios.get(`${this.API_URL}/object/?uuid=${uuid}`)).data
+  public static async getObject(resourceId: string): Promise<AM_IObjectInfo> {
+    const obj = (await Axios.get(`${this.API_URL}/object/?resourceId=${resourceId}`)).data
       .response as AM_IObjectInfo;
     obj.modelPath = `${this.ROOT_URL}/` + obj.modelPath;
     if (obj.previewPath) obj.previewPath = `${this.ROOT_URL}/` + obj.previewPath;
@@ -145,7 +146,8 @@ export class AM_API {
       name,
       objectList: objectList.map((x) => {
         return {
-          uuid: x.uuid,
+          id: x.id,
+          resourceId: x.resourceId,
           position: x.position,
           rotation: x.rotation,
           scale: x.scale,
@@ -153,7 +155,7 @@ export class AM_API {
       }),
       animationList: objectList.map((x) => {
         return {
-          objectUUID: x.uuid,
+          objectId: x.id,
           animationList: x.animationController.animationList.map((x) => {
             return {
               offset: x.offset,
@@ -163,7 +165,7 @@ export class AM_API {
         };
       }),
     };
-    console.log(clipData);
+    // console.log(clipData);
     await Axios.put(`${this.API_URL}/clip`, {
       clip: JSON.stringify(clipData),
     });
@@ -180,8 +182,20 @@ export class AM_API {
     return (await Axios.get(`${this.API_URL}/animation/list`)).data.response;
   }
 
-  public static async getClipList(): Promise<string[]> {
+  public static async getClipList(): Promise<AM_IClipInfo[]> {
     return (await Axios.get(`${this.API_URL}/clip/list`)).data.response;
+  }
+
+  public static async createClip(name: string): Promise<AM_IClipInfo> {
+    return (
+      await Axios.put(`${this.API_URL}/clip`, {
+        clip: JSON.stringify({
+          name,
+          objectList: [],
+          animationList: [],
+        }),
+      })
+    ).data.response;
   }
 
   public static async getAnimation(name: string): Promise<AM_Animation> {
@@ -191,5 +205,9 @@ export class AM_API {
 
   public static async getClip(name: string): Promise<AM_IClip> {
     return (await Axios.get(`${this.API_URL}/clip?name=${name}`)).data.response;
+  }
+
+  public static async getClipInfo(resourceId: string): Promise<AM_IClipInfo> {
+    return (await Axios.get(`${this.API_URL}/clip/info?resourceId=${resourceId}`)).data.response;
   }
 }

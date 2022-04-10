@@ -6,6 +6,7 @@ import { AM_AnimationController, AM_IAnimationPart } from '@/core/animation/AM_A
 import { AM_Core } from '@/core/AM_Core';
 import { AM_Character } from '@/core/am/AM_Character';
 import { AM_Bone } from '@/core/am/AM_Bone';
+import { AM_IClipInfo } from '@/core/AM_Type';
 
 export class AM_UI {
   public scene = {
@@ -65,6 +66,7 @@ export class AM_State {
   public static animationTime = 0;
   public static mode = '';
   public static _globalFrameId = 0;
+  public static clipInfo?: AM_IClipInfo;
   // public static interactionMode: 'pose' | 'object' = 'object';
 
   public static get globalFrameId(): number {
@@ -139,7 +141,7 @@ export class AM_State {
     this.ui.scene.refresh();
   }
 
-  public static async loadObject(path: string, type = '', uuid = ''): Promise<AM_Object> {
+  public static async loadObject(path: string, type = ''): Promise<AM_Object> {
     const loader = new GLTFLoader();
 
     return new Promise((resolve, reject) => {
@@ -171,13 +173,13 @@ export class AM_State {
           if (type === 'character') {
             const obj = new AM_Character(object);
 
-            obj.uuid = uuid;
+            obj.id = object.uuid;
             obj.name = object.name;
             resolve(obj);
           } else {
             const obj = new AM_Object(object);
 
-            obj.uuid = uuid;
+            obj.id = object.uuid;
             obj.name = object.name;
             resolve(obj);
           }
