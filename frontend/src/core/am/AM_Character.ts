@@ -5,7 +5,7 @@ import { AM_Bone } from '@/core/am/AM_Bone';
 import { SkinnedMesh } from 'three';
 import { AM_State } from '@/core/AM_State';
 import { AM_Key } from '@/core/animation/key/AM_Key';
-import { AM_IVector4 } from '@/core/am/AM_Vector';
+import { AM_IVector4 } from '@/core/AM_Type';
 
 export class AM_Character extends AM_Object {
   public exposedKeys = ['transform.position', 'transform.rotation', 'transform.scale'];
@@ -97,6 +97,7 @@ export class AM_Character extends AM_Object {
 
       if (AM_State.interactionMode === 'object') AM_Core.setManipulatorTo(this);
     }*/
+    this.update();
   }
 
   public onUnselect(): void {
@@ -156,6 +157,17 @@ export class AM_Character extends AM_Object {
 
   public get boneList(): Record<string, AM_Bone> {
     return this._boneList;
+  }
+
+  public set visible(status: boolean) {
+    this.model.visible = status;
+    for (const x in this.boneList) {
+      this.boneList[x].visible = status;
+    }
+  }
+
+  public get visible(): boolean {
+    return this.model.visible;
   }
 
   public destroy(): void {

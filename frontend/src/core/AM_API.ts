@@ -4,7 +4,14 @@ import { AM_Animation } from '@/core/animation/AM_Animation';
 import { AM_KeyFloat } from '@/core/animation/key/AM_KeyFloat';
 import { AM_KeyVector3 } from '@/core/animation/key/AM_KeyVector3';
 import { AM_KeyQuaternion } from '@/core/animation/key/AM_KeyQuaternion';
-import { AM_IAudioInfo, AM_IObjectInfo, AM_IVector3, AM_IVector4 } from '@/core/AM_Type';
+import {
+  AM_IAnimation,
+  AM_IAudioInfo,
+  AM_IClip,
+  AM_IObjectInfo,
+  AM_IVector3,
+  AM_IVector4,
+} from '@/core/AM_Type';
 
 export class AM_API {
   public static API_URL = process.env.VUE_APP_API_URL || `${window.location.origin}/api`;
@@ -83,7 +90,7 @@ export class AM_API {
     };
   }
 
-  public static jsonToAnimation(data: any): AM_Animation {
+  public static jsonToAnimation(data: AM_IAnimation): AM_Animation {
     const animation = new AM_Animation();
     const allKeys = {} as Record<string, number>;
 
@@ -182,8 +189,7 @@ export class AM_API {
     return this.jsonToAnimation(data);
   }
 
-  public static async getClip(name: string): Promise<any> {
-    const data = (await Axios.get(`${this.API_URL}/clip?name=${name}`)).data.response;
-    console.log(data);
+  public static async getClip(name: string): Promise<AM_IClip> {
+    return (await Axios.get(`${this.API_URL}/clip?name=${name}`)).data.response;
   }
 }

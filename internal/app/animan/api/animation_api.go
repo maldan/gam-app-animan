@@ -78,6 +78,11 @@ func WriteAnimationFrames(stream *cmhp_data.ByteArray, animation core.AnimationS
 	stream.WriteSection(core.ANIMATION_SECTION_MARKET, "FRAMES", frameSection)
 }
 
+func WriteEnd(stream *cmhp_data.ByteArray) {
+	frameSection := cmhp_data.Allocate(0, true)
+	stream.WriteSection(core.ANIMATION_SECTION_MARKET, "END", frameSection)
+}
+
 func ReadAnimation(stream *cmhp_data.ByteArray) core.AnimationSequence {
 	animation := core.AnimationSequence{}
 
@@ -154,6 +159,8 @@ func ReadAnimation(stream *cmhp_data.ByteArray) core.AnimationSequence {
 			}
 
 			break
+		case "END":
+			return animation
 		default:
 			fmt.Printf("Unknown section %v\n", sectionName)
 			rapi_core.Fatal(rapi_core.Error{Description: fmt.Sprintf("Unknown section %v\n", sectionName)})
@@ -213,6 +220,7 @@ func (r AnimationApi) PutIndex(args struct {
 	stream := cmhp_data.Allocate(0, true)
 	WriteAnimationFileInfo(stream, animation)
 	WriteAnimationFrames(stream, animation)
+	WriteEnd(stream)
 
 	// Animation
 	err := cmhp_file.Write(core.DataDir+"/animation/"+animation.Name+".ka", stream.Data)

@@ -80,6 +80,10 @@ export class AM_Object {
     };
   }
 
+  public set scale(value: AM_IVector3) {
+    this.#_threeObject.scale.set(value.x, value.y, value.z);
+  }
+
   public get scale(): AM_IVector3 {
     return {
       x: this.#_threeObject.scale.x,

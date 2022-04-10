@@ -54,6 +54,7 @@ func WriteClipAnimationList(stream *cmhp_data.ByteArray, animationList []core.An
 			// Write animation data
 			WriteAnimationFileInfo(chunk, part.Animation)
 			WriteAnimationFrames(chunk, part.Animation)
+			WriteEnd(chunk)
 		}
 	}
 	stream.WriteSection(core.ANIMATION_SECTION_MARKET, "ANIMATION_LIST", chunk)
@@ -124,6 +125,7 @@ func (r ClipApi) GetIndex(args ArgsName) core.Clip {
 			break
 		case "ANIMATION_LIST":
 			amount := section.ReadUint16() // Amount of total animations
+
 			for i := 0; i < int(amount); i++ {
 				controller := core.AnimationController{}
 				controller.ObjectUUID = section.ReadUTF8() // UUID of object
@@ -139,6 +141,8 @@ func (r ClipApi) GetIndex(args ArgsName) core.Clip {
 				clip.AnimationList = append(clip.AnimationList, controller)
 			}
 			break
+		case "END":
+			return clip
 		default:
 			fmt.Printf("Unknown section %v\n", sectionName)
 			rapi_core.Fatal(rapi_core.Error{Description: fmt.Sprintf("Unknown section %v\n", sectionName)})
@@ -163,6 +167,7 @@ func (r ClipApi) PutIndex(args struct {
 	stream := cmhp_data.Allocate(0, true)
 	WriteClipObjectList(stream, clip.ObjectList)
 	WriteClipAnimationList(stream, clip.AnimationList)
+	WriteEnd(stream)
 
 	// Animation
 	err := cmhp_file.Write(core.DataDir+"/clip/"+clip.Name+".ac", stream.Data)

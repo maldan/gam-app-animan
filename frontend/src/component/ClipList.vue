@@ -27,17 +27,31 @@ export default defineComponent({
   methods: {
     async loadClip(name: string) {
       const clip = await AM_API.getClip(name);
-      console.log(clip);
+      for (let i = 0; i < clip.objectList.length; i++) {
+        const objectInfo = await AM_API.getObjectByUUID(clip.objectList[i].uuid);
+        const obj = await AM_State.loadObject(
+          objectInfo.modelPath,
+          objectInfo.category === 'character' ? 'character' : '',
+          objectInfo.uuid,
+        );
 
-      /*
-      AM_State.objectList
-        .filter((x) => x instanceof AM_Character)
-        .forEach((x) => {
-          (x as AM_Character).resetPose();
+        obj.position = clip.objectList[i].position;
+        obj.rotation = clip.objectList[i].rotation;
+        // obj.scale = objectInfo.scale;
+        AM_State.addObject(obj);
+      }
+
+      for (let i = 0; i < clip.animationList.length; i++) {
+        const obj = AM_State.objectList.find((x) => x.uuid === clip.animationList[i].objectUUID);
+        if (!obj) continue;
+        obj.animationController.animationList.length = 0;
+
+        clip.animationList[i].animationList?.forEach((x) => {
+          const animation = AM_API.jsonToAnimation(x.animation);
+          obj.animationController.appendAnimation(animation, x.offset);
         });
-      AM_State.animationController.animationList = [{ offset: 0, animation }];
-      AM_State.animationController.compile();
-      AM_State.ui.refresh();*/
+        obj.animationController.compile();
+      }
     },
   },
   data: () => {

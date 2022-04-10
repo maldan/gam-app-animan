@@ -1,5 +1,5 @@
 import { AM_Key } from '@/core/animation/key/AM_Key';
-import { AM_IVector3 } from '@/core/am/AM_Vector';
+import { AM_IVector3 } from '@/core/AM_Type';
 
 export class AM_KeyVector3 extends AM_Key {
   private _value: AM_IVector3 = { x: 0, y: 0, z: 0 };
