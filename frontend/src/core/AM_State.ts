@@ -64,11 +64,27 @@ export class AM_State {
   public static isAnimationPlay = false;
   public static animationTime = 0;
   public static mode = '';
-  public static interactionMode: 'pose' | 'object' = 'object';
+  public static _globalFrameId = 0;
+  // public static interactionMode: 'pose' | 'object' = 'object';
+
+  public static get globalFrameId(): number {
+    return this._globalFrameId;
+  }
+
+  public static set globalFrameId(v: number) {
+    if (v <= 0) v = 0;
+
+    const l = AM_State.objectList.filter((x) => !(x instanceof AM_Bone));
+    l.forEach((x) => {
+      x.animationController.animation.frameId = v;
+      x.applyAnimation(x.animationController.animation);
+    });
+    this._globalFrameId = v;
+  }
 
   public static init(): void {
-    AM_State.animationController.off('change');
-    AM_State.animationController.on('change', () => {
+    this.animationController.off('change');
+    this.animationController.on('change', () => {
       this.objectList
         .filter((x) => x instanceof AM_Character)
         .forEach((x) => {
@@ -79,7 +95,12 @@ export class AM_State {
   }
 
   public static destroy(): void {
-    AM_State.animationController.off('change');
+    this.animationController.off('change');
+    this.objectList.length = 0;
+    this.selectedObject = undefined;
+    this.selectedAnimation = undefined;
+    this.selectedAnimationPart = undefined;
+    this.isAnimationPlay = false;
   }
 
   public static addObject(obj: AM_Object): void {
@@ -118,7 +139,7 @@ export class AM_State {
     this.ui.scene.refresh();
   }
 
-  public static async loadObject(path: string, type = ''): Promise<AM_Object> {
+  public static async loadObject(path: string, type = '', uuid = ''): Promise<AM_Object> {
     const loader = new GLTFLoader();
 
     return new Promise((resolve, reject) => {
@@ -150,13 +171,13 @@ export class AM_State {
           if (type === 'character') {
             const obj = new AM_Character(object);
 
-            obj.uuid = object.uuid;
+            obj.uuid = uuid;
             obj.name = object.name;
             resolve(obj);
           } else {
             const obj = new AM_Object(object);
 
-            obj.uuid = object.uuid;
+            obj.uuid = uuid;
             obj.name = object.name;
             resolve(obj);
           }

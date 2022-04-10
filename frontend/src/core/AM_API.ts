@@ -1,10 +1,10 @@
 import Axios from 'axios';
-import { AM_IAudioInfo, AM_IObjectInfo } from '@/core/am/AM_Object';
+import { AM_Object } from '@/core/am/AM_Object';
 import { AM_Animation } from '@/core/animation/AM_Animation';
 import { AM_KeyFloat } from '@/core/animation/key/AM_KeyFloat';
 import { AM_KeyVector3 } from '@/core/animation/key/AM_KeyVector3';
 import { AM_KeyQuaternion } from '@/core/animation/key/AM_KeyQuaternion';
-import { AM_IVector3, AM_IVector4 } from '@/core/am/AM_Vector';
+import { AM_IAudioInfo, AM_IObjectInfo, AM_IVector3, AM_IVector4 } from '@/core/AM_Type';
 
 export class AM_API {
   public static API_URL = process.env.VUE_APP_API_URL || `${window.location.origin}/api`;
@@ -51,11 +51,11 @@ export class AM_API {
     await Axios.put(`${this.API_URL}/audio`, form);
   }
 
-  public static async saveAnimation(name: string, animation: AM_Animation): Promise<void> {
-    const animationData = {
+  public static animationToJson(animation: AM_Animation): any {
+    return {
       fps: animation.fps,
       frameCount: animation.frameCount,
-      name,
+      name: animation.name,
       version: 1,
       frames: animation.frames.map((x) => {
         return {
@@ -81,26 +81,10 @@ export class AM_API {
         };
       }),
     };
-    // console.log(animationData);
-    await Axios.put(`${this.API_URL}/animation`, {
-      animation: JSON.stringify(animationData),
-    });
   }
 
-  public static async getAudioList(): Promise<AM_IAudioInfo[]> {
-    return (await Axios.get(`${this.API_URL}/audio/list`)).data.response.map((x: AM_IAudioInfo) => {
-      x.audioPath = `${this.ROOT_URL}/` + x.audioPath;
-      return x;
-    });
-  }
-
-  public static async getAnimationList(): Promise<string[]> {
-    return (await Axios.get(`${this.API_URL}/animation/list`)).data.response;
-  }
-
-  public static async getAnimation(name: string): Promise<AM_Animation> {
+  public static jsonToAnimation(data: any): AM_Animation {
     const animation = new AM_Animation();
-    const data = (await Axios.get(`${this.API_URL}/animation?name=${name}`)).data.response;
     const allKeys = {} as Record<string, number>;
 
     animation.name = data.name;
@@ -138,5 +122,68 @@ export class AM_API {
     });
 
     return animation;
+  }
+
+  public static async saveAnimation(name: string, animation: AM_Animation): Promise<void> {
+    const animationData = this.animationToJson(animation);
+    animationData.name = name;
+
+    await Axios.put(`${this.API_URL}/animation`, {
+      animation: JSON.stringify(animationData),
+    });
+  }
+
+  public static async saveClip(name: string, objectList: AM_Object[]): Promise<void> {
+    const clipData = {
+      name,
+      objectList: objectList.map((x) => {
+        return {
+          uuid: x.uuid,
+          position: x.position,
+          rotation: x.rotation,
+          scale: x.scale,
+        };
+      }),
+      animationList: objectList.map((x) => {
+        return {
+          objectUUID: x.uuid,
+          animationList: x.animationController.animationList.map((x) => {
+            return {
+              offset: x.offset,
+              animation: this.animationToJson(x.animation),
+            };
+          }),
+        };
+      }),
+    };
+    console.log(clipData);
+    await Axios.put(`${this.API_URL}/clip`, {
+      clip: JSON.stringify(clipData),
+    });
+  }
+
+  public static async getAudioList(): Promise<AM_IAudioInfo[]> {
+    return (await Axios.get(`${this.API_URL}/audio/list`)).data.response.map((x: AM_IAudioInfo) => {
+      x.audioPath = `${this.ROOT_URL}/` + x.audioPath;
+      return x;
+    });
+  }
+
+  public static async getAnimationList(): Promise<string[]> {
+    return (await Axios.get(`${this.API_URL}/animation/list`)).data.response;
+  }
+
+  public static async getClipList(): Promise<string[]> {
+    return (await Axios.get(`${this.API_URL}/clip/list`)).data.response;
+  }
+
+  public static async getAnimation(name: string): Promise<AM_Animation> {
+    const data = (await Axios.get(`${this.API_URL}/animation?name=${name}`)).data.response;
+    return this.jsonToAnimation(data);
+  }
+
+  public static async getClip(name: string): Promise<any> {
+    const data = (await Axios.get(`${this.API_URL}/clip?name=${name}`)).data.response;
+    console.log(data);
   }
 }

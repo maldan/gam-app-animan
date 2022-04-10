@@ -15,10 +15,10 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { AM_API } from '@/core/AM_API';
-import { AM_IObjectInfo } from '@/core/am/AM_Object';
 import { AM_State } from '@/core/AM_State';
 import { AM_Core } from '@/core/AM_Core';
 import { AM_Character } from '@/core/am/AM_Character';
+import { AM_IObjectInfo } from '@/core/AM_Type';
 
 export default defineComponent({
   props: {},

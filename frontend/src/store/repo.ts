@@ -1,7 +1,7 @@
 import { ActionContext } from 'vuex';
 import { MainTree } from '.';
 import Axios from 'axios';
-import { AM_IObjectInfo } from '@/core/am/AM_Object';
+import { AM_IObjectInfo } from '@/core/AM_Type';
 
 /*export type RepoObject = {
   name: string;

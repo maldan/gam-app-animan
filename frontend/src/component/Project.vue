@@ -1,12 +1,22 @@
 <template>
   <div :class="$style.project">
-    <desktop-ui-button
-      @click="saveAnimation"
-      v-if="animationList && animationList[0]?.animation.name"
-      text="Save animation"
-      style="margin-bottom: 5px"
-    />
-    <desktop-ui-button @click="togglePlay" :text="isAnimationPlay ? 'Stop' : 'Play'" />
+    <!-- Animation -->
+    <div v-if="mode === 'animation'" :class="$style.panel">
+      <desktop-ui-button
+        @click="saveAnimation"
+        v-if="animationList && animationList[0]?.animation.name"
+        text="Save animation"
+        style="margin-bottom: 5px"
+      />
+      <desktop-ui-button @click="togglePlay" :text="isAnimationPlay ? 'Stop' : 'Play'" />
+    </div>
+
+    <!-- Clip -->
+    <div v-if="mode === 'clip'" :class="$style.panel">
+      <desktop-ui-input v-model="clipName" style="margin-bottom: 5px" placeholder="Clip name..." />
+      <desktop-ui-button @click="saveClip" text="Save Clip" style="margin-bottom: 5px" />
+      <desktop-ui-button @click="togglePlay" :text="isAnimationPlay ? 'Stop' : 'Play'" />
+    </div>
   </div>
 </template>
 
@@ -39,6 +49,10 @@ export default defineComponent({
       if (this.r < 0) return false;
       return AM_State.isAnimationPlay;
     },
+    mode(): string {
+      if (this.r < 0) return '';
+      return AM_State.mode;
+    },
   },
   async mounted() {
     AM_State.ui.project.ref = this;
@@ -51,6 +65,14 @@ export default defineComponent({
     togglePlay() {
       AM_State.isAnimationPlay = !AM_State.isAnimationPlay;
       this.refresh();
+    },
+    async saveClip(): Promise<void> {
+      if (!this.clipName) return;
+
+      await AM_API.saveClip(
+        this.clipName,
+        AM_State.objectList.filter((x) => !(x instanceof AM_Bone)),
+      );
     },
     async saveAnimation(): Promise<void> {
       if (this.animationController && this.animationController.animationList.length) {
@@ -65,6 +87,7 @@ export default defineComponent({
   data: () => {
     return {
       r: 0,
+      clipName: '',
     };
   },
 });
@@ -76,5 +99,10 @@ export default defineComponent({
   flex-direction: column;
   font-size: 14px;
   user-select: none;
+
+  .panel {
+    display: flex;
+    flex-direction: column;
+  }
 }
 </style>

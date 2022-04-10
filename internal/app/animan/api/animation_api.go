@@ -15,14 +15,14 @@ import (
 type AnimationApi struct {
 }
 
-func WriteFileInfo(stream *cmhp_data.ByteArray, animation core.AnimationSequence) {
+func WriteAnimationFileInfo(stream *cmhp_data.ByteArray, animation core.AnimationSequence) {
 	fileInfo := cmhp_data.Allocate(0, true)
 	fileInfo.WriteUInt8(animation.Version) // Animation version
 	fileInfo.WriteUInt8(animation.FPS)     // FPS
 	stream.WriteSection(core.ANIMATION_SECTION_MARKET, "INFO", fileInfo)
 }
 
-func WriteFrames(stream *cmhp_data.ByteArray, animation core.AnimationSequence) {
+func WriteAnimationFrames(stream *cmhp_data.ByteArray, animation core.AnimationSequence) {
 	frameSection := cmhp_data.Allocate(0, true)
 	frameSection.WriteUInt32(animation.FrameCount)
 
@@ -78,13 +78,8 @@ func WriteFrames(stream *cmhp_data.ByteArray, animation core.AnimationSequence) 
 	stream.WriteSection(core.ANIMATION_SECTION_MARKET, "FRAMES", frameSection)
 }
 
-func (r AnimationApi) GetIndex(args ArgsAnimationName) core.AnimationSequence {
-	stream, err := cmhp_data.FromFile(core.DataDir+"/animation/"+args.Name+".ka", true)
-	rapi_core.FatalIfError(err)
-
-	animation := core.AnimationSequence{
-		Name: args.Name,
-	}
+func ReadAnimation(stream *cmhp_data.ByteArray) core.AnimationSequence {
+	animation := core.AnimationSequence{}
 
 	for {
 		sectionName, section, err := stream.ReadSection(core.ANIMATION_SECTION_MARKET)
@@ -173,6 +168,16 @@ func (r AnimationApi) GetIndex(args ArgsAnimationName) core.AnimationSequence {
 	return animation
 }
 
+func (r AnimationApi) GetIndex(args ArgsAnimationName) core.AnimationSequence {
+	stream, err := cmhp_data.FromFile(core.DataDir+"/animation/"+args.Name+".ka", true)
+	rapi_core.FatalIfError(err)
+
+	animation := ReadAnimation(stream)
+	animation.Name = args.Name
+
+	return animation
+}
+
 func (r AnimationApi) GetList() []string {
 	list := make([]string, 0)
 
@@ -206,8 +211,8 @@ func (r AnimationApi) PutIndex(args struct {
 
 	// Write animation data
 	stream := cmhp_data.Allocate(0, true)
-	WriteFileInfo(stream, animation)
-	WriteFrames(stream, animation)
+	WriteAnimationFileInfo(stream, animation)
+	WriteAnimationFrames(stream, animation)
 
 	// Animation
 	err := cmhp_file.Write(core.DataDir+"/animation/"+animation.Name+".ka", stream.Data)

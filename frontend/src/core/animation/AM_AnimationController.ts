@@ -1,5 +1,4 @@
 import { AM_Animation } from '@/core/animation/AM_Animation';
-import { AM_Key } from '@/core/animation/key/AM_Key';
 import { AM_Frame } from '@/core/animation/AM_Frame';
 
 export interface AM_IAnimationPart {
@@ -9,15 +8,16 @@ export interface AM_IAnimationPart {
 
 export class AM_AnimationController {
   public animationList: AM_IAnimationPart[] = [];
-  //public frames: AM_Frame[] = [];
-
-  //public _frameId = 0;
-  //private _frameCount = 0;
   private _eventList: Record<string, ((...data: unknown[]) => void)[]> = {};
   private _animation: AM_Animation = new AM_Animation();
 
   public createAnimation(offset = 0): void {
     this.animationList.push({ offset, animation: new AM_Animation() });
+    this.compile();
+  }
+
+  public appendAnimation(animation: AM_Animation, offset = 0): void {
+    this.animationList.push({ offset, animation });
     this.compile();
   }
 

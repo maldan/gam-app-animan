@@ -37,9 +37,19 @@ export default defineComponent({
     return {
       windowList: [
         {
+          title: 'Project',
+          name: 'project',
+          position: { x: 80, y: 5, width: 18, height: 15 },
+        },
+        {
           title: 'Scene',
           name: 'scene',
           position: { x: 1, y: 5, width: 18, height: 20 },
+        },
+        {
+          title: 'Clip List',
+          name: 'clip-list',
+          position: { x: 1, y: 27, width: 18, height: 20 },
         },
         {
           title: 'Timeline',

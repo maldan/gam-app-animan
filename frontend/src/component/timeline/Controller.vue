@@ -62,6 +62,8 @@
           {{ x.animation.name }}
         </div>
       </div>
+
+      <desktop-ui-button @click="pickAnimation" text="Append animation" icon="plus" />
     </div>
 
     <div :class="$style.right">
@@ -122,13 +124,24 @@ export default defineComponent({
       if (!this.animationController) return;
 
       // Offset animation controller
-      if (e.key === 'ArrowRight' && !this.hoverAnimationPart) {
-        this.animationController.frameId += 1;
-        this.refresh();
-      }
-      if (e.key === 'ArrowLeft' && !this.hoverAnimationPart) {
-        this.animationController.frameId -= 1;
-        this.refresh();
+      if (AM_State.mode === 'Animation') {
+        if (e.key === 'ArrowRight') {
+          this.animationController.frameId += 1;
+          this.refresh();
+        }
+        if (e.key === 'ArrowLeft') {
+          this.animationController.frameId -= 1;
+          this.refresh();
+        }
+      } else {
+        if (e.key === 'ArrowRight') {
+          AM_State.globalFrameId += 1;
+          this.refresh();
+        }
+        if (e.key === 'ArrowLeft') {
+          AM_State.globalFrameId -= 1;
+          this.refresh();
+        }
       }
     };
     document.addEventListener('keydown', this.kd);
@@ -169,18 +182,17 @@ export default defineComponent({
 
       AM_State.ui.refresh();
     },
-    /*togglePlay() {
-      AM_State.isAnimationPlay = !AM_State.isAnimationPlay;
-      this.refresh();
-    },*/
-    /*async saveAnimation(): Promise<void> {
-      if (this.animationController && this.animationController.animationList.length) {
-        await AM_API.saveAnimation(
-          this.animationController.animationList[0].animation.name,
-          this.animationController.animation,
-        );
-      }
-    },*/
+    pickAnimation(): void {
+      this.$store.dispatch('modal/show', {
+        name: 'pick/animation',
+        data: {},
+        onSuccess: async () => {
+          const an = await AM_API.getAnimation(this.$store.state.modal.data.name);
+          this.animationController?.appendAnimation(an);
+          AM_State.ui.refresh();
+        },
+      });
+    },
   },
   data: () => {
     return {

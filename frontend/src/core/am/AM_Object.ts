@@ -1,24 +1,9 @@
 import * as THREE from 'three';
 import { AM_Key } from '@/core/animation/key/AM_Key';
 import { AM_AnimationController } from '@/core/animation/AM_AnimationController';
-import { AM_IVector3, AM_IVector4 } from '@/core/am/AM_Vector';
 import { AM_Core } from '@/core/AM_Core';
 import { AM_Animation } from '@/core/animation/AM_Animation';
-
-export interface AM_IObjectInfo {
-  uuid: string;
-  name: string;
-  category: string;
-  modelPath: string;
-  previewPath: string;
-}
-
-export interface AM_IAudioInfo {
-  uuid: string;
-  name: string;
-  category: string;
-  audioPath: string;
-}
+import { AM_IVector3, AM_IVector4 } from '@/core/AM_Type';
 
 export class AM_Object {
   public uuid = '';

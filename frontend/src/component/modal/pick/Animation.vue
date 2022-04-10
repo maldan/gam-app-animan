@@ -1,20 +1,17 @@
 <template>
   <div :class="$style.objectList">
-    <ui-input @change="refresh" placeholder="Search..." v-model="search" />
     <div :class="$style.list">
-      <div
+      <desktop-ui-button
         @click="
-          $store.state.modal.data.uuid = x.uuid;
+          $store.state.modal.data.name = x;
           $store.dispatch('modal/ok');
         "
         class="clickable"
         :class="$style.item"
         v-for="x in list"
-        :key="x.modelPath"
-      >
-        <img :src="x.previewPath" alt="" />
-        <div>{{ x.name }}</div>
-      </div>
+        :key="x"
+        :text="x"
+      />
     </div>
     <desktop-ui-button @click="$store.dispatch('modal/close')" text="Close" />
   </div>
@@ -23,7 +20,6 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { AM_API } from '@/core/AM_API';
-import { AM_IObjectInfo } from '@/core/AM_Type';
 
 export default defineComponent({
   props: {},
@@ -33,13 +29,12 @@ export default defineComponent({
   },
   methods: {
     async refresh() {
-      this.list = await AM_API.getObjectList();
+      this.list = await AM_API.getAnimationList();
     },
   },
   data: () => {
     return {
-      search: 'character',
-      list: [] as AM_IObjectInfo[],
+      list: [] as string[],
     };
   },
 });
@@ -49,16 +44,13 @@ export default defineComponent({
 .objectList {
   display: flex;
   flex-direction: column;
-  max-width: 720px;
 
   .list {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    display: flex;
+    flex-direction: column;
 
     .item {
-      img {
-        width: 100%;
-      }
+      margin-bottom: 2px;
     }
   }
 }

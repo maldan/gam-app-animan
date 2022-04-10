@@ -59,7 +59,11 @@ export class AM_Core {
                 ~~(AM_State.animationTime * 24) % obj.animationController.frameCount;
               obj.animationController.frameId =
                 ~~(AM_State.animationTime * 24) % obj.animationController.frameCount;
-              if (isChanged) obj.applyAnimation(obj.animationController.animation);
+              if (isChanged) {
+                obj.applyAnimation(obj.animationController.animation);
+                AM_State.ui.timeline.refresh();
+                AM_State.ui.shape.refresh();
+              }
             }
           }
         } else {

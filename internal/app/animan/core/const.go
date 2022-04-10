@@ -35,12 +35,25 @@ type AnimationSequence struct {
 	Frames     []AnimationFrame `json:"frames"`
 }
 
+type AnimationPart struct {
+	Offset    uint16            `json:"offset"`
+	Animation AnimationSequence `json:"animation"`
+}
+
+type AnimationController struct {
+	ObjectUUID    string          `json:"objectUUID"`
+	AnimationList []AnimationPart `json:"animationList"`
+}
+
 type ObjectInfo struct {
-	UUID        string `json:"uuid"`
-	Name        string `json:"name"`
-	Category    string `json:"category"`
-	PreviewPath string `json:"previewPath"`
-	ModelPath   string `json:"modelPath"`
+	UUID        string     `json:"uuid"`
+	Name        string     `json:"name"`
+	Category    string     `json:"category"`
+	PreviewPath string     `json:"previewPath"`
+	ModelPath   string     `json:"modelPath"`
+	Position    Vector3    `json:"position"`
+	Rotation    Quaternion `json:"rotation"`
+	Scale       Vector3    `json:"scale"`
 }
 
 type AudioInfo struct {
@@ -48,6 +61,12 @@ type AudioInfo struct {
 	Name      string `json:"name"`
 	Category  string `json:"category"`
 	AudioPath string `json:"audioPath"`
+}
+
+type Clip struct {
+	Name          string                `json:"name"`
+	ObjectList    []ObjectInfo          `json:"objectList"`
+	AnimationList []AnimationController `json:"animationList"`
 }
 
 const ANIMATION_SECTION_MARKET uint32 = 1296649793

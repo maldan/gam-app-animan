@@ -8,8 +8,22 @@
       @click="selectObject(x)"
     >
       {{ x.type }} {{ x.name }}
-      <ui-icon @click.stop="toggleVisibility(x)" :class="$style.visibility" name="eye" />
-      <ui-icon @click.stop="removeObject(x)" :class="$style.remove" name="trash" />
+      <ui-icon
+        @click.stop="toggleVisibility(x)"
+        :class="$style.visibility"
+        name="eye"
+        :width="18"
+        :height="18"
+        :color="isSelected(x) ? '#a6ff68' : undefined"
+      />
+      <ui-icon
+        @click.stop="removeObject(x)"
+        :class="$style.remove"
+        name="trash"
+        :width="18"
+        :height="18"
+        :color="isSelected(x) ? '#a6ff68' : undefined"
+      />
     </div>
     <desktop-ui-button @click="pickObject" text="Add" />
   </div>
@@ -65,10 +79,12 @@ export default defineComponent({
           uuid: '',
         },
         onSuccess: async () => {
-          const info = await AM_API.getObjectByUUID(store.state.modal.data.uuid);
+          const uuid = store.state.modal.data.uuid;
+          const info = await AM_API.getObjectByUUID(uuid);
           const obj = await AM_State.loadObject(
             info.modelPath,
             info.category === 'character' ? 'character' : '',
+            uuid,
           );
           AM_State.addObject(obj);
           AM_State.ui.refresh();
@@ -94,10 +110,11 @@ export default defineComponent({
   .object {
     background: #1b1b1b;
     color: #999999;
-    padding: 5px;
-    margin-bottom: 1px;
+    padding: 3px 5px;
+    margin-bottom: 2px;
     display: flex;
     align-items: center;
+    border-radius: 2px;
 
     .visibility {
       margin-left: auto;
