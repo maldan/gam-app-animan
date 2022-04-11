@@ -8,7 +8,7 @@
         :class="$style.preview"
         v-for="x in list"
         :key="x.filePath"
-        @click="$router.push(`/animation/${x.resourceId}`)"
+        @click="$router.push(`/pose/${x.resourceId}`)"
       >
         <img :src="x.previewPath" alt="Preview" />
         <div :class="$style.title">{{ x.name }}</div>

@@ -1,3 +1,5 @@
+import { AM_IKey } from '@/core/AM_Type';
+
 export class AM_Key {
   public isAuto = false;
   public name = '';

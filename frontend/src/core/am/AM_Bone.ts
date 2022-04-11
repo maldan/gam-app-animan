@@ -41,6 +41,14 @@ export class AM_Bone extends AM_Object {
     this.update();
   }
 
+  public get isRotationOffsetIsChanged(): boolean {
+    if (this.rotationOffset.x != 0) return true;
+    if (this.rotationOffset.y != 0) return true;
+    if (this.rotationOffset.z != 0) return true;
+    if (this.rotationOffset.w != 1) return true;
+    return false;
+  }
+
   /*public bone!: THREE.Bone;
   public boneHelper!: THREE.Mesh;
 

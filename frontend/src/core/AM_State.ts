@@ -65,10 +65,13 @@ export class AM_State {
   public static isAnimationPlay = false;
   public static animationTime = 0;
   public static mode = '';
-  public static _globalFrameId = 0;
   public static clipInfo?: AM_IClipInfo;
   public static animationInfo?: AM_IAnimationInfo;
   public static poseInfo?: AM_IResourceInfo;
+
+  private static _globalFrameId = 0;
+  private static _eventList: Record<string, ((...data: unknown[]) => void)[]> = {};
+
   // public static interactionMode: 'pose' | 'object' = 'object';
 
   public static get globalFrameId(): number {
@@ -105,11 +108,14 @@ export class AM_State {
     this.selectedAnimation = undefined;
     this.selectedAnimationPart = undefined;
     this.isAnimationPlay = false;
+
+    this._eventList = {};
   }
 
   public static addObject(obj: AM_Object): void {
     this.objectList.push(obj);
     this.ui.refresh();
+    this.emit('addObject', obj);
   }
 
   public static selectObject(obj: AM_Object | undefined): void {
@@ -141,6 +147,8 @@ export class AM_State {
     if (index !== -1) this.objectList.splice(index, 1);
     if (obj) obj.destroy();
     this.ui.scene.refresh();
+
+    this.emit('removeObject', obj);
   }
 
   public static async loadObject(path: string, type = ''): Promise<AM_Object> {
@@ -192,5 +200,21 @@ export class AM_State {
         },
       );
     });
+  }
+
+  public static on(eventName: string, fn: (...data: unknown[]) => void): void {
+    if (!this._eventList[eventName]) this._eventList[eventName] = [];
+    this._eventList[eventName].push(fn);
+  }
+
+  public static off(eventName: string): void {
+    if (this._eventList[eventName]) this._eventList[eventName].length = 0;
+  }
+
+  public static emit(eventName: string, ...data: unknown[]): void {
+    if (!this._eventList[eventName]) return;
+    for (let i = 0; i < this._eventList[eventName].length; i++) {
+      this._eventList[eventName][i](...data);
+    }
   }
 }

@@ -32,6 +32,7 @@ import { AM_Object } from '@/core/am/AM_Object';
 import { AM_Bone } from '@/core/am/AM_Bone';
 import { AM_API } from '@/core/AM_API';
 import { AM_IAnimationInfo, AM_IClipInfo, AM_IResourceInfo } from '@/core/AM_Type';
+import { AM_Character } from '@/core/am/AM_Character';
 
 export default defineComponent({
   props: {},
@@ -106,8 +107,11 @@ export default defineComponent({
     },
     async savePose(): Promise<void> {
       if (!AM_State.poseInfo) return;
+      const character = AM_State.objectList.find((x) => x instanceof AM_Character) as AM_Character;
+      if (!character) return;
 
       this.isLoading = true;
+      await AM_API.pose.save(AM_State.poseInfo.name, character);
       this.isLoading = false;
     },
   },

@@ -22,6 +22,7 @@ import { AM_Core } from '@/core/AM_Core';
 import { AM_State } from '@/core/AM_State';
 import { AM_API } from '@/core/AM_API';
 import { AM_Character } from '@/core/am/AM_Character';
+import { AM_IPose, AM_KeyHelper } from '@/core/AM_Type';
 
 export default defineComponent({
   components: {},
@@ -34,6 +35,15 @@ export default defineComponent({
     AM_State.poseInfo = info;
 
     await this.loadPose(info.name);
+
+    AM_State.on('addObject', (ch: unknown) => {
+      if (!this.pose) return;
+      if (ch instanceof AM_Character) {
+        for (let i = 0; i < this.pose.keys.length; i++) {
+          ch.applyKey(AM_KeyHelper.fromJSON(this.pose.keys[i]));
+        }
+      }
+    });
   },
   beforeUnmount() {
     AM_Core.destroy();
@@ -41,8 +51,7 @@ export default defineComponent({
   },
   methods: {
     async loadPose(name: string) {
-      const pose = await AM_API.pose.get(name);
-      console.log(pose);
+      this.pose = await AM_API.pose.get(name);
       AM_State.ui.refresh();
     },
   },
@@ -65,6 +74,7 @@ export default defineComponent({
           position: { x: 80, y: 44, width: 18, height: 25 },
         },
       ],
+      pose: undefined as AM_IPose | undefined,
     };
   },
 });

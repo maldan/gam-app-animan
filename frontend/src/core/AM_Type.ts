@@ -1,3 +1,8 @@
+import { AM_Key } from '@/core/animation/key/AM_Key';
+import { AM_KeyFloat } from '@/core/animation/key/AM_KeyFloat';
+import { AM_KeyVector3 } from '@/core/animation/key/AM_KeyVector3';
+import { AM_KeyQuaternion } from '@/core/animation/key/AM_KeyQuaternion';
+
 export interface AM_IObjectInfo {
   id: string;
   resourceId: string;
@@ -56,16 +61,18 @@ export interface AM_IVector4 {
   w: number;
 }
 
+export interface AM_IKey {
+  name: string;
+  type: number;
+  vBool: boolean;
+  vFloat: number;
+  vVector2: AM_IVector2;
+  vVector3: AM_IVector3;
+  vQuaternion: AM_IVector4;
+}
+
 export interface AM_IFrame {
-  keys: {
-    name: string;
-    type: number;
-    vBool: boolean;
-    vFloat: number;
-    vVector2: AM_IVector2;
-    vVector3: AM_IVector3;
-    vQuaternion: AM_IVector4;
-  }[];
+  keys: AM_IKey[];
 }
 
 export interface AM_IAnimation {
@@ -86,5 +93,14 @@ export interface AM_IClip {
 }
 
 export interface AM_IPose {
-  keys: AM_IFrame[];
+  keys: AM_IKey[];
+}
+
+export class AM_KeyHelper {
+  public static fromJSON(data: AM_IKey): AM_Key {
+    if (data.type == 1) return new AM_KeyFloat(data.name, data.vFloat);
+    if (data.type == 3) return new AM_KeyVector3(data.name, data.vVector3);
+    if (data.type == 4) return new AM_KeyQuaternion(data.name, data.vQuaternion);
+    return new AM_Key();
+  }
 }
