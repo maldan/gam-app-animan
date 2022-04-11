@@ -11,6 +11,7 @@ import {
   AM_IClip,
   AM_IClipInfo,
   AM_IObjectInfo,
+  AM_IVector2,
   AM_IVector3,
   AM_IVector4,
 } from '@/core/AM_Type';
@@ -18,6 +19,88 @@ import {
 export class AM_API {
   public static API_URL = process.env.VUE_APP_API_URL || `${window.location.origin}/api`;
   public static ROOT_URL = process.env.VUE_APP_ROOT_URL || `${window.location.origin}`;
+
+  public static animation = {
+    async get(name: string): Promise<AM_Animation> {
+      const data = (await Axios.get(`${AM_API.API_URL}/animation?name=${name}`)).data.response;
+      return this.fromJSON(data);
+    },
+    async getInfo(resourceId: string): Promise<AM_IAnimationInfo> {
+      return (await Axios.get(`${AM_API.API_URL}/animation/info?resourceId=${resourceId}`)).data
+        .response;
+    },
+    toJSON(animation: AM_Animation): AM_IAnimation {
+      return {
+        fps: animation.fps,
+        frameCount: animation.frameCount,
+        name: animation.name,
+        version: 1,
+        frames: animation.frames.map((x) => {
+          return {
+            keys: Object.values(x.keys)
+              .filter((x) => !x.isAuto)
+              .map((x) => {
+                let type = 0;
+                if (x instanceof AM_KeyFloat) type = 1;
+                // if (x instanceof AM_KeyVector2) type = 2;
+                if (x instanceof AM_KeyVector3) type = 3;
+                if (x instanceof AM_KeyQuaternion) type = 4;
+
+                return {
+                  name: x.name,
+                  type,
+                  vBool: x.value as boolean,
+                  vFloat: x.value as number,
+                  vVector2: x.value as AM_IVector2,
+                  vVector3: x.value as AM_IVector3,
+                  vQuaternion: x.value as AM_IVector4,
+                };
+              }),
+          };
+        }),
+      };
+    },
+    fromJSON(data: AM_IAnimation): AM_Animation {
+      const animation = new AM_Animation();
+      const allKeys = {} as Record<string, number>;
+
+      animation.name = data.name;
+      animation.fps = data.fps;
+      animation.frameCount = data.frameCount;
+      for (let i = 0; i < data.frames.length; i++) {
+        const frame = data.frames[i];
+
+        animation.frames[i].keys = {};
+
+        for (let j = 0; j < frame.keys.length; j++) {
+          const key = frame.keys[j] as {
+            name: string;
+            type: number;
+            vBool: boolean;
+            vFloat: number;
+            vVector3: AM_IVector3;
+            vQuaternion: AM_IVector4;
+          };
+
+          if (key.type === 1)
+            animation.frames[i].keys[key.name] = new AM_KeyFloat(key.name, key.vFloat);
+          if (key.type === 3)
+            animation.frames[i].keys[key.name] = new AM_KeyVector3(key.name, key.vVector3);
+          if (key.type === 4)
+            animation.frames[i].keys[key.name] = new AM_KeyQuaternion(key.name, key.vQuaternion);
+
+          allKeys[key.name] = 0;
+        }
+      }
+
+      // Interpolate all keys
+      Object.keys(allKeys).forEach((x) => {
+        animation.interpolateKey(x);
+      });
+
+      return animation;
+    },
+  };
 
   public static async getObject(resourceId: string): Promise<AM_IObjectInfo> {
     const obj = (await Axios.get(`${this.API_URL}/object/?resourceId=${resourceId}`)).data
@@ -59,7 +142,7 @@ export class AM_API {
 
     await Axios.put(`${this.API_URL}/audio`, form);
   }
-
+  /*
   public static animationToJson(animation: AM_Animation): any {
     return {
       fps: animation.fps,
@@ -132,9 +215,9 @@ export class AM_API {
 
     return animation;
   }
-
+*/
   public static async saveAnimation(name: string, animation: AM_Animation): Promise<void> {
-    const animationData = this.animationToJson(animation);
+    const animationData = AM_API.animation.toJSON(animation);
     animationData.name = name;
 
     await Axios.put(`${this.API_URL}/animation`, {
@@ -160,7 +243,7 @@ export class AM_API {
           animationList: x.animationController.animationList.map((x) => {
             return {
               offset: x.offset,
-              animation: this.animationToJson(x.animation),
+              animation: AM_API.animation.toJSON(x.animation),
             };
           }),
         };
@@ -212,10 +295,10 @@ export class AM_API {
     ).data.response;
   }
 
-  public static async getAnimation(name: string): Promise<AM_Animation> {
+  /*public static async getAnimation(name: string): Promise<AM_Animation> {
     const data = (await Axios.get(`${this.API_URL}/animation?name=${name}`)).data.response;
     return this.jsonToAnimation(data);
-  }
+  }*/
 
   public static async getClip(name: string): Promise<AM_IClip> {
     return (await Axios.get(`${this.API_URL}/clip?name=${name}`)).data.response;
@@ -225,8 +308,8 @@ export class AM_API {
     return (await Axios.get(`${this.API_URL}/clip/info?resourceId=${resourceId}`)).data.response;
   }
 
-  public static async getAnimationInfo(resourceId: string): Promise<AM_IAnimationInfo> {
+  /*public static async getAnimationInfo(resourceId: string): Promise<AM_IAnimationInfo> {
     return (await Axios.get(`${this.API_URL}/animation/info?resourceId=${resourceId}`)).data
       .response;
-  }
+  }*/
 }

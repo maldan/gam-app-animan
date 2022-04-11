@@ -27,7 +27,7 @@ export default defineComponent({
   },
   methods: {
     async loadAnimation(name: string) {
-      const animation = await AM_API.getAnimation(name);
+      const animation = await AM_API.animation.get(name);
       AM_State.objectList
         .filter((x) => x instanceof AM_Character)
         .forEach((x) => {

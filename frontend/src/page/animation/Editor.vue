@@ -30,7 +30,7 @@ export default defineComponent({
     AM_State.init();
     AM_Core.init(this.$refs['scene'] as HTMLElement);
 
-    const info = await AM_API.getAnimationInfo(this.$route.params.resourceId as string);
+    const info = await AM_API.animation.getInfo(this.$route.params.resourceId as string);
     AM_State.animationInfo = info;
 
     await this.loadAnimation(info.name);
@@ -41,7 +41,7 @@ export default defineComponent({
   },
   methods: {
     async loadAnimation(name: string) {
-      const animation = await AM_API.getAnimation(name);
+      const animation = await AM_API.animation.get(name);
       AM_State.objectList
         .filter((x) => x instanceof AM_Character)
         .forEach((x) => {

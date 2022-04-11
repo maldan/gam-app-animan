@@ -133,7 +133,7 @@ export default defineComponent({
       if (!this.animationController) return;
 
       // Offset animation controller
-      if (AM_State.mode === 'Animation') {
+      if (AM_State.mode === 'animation') {
         if (e.key === 'ArrowRight') {
           this.animationController.frameId += 1;
           this.refresh();
@@ -196,7 +196,7 @@ export default defineComponent({
         name: 'pick/animation',
         data: {},
         onSuccess: async () => {
-          const an = await AM_API.getAnimation(this.$store.state.modal.data.name);
+          const an = await AM_API.animation.get(this.$store.state.modal.data.name);
           this.animationController?.appendAnimation(an);
           AM_State.ui.refresh();
         },

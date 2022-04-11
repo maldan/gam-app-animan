@@ -48,7 +48,7 @@ export default defineComponent({
         obj.animationController.animationList.length = 0;
 
         clip.animationList[i].animationList?.forEach((x) => {
-          const animation = AM_API.jsonToAnimation(x.animation);
+          const animation = AM_API.animation.fromJSON(x.animation);
           obj.animationController.appendAnimation(animation, x.offset);
         });
         obj.animationController.compile();
