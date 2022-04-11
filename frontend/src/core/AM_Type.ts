@@ -31,6 +31,13 @@ export interface AM_IAnimationInfo {
   filePath: string;
 }
 
+export interface AM_IResourceInfo {
+  resourceId: string;
+  name: string;
+  category: string;
+  filePath: string;
+}
+
 export interface AM_IVector2 {
   x: number;
   y: number;
@@ -76,4 +83,8 @@ export interface AM_IClip {
     objectId: string;
     animationList: { offset: number; animation: AM_IAnimation }[];
   }[];
+}
+
+export interface AM_IPose {
+  keys: AM_IFrame[];
 }

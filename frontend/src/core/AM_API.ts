@@ -11,6 +11,8 @@ import {
   AM_IClip,
   AM_IClipInfo,
   AM_IObjectInfo,
+  AM_IPose,
+  AM_IResourceInfo,
   AM_IVector2,
   AM_IVector3,
   AM_IVector4,
@@ -19,6 +21,29 @@ import {
 export class AM_API {
   public static API_URL = process.env.VUE_APP_API_URL || `${window.location.origin}/api`;
   public static ROOT_URL = process.env.VUE_APP_ROOT_URL || `${window.location.origin}`;
+
+  public static pose = {
+    async get(name: string): Promise<AM_IPose> {
+      return (await Axios.get(`${AM_API.API_URL}/pose?name=${name}`)).data.response;
+    },
+    async getInfo(resourceId: string): Promise<AM_IResourceInfo> {
+      return (await Axios.get(`${AM_API.API_URL}/pose/info?resourceId=${resourceId}`)).data
+        .response;
+    },
+    async getList(): Promise<AM_IResourceInfo[]> {
+      return (await Axios.get(`${AM_API.API_URL}/pose/list`)).data.response;
+    },
+    async create(name: string): Promise<AM_IResourceInfo> {
+      return (
+        await Axios.put(`${AM_API.API_URL}/pose`, {
+          name,
+          pose: JSON.stringify({
+            keys: [],
+          }),
+        })
+      ).data.response;
+    },
+  };
 
   public static animation = {
     async get(name: string): Promise<AM_Animation> {
@@ -232,6 +257,7 @@ export class AM_API {
         return {
           id: x.id,
           resourceId: x.resourceId,
+          name: x.name,
           position: x.position,
           rotation: x.rotation,
           scale: x.scale,

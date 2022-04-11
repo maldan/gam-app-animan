@@ -17,10 +17,10 @@ export default defineComponent({
       API_URL: process.env.VUE_APP_API_URL || `${window.location.origin}/api`,
       console: console,
       menu: [
-        //{ name: 'Animation', url: '/' },
         { name: 'Animation', url: '/animation' },
         { name: 'Clip', url: '/clip' },
         { name: 'Object', url: '/object' },
+        { name: 'Pose', url: '/pose' },
         { name: 'Audio', url: '/audio' },
       ],
     };

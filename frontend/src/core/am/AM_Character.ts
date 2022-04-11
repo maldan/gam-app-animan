@@ -97,11 +97,12 @@ export class AM_Character extends AM_Object {
 
       if (AM_State.interactionMode === 'object') AM_Core.setManipulatorTo(this);
     }*/
+    //for (const x in this.boneList) this.boneList[x].visible = true;
     this.update();
   }
 
   public onUnselect(): void {
-    // for (const x in this.boneList) this.boneList[x].visible = false;
+    //for (const x in this.boneList) this.boneList[x].visible = false;
   }
 
   public applyKey(key: AM_Key): void {

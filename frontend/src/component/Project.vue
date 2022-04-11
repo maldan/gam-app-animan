@@ -14,6 +14,12 @@
       <desktop-ui-button @click="togglePlay" :text="isAnimationPlay ? 'Stop' : 'Play'" />
     </div>
 
+    <!-- Pose -->
+    <div v-if="!isLoading && mode === 'pose'" :class="$style.panel">
+      <div>Pose name: {{ poseInfo?.name }}</div>
+      <desktop-ui-button @click="savePose" text="Save" style="margin-bottom: 5px" />
+    </div>
+
     <div v-if="isLoading">...</div>
   </div>
 </template>
@@ -25,7 +31,7 @@ import { AM_AnimationController, AM_IAnimationPart } from '@/core/animation/AM_A
 import { AM_Object } from '@/core/am/AM_Object';
 import { AM_Bone } from '@/core/am/AM_Bone';
 import { AM_API } from '@/core/AM_API';
-import { AM_IAnimationInfo, AM_IClipInfo } from '@/core/AM_Type';
+import { AM_IAnimationInfo, AM_IClipInfo, AM_IResourceInfo } from '@/core/AM_Type';
 
 export default defineComponent({
   props: {},
@@ -60,6 +66,10 @@ export default defineComponent({
       if (this.r < 0) return undefined;
       return AM_State.animationInfo;
     },
+    poseInfo(): AM_IResourceInfo | undefined {
+      if (this.r < 0) return undefined;
+      return AM_State.poseInfo;
+    },
   },
   async mounted() {
     AM_State.ui.project.ref = this;
@@ -92,6 +102,12 @@ export default defineComponent({
         AM_State.animationInfo.name,
         AM_State.animationController.animation,
       );
+      this.isLoading = false;
+    },
+    async savePose(): Promise<void> {
+      if (!AM_State.poseInfo) return;
+
+      this.isLoading = true;
       this.isLoading = false;
     },
   },

@@ -80,12 +80,14 @@ export default defineComponent({
         },
         onSuccess: async () => {
           const resourceId = store.state.modal.data.resourceId;
+          const name = store.state.modal.data.name;
           const info = await AM_API.getObject(resourceId);
           const obj = await AM_State.loadObject(
             info.modelPath,
             info.category === 'character' ? 'character' : '',
           );
           obj.resourceId = resourceId;
+          obj.name = name;
 
           AM_State.addObject(obj);
           AM_State.ui.refresh();

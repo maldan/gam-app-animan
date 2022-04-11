@@ -1,22 +1,26 @@
 package api
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/maldan/gam-app-animan/internal/app/animan/core"
+	"github.com/maldan/go-cmhp/cmhp_data"
 	"github.com/maldan/go-cmhp/cmhp_file"
+	"github.com/maldan/go-cmhp/cmhp_slice"
 	"github.com/maldan/go-rapi/rapi_core"
+	"os"
 	"strings"
 )
 
 type PoseApi struct {
 }
 
-/*
 func (r PoseApi) GetIndex(args ArgsAnimationName) core.AnimationFrame {
-	stream, err := cmhp_data.FromFile(core.DataDir+"/pose/"+args.Name+".kp", true)
+	stream, err := cmhp_data.FromFile(core.DataDir+"/pose/"+args.Name+"/pose.kp", true)
 	rapi_core.FatalIfError(err)
 
 	// Create frame
-	pose := core.AnimationFrame{Keys: map[string]core.AnimationKey{}}
+	frame := core.AnimationFrame{Keys: make([]core.AnimationKey, 0)}
 
 	// Read keys of frame
 	keysAmount := int(stream.ReadUint16())
@@ -25,96 +29,164 @@ func (r PoseApi) GetIndex(args ArgsAnimationName) core.AnimationFrame {
 		// Read key
 		keyName := stream.ReadUTF8()
 		keyType := stream.ReadUint8()
-		key := core.AnimationKey{}
-
-		if keyType == 0 {
-			// Read position
-			x := stream.ReadFloat32()
-			y := stream.ReadFloat32()
-			z := stream.ReadFloat32()
-			key.Position = core.Vector3{X: x, Y: y, Z: z}
-
-			// Read rotation
-			x = stream.ReadFloat32()
-			y = stream.ReadFloat32()
-			z = stream.ReadFloat32()
-			w := stream.ReadFloat32()
-			key.Rotation = core.Quaternion{X: x, Y: y, Z: z, W: w}
-
-			// Read scale
-			x = stream.ReadFloat32()
-			y = stream.ReadFloat32()
-			z = stream.ReadFloat32()
-			key.Scale = core.Vector3{X: x, Y: y, Z: z}
+		key := core.AnimationKey{
+			Name: keyName,
+			Type: keyType,
 		}
 
-		// Set key
-		pose.Keys[keyName] = key
+		// Float key
+		if keyType == 1 {
+			key.VFloat = stream.ReadFloat32()
+		}
+
+		// Vector2 key
+		if keyType == 2 {
+			key.VVector2.X = stream.ReadFloat32()
+			key.VVector2.Y = stream.ReadFloat32()
+		}
+
+		// Vector3 key
+		if keyType == 3 {
+			key.VVector3.X = stream.ReadFloat32()
+			key.VVector3.Y = stream.ReadFloat32()
+			key.VVector3.Z = stream.ReadFloat32()
+		}
+
+		// Quaternion key
+		if keyType == 4 {
+			key.VQuaternion.X = stream.ReadFloat32()
+			key.VQuaternion.Y = stream.ReadFloat32()
+			key.VQuaternion.Z = stream.ReadFloat32()
+			key.VQuaternion.W = stream.ReadFloat32()
+		}
+
+		frame.Keys = append(frame.Keys, key)
 	}
 
-	return pose
-}*/
-
-func (r PoseApi) GetList() []string {
-	out := make([]string, 0)
-	fileList, err := cmhp_file.List(core.DataDir + "/pose")
-	rapi_core.FatalIfError(err)
-
-	for _, file := range fileList {
-		out = append(out, strings.Replace(file.Name(), ".kp", "", 1))
-	}
-
-	return out
+	return frame
 }
 
-/*
-func (r PoseApi) PostIndex(args struct {
-	Name string `json:"name"`
-	Data string `json:"data"`
-}) {
-	pose := core.AnimationFrame{}
-	json.Unmarshal([]byte(args.Data), &pose)
+// GetInfo of audio files
+func (r PoseApi) GetInfo(args ArgsResourceId) core.ResourceInfo {
+	obj := core.ResourceInfo{}
 
-	// Write animation data
+	// Get file list
+	allFiles, _ := cmhp_file.ListAll(core.DataDir + "/pose")
+	allFiles = cmhp_slice.Filter(allFiles, func(t cmhp_file.FileInfo) bool {
+		return strings.Contains(t.FullPath, "info.json")
+	})
+
+	// Get wd
+	wd, _ := os.Getwd()
+	wd = strings.ReplaceAll(wd, "\\", "/")
+
+	for _, file := range allFiles {
+		info := core.ResourceInfo{}
+
+		info.FilePath = strings.Replace(
+			strings.Replace(strings.ReplaceAll(file.FullPath, "/info.json", "/pose.kp"), wd, "", 1),
+			"/db",
+			"data",
+			1,
+		)
+		cmhp_file.ReadJSON(file.FullPath, &info)
+
+		if info.ResourceId == args.ResourceId {
+			return info
+		}
+	}
+
+	rapi_core.Fatal(rapi_core.Error{Description: "File not found", Code: 404})
+
+	return obj
+}
+
+// GetList of audio files
+func (r PoseApi) GetList() []core.ResourceInfo {
+	list := make([]core.ResourceInfo, 0)
+
+	fileList, _ := cmhp_file.ListAll(core.DataDir + "/pose")
+	fileList = cmhp_slice.Filter(fileList, func(t cmhp_file.FileInfo) bool {
+		return strings.Contains(t.Name, ".kp")
+	})
+
+	for _, file := range fileList {
+		fileDir := strings.Replace(file.FullPath, "/pose.kp", "", 1)
+
+		// Get file info
+		clipInfo, err := core.GetResourceInfo(fileDir)
+		if err != nil {
+			core.UpdateResourceInfo(fileDir, "pose")
+			clipInfo, err = core.GetResourceInfo(fileDir)
+		}
+
+		// Add to list
+		list = append(list, clipInfo)
+	}
+
+	return list
+}
+
+func (r PoseApi) PutIndex(args struct {
+	Name string `json:"name"`
+	Pose string `json:"pose"`
+}) core.ResourceInfo {
+	// Parse data
+	frame := core.AnimationFrame{}
+	err := json.Unmarshal([]byte(args.Pose), &frame)
+	rapi_core.FatalIfError(err)
+
+	// Allocate stream
 	stream := cmhp_data.Allocate(0, true)
 
 	// Amount of keys
-	stream.WriteUInt16(uint16(len(pose.Keys)))
+	stream.WriteUInt16(uint16(len(frame.Keys)))
 
 	// Write each key
-	for keyName, keyValue := range pose.Keys {
+	for _, key := range frame.Keys {
 		// Key name
-		stream.WriteUTF8(keyName)
+		stream.WriteUTF8(key.Name)
 
 		// Key type
-		stream.WriteUInt8(uint8(keyValue.Type))
+		stream.WriteUInt8(key.Type)
 
-		// Transform key
-		if keyValue.Type == 0 {
-			// Write position
-			stream.WriteFloat32(keyValue.Position.X)
-			stream.WriteFloat32(keyValue.Position.Y)
-			stream.WriteFloat32(keyValue.Position.Z)
-
-			// Write rotation
-			stream.WriteFloat32(keyValue.Rotation.X)
-			stream.WriteFloat32(keyValue.Rotation.Y)
-			stream.WriteFloat32(keyValue.Rotation.Z)
-			stream.WriteFloat32(keyValue.Rotation.W)
-
-			// Write scale
-			stream.WriteFloat32(keyValue.Scale.X)
-			stream.WriteFloat32(keyValue.Scale.Y)
-			stream.WriteFloat32(keyValue.Scale.Z)
+		// Float key
+		if key.Type == 1 {
+			stream.WriteFloat32(key.VFloat)
 		}
 
-		// Blend shape key
-		if keyValue.Type == 1 {
-			stream.WriteFloat32(keyValue.Value)
+		// Vector2 key
+		if key.Type == 2 {
+			stream.WriteFloat32(key.VVector3.X)
+			stream.WriteFloat32(key.VVector3.Y)
+		}
+
+		// Vector3 key
+		if key.Type == 3 {
+			stream.WriteFloat32(key.VVector3.X)
+			stream.WriteFloat32(key.VVector3.Y)
+			stream.WriteFloat32(key.VVector3.Z)
+		}
+
+		// Quaternion key
+		if key.Type == 4 {
+			stream.WriteFloat32(key.VQuaternion.X)
+			stream.WriteFloat32(key.VQuaternion.Y)
+			stream.WriteFloat32(key.VQuaternion.Z)
+			stream.WriteFloat32(key.VQuaternion.W)
 		}
 	}
 
-	// Pose
-	err := cmhp_file.Write(core.DataDir+"/pose/"+args.Name+".kp", stream.Data)
+	// Write file
+	err = cmhp_file.Write(fmt.Sprintf("%v/pose/%v/pose.kp", core.DataDir, args.Name), stream.Data)
 	rapi_core.FatalIfError(err)
-}*/
+
+	// Update info
+	core.UpdateResourceInfo(fmt.Sprintf("%v/pose/%v", core.DataDir, args.Name), "pose")
+
+	// Get info
+	info, err := core.GetResourceInfo(core.DataDir + "/pose/" + args.Name)
+	rapi_core.FatalIfError(err)
+
+	return info
+}

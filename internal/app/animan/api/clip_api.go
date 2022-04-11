@@ -22,6 +22,7 @@ func WriteClipObjectList(stream *cmhp_data.ByteArray, objectList []core.ObjectIn
 	for _, obj := range objectList {
 		chunk.WriteUTF8(obj.Id)
 		chunk.WriteUTF8(obj.ResourceId)
+		chunk.WriteUTF8(obj.Name)
 
 		// Position
 		chunk.WriteFloat32(obj.Position.X)
@@ -141,6 +142,7 @@ func (r ClipApi) GetIndex(args ArgsName) core.Clip {
 				obj := core.ObjectInfo{}
 				obj.Id = section.ReadUTF8()
 				obj.ResourceId = section.ReadUTF8()
+				obj.Name = section.ReadUTF8()
 
 				// Position
 				obj.Position.X = section.ReadFloat32()

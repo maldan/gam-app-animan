@@ -5,6 +5,9 @@ import ClipEditor from '../page/clip/Editor.vue';
 import ClipList from '../page/clip/List.vue';
 import ObjectList from '../page/object/List.vue';
 import ObjectPreview from '../page/object/Preview.vue';
+import PoseEditor from '../page/pose/Editor.vue';
+import PoseList from '../page/pose/List.vue';
+
 import Audio from '../page/Audio.vue';
 
 const routes: Array<RouteRecordRaw> = [
@@ -18,6 +21,18 @@ const routes: Array<RouteRecordRaw> = [
     name: 'Animation Editor',
     component: AnimationEditor,
   },
+
+  {
+    path: '/pose',
+    name: 'Pose List',
+    component: PoseList,
+  },
+  {
+    path: '/pose/:resourceId',
+    name: 'Pose Editor',
+    component: PoseEditor,
+  },
+
   {
     path: '/clip',
     name: 'Clip List',
@@ -28,6 +43,7 @@ const routes: Array<RouteRecordRaw> = [
     name: 'Clip Editor',
     component: ClipEditor,
   },
+
   {
     path: '/object',
     name: 'Object List',
@@ -38,6 +54,7 @@ const routes: Array<RouteRecordRaw> = [
     name: 'Object Preview',
     component: ObjectPreview,
   },
+
   {
     path: '/audio',
     name: 'Audio',

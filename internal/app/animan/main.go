@@ -11,6 +11,9 @@ import (
 	"github.com/maldan/go-rapi/rapi_file"
 	"github.com/maldan/go-rapi/rapi_rest"
 	"github.com/maldan/go-rapi/rapi_vfs"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
 func Start(frontFs embed.FS) {
@@ -40,6 +43,15 @@ func Start(frontFs embed.FS) {
 
 	// Set
 	core.DataDir = *dataDir
+	isAbs := filepath.IsAbs(core.DataDir)
+	if !isAbs {
+		wd, _ := os.Getwd()
+		wd = strings.ReplaceAll(wd, "\\", "/")
+		core.DataDir = wd + "/" + core.DataDir
+		if core.DataDir[len(core.DataDir)-1] == '/' {
+			core.DataDir = core.DataDir[0 : len(core.DataDir)-1]
+		}
+	}
 
 	// Test
 	/*aa := api.AnimationApi{}.GetIndex(api.ArgsAnimationName{Name: "na"})

@@ -49,6 +49,7 @@ export default defineComponent({
         );
         obj.id = clip.objectList[i].id;
         obj.resourceId = clip.objectList[i].resourceId;
+        obj.name = clip.objectList[i].name;
 
         obj.position = clip.objectList[i].position;
         obj.rotation = clip.objectList[i].rotation;

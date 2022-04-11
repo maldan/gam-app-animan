@@ -5,6 +5,7 @@
       <div
         @click="
           $store.state.modal.data.resourceId = x.resourceId;
+          $store.state.modal.data.name = x.name;
           $store.dispatch('modal/ok');
         "
         class="clickable"
