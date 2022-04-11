@@ -50,6 +50,8 @@ export class AM_API {
       const poseData = {
         keys: [] as AM_IKey[],
       };
+
+      // Bone list
       for (const x in character.boneList) {
         const bone = character.boneList[x];
 
@@ -70,6 +72,28 @@ export class AM_API {
           });
         }
       }
+
+      // Shape list
+      for (const x in character.shapeList) {
+        const shape = character.shapeList[x];
+        if (shape.value != 0) {
+          poseData.keys.push({
+            name: `shape.${character.shapeList[x].name}`,
+            type: 1,
+            vBool: false,
+            vFloat: character.shapeList[x].value,
+            vVector2: { x: 0, y: 0 },
+            vVector3: { x: 0, y: 0, z: 0 },
+            vQuaternion: {
+              x: 0,
+              y: 0,
+              z: 0,
+              w: 1,
+            },
+          });
+        }
+      }
+
       console.log(poseData);
       await Axios.put(`${AM_API.API_URL}/pose`, {
         name,

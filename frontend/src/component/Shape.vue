@@ -22,11 +22,19 @@ export default defineComponent({
   computed: {
     character(): AM_Character | undefined {
       if (this.r < 0) return undefined;
+      if (AM_State.mode === 'pose') {
+        return AM_State.objectList.find((x) => x instanceof AM_Character) as AM_Character;
+      }
       if (AM_State.selectedObject instanceof AM_Character) return AM_State.selectedObject;
       return undefined;
     },
     shapeList() {
       if (this.r < 0) return [];
+      if (AM_State.mode === 'pose') {
+        const ch = AM_State.objectList.find((x) => x instanceof AM_Character) as AM_Character;
+        if (ch) return ch.shapeList;
+        return [];
+      }
       if (!AM_State.selectedAnimation) return [];
       if (AM_State.selectedObject instanceof AM_Character) return AM_State.selectedObject.shapeList;
       return [];
@@ -47,6 +55,11 @@ export default defineComponent({
     },
     setShapeKey(name: string, value: number) {
       if (!this.character) return;
+      if (AM_State.mode === 'pose') {
+        this.character.setShapeKey(name, value);
+        AM_State.ui.refresh();
+        return;
+      }
       if (!AM_State.selectedAnimation) return;
 
       this.character.setShapeKey(name, value);
