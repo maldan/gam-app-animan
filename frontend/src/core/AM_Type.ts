@@ -24,6 +24,13 @@ export interface AM_IClipInfo {
   clipPath: string;
 }
 
+export interface AM_IAnimationInfo {
+  resourceId: string;
+  name: string;
+  category: string;
+  filePath: string;
+}
+
 export interface AM_IVector2 {
   x: number;
   y: number;

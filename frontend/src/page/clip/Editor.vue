@@ -54,6 +54,7 @@ export default defineComponent({
         obj.rotation = clip.objectList[i].rotation;
         // obj.scale = objectInfo.scale;
         AM_State.addObject(obj);
+        obj.update();
       }
 
       for (let i = 0; i < clip.animationList.length; i++) {
@@ -66,6 +67,7 @@ export default defineComponent({
           obj.animationController.appendAnimation(animation, x.offset);
         });
         obj.animationController.compile();
+        obj.applyAnimation(obj.animationController.animation);
       }
     },
   },

@@ -6,6 +6,7 @@ import { AM_KeyVector3 } from '@/core/animation/key/AM_KeyVector3';
 import { AM_KeyQuaternion } from '@/core/animation/key/AM_KeyQuaternion';
 import {
   AM_IAnimation,
+  AM_IAnimationInfo,
   AM_IAudioInfo,
   AM_IClip,
   AM_IClipInfo,
@@ -178,7 +179,7 @@ export class AM_API {
     });
   }
 
-  public static async getAnimationList(): Promise<string[]> {
+  public static async getAnimationList(): Promise<AM_IAnimationInfo[]> {
     return (await Axios.get(`${this.API_URL}/animation/list`)).data.response;
   }
 
@@ -198,6 +199,19 @@ export class AM_API {
     ).data.response;
   }
 
+  public static async createAnimation(name: string): Promise<AM_IAnimationInfo> {
+    return (
+      await Axios.put(`${this.API_URL}/animation`, {
+        animation: JSON.stringify({
+          name,
+          fps: 24,
+          frameCount: 4,
+          frames: [{ keys: [] }, { keys: [] }, { keys: [] }, { keys: [] }],
+        }),
+      })
+    ).data.response;
+  }
+
   public static async getAnimation(name: string): Promise<AM_Animation> {
     const data = (await Axios.get(`${this.API_URL}/animation?name=${name}`)).data.response;
     return this.jsonToAnimation(data);
@@ -209,5 +223,10 @@ export class AM_API {
 
   public static async getClipInfo(resourceId: string): Promise<AM_IClipInfo> {
     return (await Axios.get(`${this.API_URL}/clip/info?resourceId=${resourceId}`)).data.response;
+  }
+
+  public static async getAnimationInfo(resourceId: string): Promise<AM_IAnimationInfo> {
+    return (await Axios.get(`${this.API_URL}/animation/info?resourceId=${resourceId}`)).data
+      .response;
   }
 }

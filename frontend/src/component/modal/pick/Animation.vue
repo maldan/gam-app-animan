@@ -20,6 +20,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { AM_API } from '@/core/AM_API';
+import { AM_IAnimationInfo } from '@/core/AM_Type';
 
 export default defineComponent({
   props: {},
@@ -34,7 +35,7 @@ export default defineComponent({
   },
   data: () => {
     return {
-      list: [] as string[],
+      list: [] as AM_IAnimationInfo[],
     };
   },
 });

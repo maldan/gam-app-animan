@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
-import Animation from '../page/Animation.vue';
+import AnimationEditor from '../page/animation/Editor.vue';
+import AnimationList from '../page/animation/List.vue';
 import ClipEditor from '../page/clip/Editor.vue';
 import ClipList from '../page/clip/List.vue';
 import ObjectList from '../page/object/List.vue';
@@ -9,8 +10,13 @@ import Audio from '../page/Audio.vue';
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/animation',
-    name: 'Animation',
-    component: Animation,
+    name: 'Animation List',
+    component: AnimationList,
+  },
+  {
+    path: '/animation/:resourceId',
+    name: 'Animation Editor',
+    component: AnimationEditor,
   },
   {
     path: '/clip',

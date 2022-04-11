@@ -2,12 +2,8 @@
   <div :class="$style.project">
     <!-- Animation -->
     <div v-if="!isLoading && mode === 'animation'" :class="$style.panel">
-      <desktop-ui-button
-        @click="saveAnimation"
-        v-if="animationList && animationList[0]?.animation.name"
-        text="Save animation"
-        style="margin-bottom: 5px"
-      />
+      <div>Animation name: {{ animationInfo?.name }}</div>
+      <desktop-ui-button @click="saveAnimation" text="Save" style="margin-bottom: 5px" />
       <desktop-ui-button @click="togglePlay" :text="isAnimationPlay ? 'Stop' : 'Play'" />
     </div>
 
@@ -29,7 +25,7 @@ import { AM_AnimationController, AM_IAnimationPart } from '@/core/animation/AM_A
 import { AM_Object } from '@/core/am/AM_Object';
 import { AM_Bone } from '@/core/am/AM_Bone';
 import { AM_API } from '@/core/AM_API';
-import { AM_IClipInfo } from '@/core/AM_Type';
+import { AM_IAnimationInfo, AM_IClipInfo } from '@/core/AM_Type';
 
 export default defineComponent({
   props: {},
@@ -60,6 +56,10 @@ export default defineComponent({
       if (this.r < 0) return undefined;
       return AM_State.clipInfo;
     },
+    animationInfo(): AM_IAnimationInfo | undefined {
+      if (this.r < 0) return undefined;
+      return AM_State.animationInfo;
+    },
   },
   async mounted() {
     AM_State.ui.project.ref = this;
@@ -84,13 +84,15 @@ export default defineComponent({
       this.isLoading = false;
     },
     async saveAnimation(): Promise<void> {
-      if (this.animationController && this.animationController.animationList.length) {
-        this.animationController.compile();
-        await AM_API.saveAnimation(
-          this.animationController.animationList[0].animation.name,
-          this.animationController.animation,
-        );
-      }
+      if (!AM_State.animationInfo) return;
+
+      this.isLoading = true;
+      AM_State.animationController.compile();
+      await AM_API.saveAnimation(
+        AM_State.animationInfo.name,
+        AM_State.animationController.animation,
+      );
+      this.isLoading = false;
     },
   },
   data: () => {

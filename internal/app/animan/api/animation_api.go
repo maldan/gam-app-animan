@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/maldan/gam-app-animan/internal/app/animan/core"
+	"github.com/maldan/go-cmhp/cmhp_crypto"
 	"github.com/maldan/go-cmhp/cmhp_data"
 	"github.com/maldan/go-cmhp/cmhp_file"
 	"github.com/maldan/go-cmhp/cmhp_slice"
@@ -19,6 +20,7 @@ func WriteAnimationFileInfo(stream *cmhp_data.ByteArray, animation core.Animatio
 	fileInfo := cmhp_data.Allocate(0, true)
 	fileInfo.WriteUInt8(animation.Version) // Animation version
 	fileInfo.WriteUInt8(animation.FPS)     // FPS
+	fileInfo.WriteUTF8(animation.Name)     // Name
 	stream.WriteSection(core.ANIMATION_SECTION_MARKET, "INFO", fileInfo)
 }
 
@@ -94,6 +96,7 @@ func ReadAnimation(stream *cmhp_data.ByteArray) core.AnimationSequence {
 		case "INFO":
 			animation.Version = section.ReadUint8()
 			animation.FPS = section.ReadUint8()
+			animation.Name = section.ReadUTF8()
 			break
 		case "FRAMES":
 			// Read frames
@@ -176,7 +179,7 @@ func ReadAnimation(stream *cmhp_data.ByteArray) core.AnimationSequence {
 }
 
 func (r AnimationApi) GetIndex(args ArgsAnimationName) core.AnimationSequence {
-	stream, err := cmhp_data.FromFile(core.DataDir+"/animation/"+args.Name+".ka", true)
+	stream, err := cmhp_data.FromFile(core.DataDir+"/animation/"+args.Name+"/animation.ka", true)
 	rapi_core.FatalIfError(err)
 
 	animation := ReadAnimation(stream)
@@ -185,34 +188,103 @@ func (r AnimationApi) GetIndex(args ArgsAnimationName) core.AnimationSequence {
 	return animation
 }
 
-func (r AnimationApi) GetList() []string {
-	list := make([]string, 0)
+func (r AnimationApi) GetList() []core.AnimationInfo {
+	list := make([]core.AnimationInfo, 0)
 
 	fileList, _ := cmhp_file.ListAll(core.DataDir + "/animation")
 	fileList = cmhp_slice.Filter(fileList, func(t cmhp_file.FileInfo) bool {
 		return strings.Contains(t.Name, ".ka")
 	})
 
-	// Get working directory
-	wd, _ := os.Getwd()
-	wd = strings.ReplaceAll(wd, "\\", "/")
-
 	for _, file := range fileList {
+		fileDir := strings.Replace(file.FullPath, "/animation.ka", "", 1)
+
+		// Get file info
+		fileInfo, err := r.GetResourceInfo(fileDir)
+		if err != nil {
+			r.UpdateResourceInfo(fileDir)
+			fileInfo, err = r.GetResourceInfo(fileDir)
+		}
+
 		// Add to list
-		list = append(
-			list,
-			strings.Replace(
-				strings.Replace(strings.Replace(file.FullPath, ".ka", "", 1), wd, "", 1), "/db/animation/", "", 1,
-			),
-		)
+		list = append(list, fileInfo)
 	}
 
 	return list
 }
 
+func (r AnimationApi) GetInfo(args ArgsResourceId) core.AnimationInfo {
+	obj := core.AnimationInfo{}
+
+	allFiles, _ := cmhp_file.ListAll(core.DataDir + "/animation")
+	allFiles = cmhp_slice.Filter(allFiles, func(t cmhp_file.FileInfo) bool {
+		return strings.Contains(t.FullPath, "info.json")
+	})
+	wd, _ := os.Getwd()
+	wd = strings.ReplaceAll(wd, "\\", "/")
+
+	for _, file := range allFiles {
+		info := core.AnimationInfo{}
+
+		info.FilePath = strings.Replace(
+			strings.Replace(strings.ReplaceAll(file.FullPath, "/info.json", "/animation.ka"), wd, "", 1),
+			"/db",
+			"data",
+			1,
+		)
+
+		cmhp_file.ReadJSON(file.FullPath, &info)
+
+		if info.ResourceId == args.ResourceId {
+			return info
+		}
+	}
+
+	rapi_core.Fatal(rapi_core.Error{Description: "File not found", Code: 404})
+
+	return obj
+}
+
+// UpdateResourceInfo write some info
+func (r AnimationApi) UpdateResourceInfo(pathDir string) {
+	// Open file info
+	info := core.AnimationInfo{}
+	cmhp_file.ReadJSON(pathDir+"/info.json", &info)
+
+	// Calculate name
+	nameTuple := strings.Split(pathDir, "/")
+	info.Name = nameTuple[len(nameTuple)-1]
+	info.ResourceId = cmhp_crypto.Sha1(info.Name)
+
+	// Get working directory
+	wd, _ := os.Getwd()
+	wd = strings.ReplaceAll(wd, "\\", "/")
+
+	// Calculate category
+	categoryTuple := strings.Split(strings.Replace(pathDir, wd+"/db/animation/", "", 1), "/")
+	info.Category = strings.Join(categoryTuple[0:len(categoryTuple)-1], "/")
+
+	// Audio path
+	info.FilePath = strings.Replace(strings.Replace(pathDir, wd, "", 1), "/db", "db", 1) + "/animation.ka"
+
+	// Write back
+	cmhp_file.Write(pathDir+"/info.json", &info)
+}
+
+// GetResourceInfo get some info
+func (r AnimationApi) GetResourceInfo(pathDir string) (core.AnimationInfo, error) {
+	// Open file info
+	info := core.AnimationInfo{}
+	err := cmhp_file.ReadJSON(pathDir+"/info.json", &info)
+	if err != nil {
+		return info, err
+	}
+	return info, nil
+}
+
 func (r AnimationApi) PutIndex(args struct {
 	Animation string `json:"animation"`
-}) {
+}) core.AnimationInfo {
 	animation := core.AnimationSequence{}
 	json.Unmarshal([]byte(args.Animation), &animation)
 
@@ -223,6 +295,17 @@ func (r AnimationApi) PutIndex(args struct {
 	WriteEnd(stream)
 
 	// Animation
-	err := cmhp_file.Write(core.DataDir+"/animation/"+animation.Name+".ka", stream.Data)
+	err := cmhp_file.Write(core.DataDir+"/animation/"+animation.Name+"/animation.ka", stream.Data)
 	rapi_core.FatalIfError(err)
+
+	// Update info
+	wd, _ := os.Getwd()
+	wd = strings.ReplaceAll(wd, "\\", "/")
+	r.UpdateResourceInfo(wd + "/" + core.DataDir + "/animation/" + animation.Name)
+
+	// Get info
+	info, err := r.GetResourceInfo(wd + "/" + core.DataDir + "/animation/" + animation.Name)
+	rapi_core.FatalIfError(err)
+
+	return info
 }

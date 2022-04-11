@@ -28,9 +28,12 @@ export class AM_AnimationController {
     const anm = this.animationList.find((x) => x.animation === animation);
     return anm?.offset ?? 0;
   }
-  /*public addAnimation(animation: AM_Animation, offset = 0): void {
-    this.animationList.push({ offset, animation });
-  }*/
+
+  public deleteAnimationPart(part: AM_IAnimationPart): void {
+    const index = this.animationList.indexOf(part);
+    if (index !== -1) this.animationList.splice(index, 1);
+    this.compile();
+  }
 
   public compile(): void {
     this._animation.frames.length = 0;

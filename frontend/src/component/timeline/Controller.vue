@@ -5,7 +5,8 @@
       <!-- Header -->
       <div :class="$style.header">
         <div class="button_group_round_compact">
-          <desktop-ui-button @click="createAnimation" text="Add animation" />
+          <desktop-ui-button @click="createAnimation" text="New" icon="file" />
+          <desktop-ui-button @click="pickAnimation" text="Append" icon="plus" />
           <desktop-ui-button @click="compileAnimation" text="Compile" />
         </div>
       </div>
@@ -62,10 +63,9 @@
           {{ x.animation.name }}
         </div>
       </div>
-
-      <desktop-ui-button @click="pickAnimation" text="Append animation" icon="plus" />
     </div>
 
+    <!-- Right menu -->
     <div :class="$style.right">
       <div v-if="selectedAnimationPart">
         <desktop-ui-number
@@ -78,7 +78,16 @@
           v-model="selectedAnimationPart.animation.frameCount"
           style="margin-bottom: 5px"
         />
-        <desktop-ui-input @change="refresh" v-model="selectedAnimationPart.animation.name" />
+        <desktop-ui-input
+          @change="refresh"
+          v-model="selectedAnimationPart.animation.name"
+          style="margin-bottom: 5px"
+        />
+        <desktop-ui-button
+          @click="deleteAnimationPart(selectedAnimationPart)"
+          text="Delete"
+          icon="trash"
+        />
       </div>
     </div>
   </div>
@@ -193,6 +202,11 @@ export default defineComponent({
         },
       });
     },
+    deleteAnimationPart(x: AM_IAnimationPart) {
+      this.animationController?.deleteAnimationPart(x);
+      this.selectAnimationPart(undefined);
+      this.refresh();
+    },
   },
   data: () => {
     return {
@@ -271,6 +285,7 @@ export default defineComponent({
         align-items: center;
         font-size: 14px;
         padding-left: 5px;
+        margin-bottom: 2px;
 
         &.selected {
           border: 1px solid #eca824;

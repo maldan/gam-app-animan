@@ -20,6 +20,8 @@
 import { defineComponent } from 'vue';
 import { AM_Core } from '@/core/AM_Core';
 import { AM_State } from '@/core/AM_State';
+import { AM_API } from '@/core/AM_API';
+import { AM_Character } from '@/core/am/AM_Character';
 
 export default defineComponent({
   components: {},
@@ -27,20 +29,37 @@ export default defineComponent({
     AM_State.mode = 'animation';
     AM_State.init();
     AM_Core.init(this.$refs['scene'] as HTMLElement);
+
+    const info = await AM_API.getAnimationInfo(this.$route.params.resourceId as string);
+    AM_State.animationInfo = info;
+
+    await this.loadAnimation(info.name);
   },
   beforeUnmount() {
     AM_Core.destroy();
     AM_State.destroy();
   },
-  methods: {},
+  methods: {
+    async loadAnimation(name: string) {
+      const animation = await AM_API.getAnimation(name);
+      AM_State.objectList
+        .filter((x) => x instanceof AM_Character)
+        .forEach((x) => {
+          (x as AM_Character).resetPose();
+        });
+      AM_State.animationController.animationList = [{ offset: 0, animation }];
+      AM_State.animationController.compile();
+      AM_State.ui.refresh();
+    },
+  },
   data: () => {
     return {
       windowList: [
-        {
+        /*{
           title: 'Animation list',
           name: 'animation-list',
           position: { x: 2, y: 5, width: 18, height: 20 },
-        },
+        },*/
         {
           title: 'Character list',
           name: 'character-list',

@@ -71,6 +71,13 @@ type ClipInfo struct {
 	ClipPath   string `json:"clipPath"`
 }
 
+type AnimationInfo struct {
+	ResourceId string `json:"resourceId"`
+	Name       string `json:"name"`
+	Category   string `json:"category"`
+	FilePath   string `json:"filePath"`
+}
+
 type Clip struct {
 	Name          string                `json:"name"`
 	ObjectList    []ObjectInfo          `json:"objectList"`
