@@ -13,7 +13,7 @@ export default defineComponent({
   components: {},
   async mounted() {
     const objectInfo = await AM_API.getObject(this.$route.params['resourceId'] as string);
-    await AM_Preview.init(this.$refs['scene'] as HTMLElement, objectInfo.modelPath);
+    await AM_Preview.init(this.$refs['scene'] as HTMLElement, objectInfo.filePath);
   },
   methods: {},
   data: () => {

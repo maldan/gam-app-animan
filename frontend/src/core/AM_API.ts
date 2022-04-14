@@ -187,7 +187,7 @@ export class AM_API {
   public static async getObject(resourceId: string): Promise<AM_IObjectInfo> {
     const obj = (await Axios.get(`${this.API_URL}/object/?resourceId=${resourceId}`)).data
       .response as AM_IObjectInfo;
-    obj.modelPath = `${this.ROOT_URL}/` + obj.modelPath;
+    obj.filePath = `${this.ROOT_URL}/` + obj.filePath;
     if (obj.previewPath) obj.previewPath = `${this.ROOT_URL}/` + obj.previewPath;
     return obj;
   }
@@ -195,7 +195,7 @@ export class AM_API {
   public static async getObjectList(): Promise<AM_IObjectInfo[]> {
     return (await Axios.get(`${this.API_URL}/object/list`)).data.response.map(
       (x: AM_IObjectInfo) => {
-        x.modelPath = `${this.ROOT_URL}/` + x.modelPath;
+        x.filePath = `${this.ROOT_URL}/` + x.filePath;
         if (x.previewPath) x.previewPath = `${this.ROOT_URL}/` + x.previewPath;
         return x;
       },

@@ -71,7 +71,7 @@ export class AM_Preview {
     const obj = await AM_State.loadObject(modelPath);
   }
 
-  public static async getPreview(virtualObject: { modelPath: string }): Promise<string> {
+  public static async getPreview(virtualObject: { filePath: string }): Promise<string> {
     // init
     const camera = new THREE.PerspectiveCamera(45, 256 / 256, 0.001, 1024);
     camera.position.y = 0;
@@ -109,7 +109,7 @@ export class AM_Preview {
     return new Promise((resolve, reject) => {
       const loader = new GLTFLoader();
       loader.load(
-        virtualObject.modelPath,
+        virtualObject.filePath,
         (gltf) => {
           // Get object and add to scene
           const object = gltf.scene.children[0] as THREE.Object3D;

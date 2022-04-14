@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"github.com/maldan/gam-app-animan/internal/app/animan/core"
+	"github.com/maldan/go-cmhp/cmhp_crypto"
 	"github.com/maldan/go-cmhp/cmhp_file"
 	"github.com/maldan/go-cmhp/cmhp_slice"
 	"github.com/maldan/go-rapi/rapi_core"
@@ -31,8 +32,8 @@ func (r ObjectApi) GetIndex(args core.ObjectInfo) core.ObjectInfo {
 			"data",
 			1,
 		)
-		info.ModelPath = strings.Replace(
-			strings.Replace(strings.ReplaceAll(file.FullPath, "/info.json", "/model.glb"), wd, "", 1),
+		info.FilePath = strings.Replace(
+			strings.Replace(strings.ReplaceAll(file.FullPath, "/info.json", "/model.gltf"), wd, "", 1),
 			"/db",
 			"data",
 			1,
@@ -55,11 +56,11 @@ func (r ObjectApi) GetList() []core.ObjectInfo {
 
 	fileList, _ := cmhp_file.ListAll(core.DataDir + "/object")
 	fileList = cmhp_slice.Filter(fileList, func(t cmhp_file.FileInfo) bool {
-		return strings.Contains(t.Name, ".glb")
+		return strings.Contains(t.Name, ".gltf")
 	})
 
 	for _, file := range fileList {
-		fileDir := strings.Replace(file.FullPath, "/model.glb", "", 1)
+		fileDir := strings.Replace(file.FullPath, "/model.gltf", "", 1)
 
 		// Get file info
 		objectInfo, err := r.GetObjectInfo(fileDir)
@@ -139,7 +140,10 @@ func (r ObjectApi) UpdateObjectInfo(pathDir string) {
 	// Open file info
 	info := core.ObjectInfo{}
 	cmhp_file.ReadJSON(pathDir+"/info.json", &info)
-	info.ResourceId, _ = cmhp_file.HashSha1(pathDir + "/model.glb")
+
+	if info.ResourceId == "" {
+		info.ResourceId = cmhp_crypto.UID(12)
+	}
 
 	// Calculate name
 	nameTuple := strings.Split(pathDir, "/")
@@ -154,7 +158,7 @@ func (r ObjectApi) UpdateObjectInfo(pathDir string) {
 	info.Category = strings.Join(categoryTuple[0:len(categoryTuple)-1], "/")
 
 	// Audio path
-	info.ModelPath = strings.Replace(strings.Replace(pathDir, wd, "", 1), "/db", "db", 1) + "/model.glb"
+	info.FilePath = strings.Replace(strings.Replace(pathDir, wd, "", 1), "/db", "db", 1) + "/model.gltf"
 
 	// Write back
 	cmhp_file.Write(pathDir+"/info.json", &info)

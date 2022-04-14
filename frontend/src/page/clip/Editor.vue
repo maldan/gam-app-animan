@@ -44,7 +44,7 @@ export default defineComponent({
       for (let i = 0; i < clip.objectList.length; i++) {
         const objectInfo = await AM_API.getObject(clip.objectList[i].resourceId);
         const obj = await AM_State.loadObject(
-          objectInfo.modelPath,
+          objectInfo.filePath,
           objectInfo.category === 'character' ? 'character' : '',
         );
         obj.id = clip.objectList[i].id;

@@ -83,7 +83,7 @@ export default defineComponent({
           const name = store.state.modal.data.name;
           const info = await AM_API.getObject(resourceId);
           const obj = await AM_State.loadObject(
-            info.modelPath,
+            info.filePath,
             info.category === 'character' ? 'character' : '',
           );
           obj.resourceId = resourceId;

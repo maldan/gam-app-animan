@@ -33,7 +33,7 @@ export default defineComponent({
         AM_State.removeObject(x);
       });
 
-      const ch = await AM_State.loadObject(obj.modelPath, 'character');
+      const ch = await AM_State.loadObject(obj.filePath, 'character');
       ch.animationController = AM_State.animationController;
       AM_State.addObject(ch);
       AM_State.selectObject(ch);

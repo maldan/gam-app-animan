@@ -160,14 +160,19 @@ export class AM_State {
         (gltf) => {
           const object = gltf.scene.children[0] as THREE.Object3D;
 
-          object.traverse(function (child) {
+          object.traverse((child) => {
+            if (child instanceof THREE.Mesh) {
+              console.log(child.material);
+            }
+          });
+          /* object.traverse(function (child) {
             if ((child as THREE.Mesh).isMesh) {
               if ((child as THREE.Mesh).material) {
                 ((child as THREE.Mesh).material as THREE.MeshPhongMaterial).shininess = 2;
                 ((child as THREE.Mesh).material as THREE.MeshPhongMaterial).reflectivity = 0.1;
               }
             }
-          });
+          });*/
 
           /*const characterName = path.split('/').pop()?.replace('.glb', '') || 'Unknown';
 

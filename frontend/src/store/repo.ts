@@ -33,7 +33,7 @@ export default {
       ).data.response as AM_IObjectInfo[];
 
       list = list.map((x) => {
-        x.modelPath = `${action.rootState.main.ROOT_URL}/` + x.modelPath;
+        x.filePath = `${action.rootState.main.ROOT_URL}/` + x.filePath;
         if (x.previewPath) x.previewPath = `${action.rootState.main.ROOT_URL}/` + x.previewPath;
         return x;
       });

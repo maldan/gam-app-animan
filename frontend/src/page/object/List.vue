@@ -7,7 +7,7 @@
         class="clickable"
         :class="$style.preview"
         v-for="x in list"
-        :key="x.modelPath"
+        :key="x.filePath"
         @click="$router.push(`/object/${x.resourceId}`)"
       >
         <img :src="x.previewPath" alt="Preview" />
@@ -37,7 +37,7 @@ export default defineComponent({
         const preview = await AM_Preview.getPreview(obj);
 
         await AM_API.uploadObjectPreview(obj.category + '/' + obj.name, preview);
-        obj.previewPath = obj.modelPath.replace(/\/[a-zA-Z0-9_]+\.glb$/, '/preview.jpg');
+        obj.previewPath = obj.filePath.replace(/\/[a-zA-Z0-9_]+\.glb$/, '/preview.jpg');
       }
     },
     uploadModal() {

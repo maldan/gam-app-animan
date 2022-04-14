@@ -53,15 +53,16 @@ type AnimationController struct {
 }
 
 type ObjectInfo struct {
-	Id          string     `json:"id"`
-	ResourceId  string     `json:"resourceId"`
-	Name        string     `json:"name"`
-	Category    string     `json:"category"`
-	PreviewPath string     `json:"previewPath"`
-	ModelPath   string     `json:"modelPath"`
-	Position    Vector3    `json:"position"`
-	Rotation    Quaternion `json:"rotation"`
-	Scale       Vector3    `json:"scale"`
+	Id          string `json:"id"`
+	ResourceId  string `json:"resourceId"`
+	Name        string `json:"name"`
+	Category    string `json:"category"`
+	FilePath    string `json:"filePath"`
+	PreviewPath string `json:"previewPath"`
+
+	Position Vector3    `json:"position"`
+	Rotation Quaternion `json:"rotation"`
+	Scale    Vector3    `json:"scale"`
 }
 
 type AudioInfo struct {

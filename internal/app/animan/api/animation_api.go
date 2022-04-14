@@ -110,7 +110,7 @@ func ReadAnimation(stream *cmhp_data.ByteArray) core.AnimationSequence {
 				// Read keys of frame
 				keysAmount := int(section.ReadUint16())
 
-				for i := 0; i < keysAmount; i++ {
+				for j := 0; j < keysAmount; j++ {
 					// Read key
 					keyName := section.ReadUTF8()
 					keyType := section.ReadUint8()

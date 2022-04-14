@@ -8,7 +8,7 @@ export interface AM_IObjectInfo {
   resourceId: string;
   name: string;
   category: string;
-  modelPath: string;
+  filePath: string;
   previewPath: string;
   position: AM_IVector3;
   rotation: AM_IVector4;
