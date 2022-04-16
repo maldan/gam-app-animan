@@ -34,6 +34,26 @@ export class AM_Bone extends AM_Object {
     this.rotation = { x: gr.x, y: gr.y, z: gr.z, w: gr.w };
   }
 
+  public mirrorFromBone(fromBone: AM_Bone): void {
+    const r = new THREE.Quaternion(
+      fromBone.rotationOffset.x,
+      fromBone.rotationOffset.y,
+      fromBone.rotationOffset.z,
+      fromBone.rotationOffset.w,
+    );
+    const e = new THREE.Euler().setFromQuaternion(r);
+    e.y *= -1;
+    e.z *= -1;
+    const nr = new THREE.Quaternion().setFromEuler(e);
+
+    this.rotationOffset.x = nr.x;
+    this.rotationOffset.y = nr.y;
+    this.rotationOffset.z = nr.z;
+    this.rotationOffset.w = nr.w;
+
+    this.update();
+  }
+
   public reset(): void {
     this.rotationOffset.set(0, 0, 0, 1);
     this.scaleOffset.set(1, 1, 1);
@@ -48,33 +68,4 @@ export class AM_Bone extends AM_Object {
     if (this.rotationOffset.w != 1) return true;
     return false;
   }
-
-  /*public bone!: THREE.Bone;
-  public boneHelper!: THREE.Mesh;
-
-  public startPosition: THREE.Vector3 = new THREE.Vector3();
-  public startRotation: THREE.Quaternion = new THREE.Quaternion();
-
-  public positionOffset: THREE.Vector3 = new THREE.Vector3();
-  public rotationOffset: THREE.Quaternion = new THREE.Quaternion();
-  public scaleOffset: THREE.Vector3 = new THREE.Vector3();
-
-  constructor(bone: THREE.Bone, helper: THREE.Mesh) {
-    this.bone = bone;
-    this.boneHelper = helper;
-    this.startRotation = bone.quaternion.clone();
-    this.startPosition = bone.position.clone();
-  }
-
-  public tick(): void {
-    this.bone.setRotationFromQuaternion(this.startRotation.clone().multiply(this.rotationOffset));
-
-    const gp = new THREE.Vector3();
-    this.bone.getWorldPosition(gp);
-    const gr = new THREE.Quaternion();
-    this.bone.getWorldQuaternion(gr);
-
-    this.boneHelper.position.set(gp.x, gp.y, gp.z);
-    this.boneHelper.quaternion.set(gr.x, gr.y, gr.z, gr.w);
-  }*/
 }

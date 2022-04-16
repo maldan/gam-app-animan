@@ -5,10 +5,19 @@ import { AM_IVector4 } from '@/core/AM_Type';
 export class AM_KeyQuaternion extends AM_Key {
   private _value: AM_IVector4 = { x: 0, y: 0, z: 0, w: 0 };
 
-  constructor(name: string, v: AM_IVector4) {
+  constructor(name: string, v: AM_IVector4 | THREE.Quaternion) {
     super();
     this.name = name;
-    this._value = v;
+    if (v instanceof THREE.Quaternion) {
+      this._value = {
+        x: v.x,
+        y: v.y,
+        z: v.z,
+        w: v.w,
+      };
+    } else {
+      this._value = v;
+    }
   }
 
   public interpolate(

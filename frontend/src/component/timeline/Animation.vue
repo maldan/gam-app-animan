@@ -49,11 +49,12 @@
     </div>
 
     <!-- Numbers -->
-    <div :class="$style.numbers" style="margin-left: 138px">
+    <div :class="$style.numbers">
       <div
         :class="[$style.number]"
         v-for="frameId in Math.min(animationController.frameCount, maxVisibleFrames)"
         :key="frameId"
+        :style="{ opacity: (frameId - 1 + offsetX) % 5 === 0 ? 1 : 0 }"
       >
         {{ (frameId - 1 + offsetX) % 5 === 0 ? frameId - 1 + offsetX : '' }}
       </div>
@@ -101,10 +102,13 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { AM_State } from '@/core/AM_State';
-import { AM_AnimationController, AM_IAnimationPart } from '@/core/animation/AM_AnimationController';
+import { AM_AnimationController } from '@/core/animation/AM_AnimationController';
 import { AM_Animation } from '@/core/animation/AM_Animation';
 import { AM_Object } from '@/core/am/AM_Object';
 import { AM_Bone } from '@/core/am/AM_Bone';
+import { AM_Key } from '@/core/animation/key/AM_Key';
+import { AM_Character } from '@/core/am/AM_Character';
+import { AM_KeyQuaternion } from '@/core/animation/key/AM_KeyQuaternion';
 
 export default defineComponent({
   props: {},
@@ -114,6 +118,11 @@ export default defineComponent({
       if (this.r < 0) return undefined;
       if (AM_State.selectedObject instanceof AM_Bone) return AM_State.selectedObject.parent;
       return AM_State.selectedObject;
+    },
+    selectedBone(): AM_Bone | undefined {
+      if (this.r < 0) return undefined;
+      if (AM_State.selectedObject instanceof AM_Bone) return AM_State.selectedObject;
+      return undefined;
     },
     animationController(): AM_AnimationController | undefined {
       if (this.r < 0) return undefined;
@@ -149,6 +158,7 @@ export default defineComponent({
 
       if (e.key === 'Shift') this.isShiftPressed = true;
 
+      // Moving
       if (e.key === 'ArrowRight') {
         this.animation.frameId += 1;
 
@@ -178,6 +188,62 @@ export default defineComponent({
         }
         this.refresh();
       }
+
+      // Copy
+      if (e.ctrlKey && e.key === 'c') {
+        this.bufferKeys.length = 0;
+        for (let i = 0; i < this.selectedKeys.length; i++) {
+          const frameId = this.selectedKeys[i].frameId;
+          const key = this.selectedKeys[i].key;
+          const keyValue = this.animation.frames[frameId].keys[key];
+          if (!keyValue) continue;
+          if (keyValue.isAuto) continue;
+
+          this.bufferKeys.push({
+            key,
+            frameId,
+            value: keyValue.clone(),
+          });
+        }
+      }
+
+      // Paste
+      if (e.ctrlKey && e.key === 'v') {
+        const toFrameId = this.selectedKeys[0].frameId;
+
+        for (let i = 0; i < this.bufferKeys.length; i++) {
+          const key = this.bufferKeys[i].key;
+
+          this.animation.frames[toFrameId].keys[key] = this.bufferKeys[i].value;
+          this.animation.interpolateKey(key);
+        }
+
+        this.refresh();
+      }
+
+      // Mirror
+      if (e.key === 'm' && this.selectedBone && this.selectedObject instanceof AM_Character) {
+        // Calculate name
+        let mirrorBoneName = '';
+        if (this.selectedBone.name.match(/\.L$/))
+          mirrorBoneName = this.selectedBone.name.replace(/(.*)\.L$/, '$1.R');
+        else if (this.selectedBone.name.match(/\.R$/))
+          mirrorBoneName = this.selectedBone.name.replace(/(.*)\.R$/, '$1.L');
+        if (!mirrorBoneName) return;
+
+        // Mirror bone
+        const mirrorBone = this.selectedObject.boneList[mirrorBoneName];
+        mirrorBone.mirrorFromBone(this.selectedObject.boneList[this.selectedBone.name]);
+
+        // Set key
+        this.animation.setCurrentKey(
+          new AM_KeyQuaternion(`bone.${mirrorBoneName}.rotation`, mirrorBone.rotationOffset),
+        );
+        this.animation.controller?.compile();
+
+        this.selectedObject.update();
+        this.refresh();
+      }
     };
 
     this.ku = (e: KeyboardEvent) => {
@@ -196,6 +262,14 @@ export default defineComponent({
     document.addEventListener('keydown', this.kd);
     document.addEventListener('keyup', this.ku);
     document.addEventListener('wheel', this.wheel);
+
+    try {
+      this.keyVisibility = JSON.parse(
+        localStorage.getItem('timeline.animation.keyVisibility') as string,
+      );
+    } catch {
+      //
+    }
   },
   beforeUnmount() {
     document.removeEventListener('keydown', this.kd);
@@ -221,6 +295,7 @@ export default defineComponent({
     },
     toggleKeyVisibility(key: string): void {
       this.keyVisibility[key] = !this.keyVisibility[key];
+      localStorage.setItem('timeline.animation.keyVisibility', JSON.stringify(this.keyVisibility));
       this.refresh();
     },
     clearKeySelection() {
@@ -290,6 +365,7 @@ export default defineComponent({
       } as Record<string, boolean>,
 
       selectedKeys: [] as { key: string; frameId: number }[],
+      bufferKeys: [] as { key: string; frameId: number; value: AM_Key }[],
 
       // Scroll
       offsetX: 0,
@@ -316,12 +392,25 @@ export default defineComponent({
   .numbers {
     display: flex;
     margin-bottom: 10px;
+    margin-left: 174px;
 
     .number {
       width: 8px;
       margin-right: 1px;
       font-size: 12px;
       color: $text-gray;
+      box-sizing: border-box;
+      position: relative;
+      padding-left: 2px;
+
+      &:after {
+        content: '';
+        border-left: 1px solid $text-gray;
+        position: absolute;
+        left: -2px;
+        top: 0;
+        height: 21px;
+      }
     }
   }
 
@@ -331,7 +420,7 @@ export default defineComponent({
     min-height: 16px;
 
     .name {
-      width: 128px;
+      width: 164px;
       font-size: 14px;
       color: $text-gray;
       background: lighten($gray-dark, 5%);
@@ -376,6 +465,10 @@ export default defineComponent({
           &.current {
             background: lighten(#0000ff, 30%);
           }
+
+          &.selected {
+            background: #18b14a;
+          }
         }
 
         &.auto {
@@ -383,6 +476,10 @@ export default defineComponent({
 
           &.current {
             background: lighten(#0000ff, 50%);
+          }
+
+          &.selected {
+            background: #18b14a;
           }
         }
       }

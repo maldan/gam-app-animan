@@ -49,6 +49,11 @@ export default defineComponent({
         });
       AM_State.animationController.animationList = [{ offset: 0, animation }];
       AM_State.animationController.compile();
+      AM_State.objectList
+        .filter((x) => x instanceof AM_Character)
+        .forEach((x) => {
+          x.update();
+        });
       AM_State.ui.refresh();
     },
   },

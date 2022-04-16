@@ -38,6 +38,8 @@ export default defineComponent({
       AM_State.addObject(ch);
       AM_State.selectObject(ch);
       AM_Core.setManipulatorTo(ch);
+      ch.applyAnimation(ch.animationController.animation);
+      ch.update();
     },
   },
   data: () => {

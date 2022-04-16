@@ -188,6 +188,11 @@ func (r AnimationApi) GetIndex(args ArgsAnimationName) core.AnimationSequence {
 	return animation
 }
 
+func (r AnimationApi) GetFile(ctx *rapi_core.Context, args ArgsAnimationName) string {
+	ctx.IsServeFile = true
+	return core.DataDir + "/animation/" + args.Name + "/animation.ka"
+}
+
 func (r AnimationApi) GetList() []core.AnimationInfo {
 	list := make([]core.AnimationInfo, 0)
 
@@ -284,7 +289,7 @@ func (r AnimationApi) GetResourceInfo(pathDir string) (core.AnimationInfo, error
 
 func (r AnimationApi) PutIndex(args struct {
 	Animation string `json:"animation"`
-}) core.AnimationInfo {
+}) core.ResourceInfo {
 	animation := core.AnimationSequence{}
 	json.Unmarshal([]byte(args.Animation), &animation)
 
@@ -299,12 +304,10 @@ func (r AnimationApi) PutIndex(args struct {
 	rapi_core.FatalIfError(err)
 
 	// Update info
-	wd, _ := os.Getwd()
-	wd = strings.ReplaceAll(wd, "\\", "/")
-	r.UpdateResourceInfo(wd + "/" + core.DataDir + "/animation/" + animation.Name)
+	core.UpdateResourceInfo(fmt.Sprintf("%v/animation/%v", core.DataDir, animation.Name), "animation")
 
 	// Get info
-	info, err := r.GetResourceInfo(wd + "/" + core.DataDir + "/animation/" + animation.Name)
+	info, err := core.GetResourceInfo(core.DataDir + "/animation/" + animation.Name)
 	rapi_core.FatalIfError(err)
 
 	return info

@@ -127,6 +127,15 @@ func UpdateResourceInfo(pathDir string, kind string) {
 		info.FilePath = strings.Replace(strings.Replace(pathDir, wd, "", 1), "/db", "db", 1) + "/pose.kp"
 	}
 
+	if kind == "animation" {
+		// Calculate category
+		categoryTuple := strings.Split(strings.Replace(wd+"/"+pathDir, wd+"/db/animation/", "", 1), "/")
+		info.Category = strings.Join(categoryTuple[0:len(categoryTuple)-1], "/")
+
+		// File path
+		info.FilePath = strings.Replace(strings.Replace(pathDir, wd, "", 1), "/db", "db", 1) + "/animation.ka"
+	}
+
 	// Write back
 	cmhp_file.Write(pathDir+"/info.json", &info)
 }
