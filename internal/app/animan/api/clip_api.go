@@ -4,67 +4,33 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/maldan/gam-app-animan/internal/app/animan/core"
-	"github.com/maldan/go-cmhp/cmhp_crypto"
 	"github.com/maldan/go-cmhp/cmhp_data"
 	"github.com/maldan/go-cmhp/cmhp_file"
-	"github.com/maldan/go-cmhp/cmhp_slice"
 	"github.com/maldan/go-rapi/rapi_core"
-	"os"
-	"strings"
 )
 
 type ClipApi struct {
 }
 
-func WriteClipObjectList(stream *cmhp_data.ByteArray, objectList []core.ObjectInfo) {
-	chunk := cmhp_data.Allocate(0, true)
-	chunk.WriteUInt16(uint16(len(objectList))) // Amount of objects
-	for _, obj := range objectList {
-		chunk.WriteUTF8(obj.Id)
-		chunk.WriteUTF8(obj.ResourceId)
-		chunk.WriteUTF8(obj.Name)
-
-		// Position
-		chunk.WriteFloat32(obj.Position.X)
-		chunk.WriteFloat32(obj.Position.Y)
-		chunk.WriteFloat32(obj.Position.Z)
-
-		// Rotation
-		chunk.WriteFloat32(obj.Rotation.X)
-		chunk.WriteFloat32(obj.Rotation.Y)
-		chunk.WriteFloat32(obj.Rotation.Z)
-		chunk.WriteFloat32(obj.Rotation.W)
-
-		// Scale
-		chunk.WriteFloat32(obj.Scale.X)
-		chunk.WriteFloat32(obj.Scale.Y)
-		chunk.WriteFloat32(obj.Scale.Z)
-	}
-	stream.WriteSection(core.ANIMATION_SECTION_MARKET, "OBJECT_LIST", chunk)
-}
-
-func WriteClipAnimationList(stream *cmhp_data.ByteArray, animationList []core.AnimationController) {
-	chunk := cmhp_data.Allocate(0, true)
-	chunk.WriteUInt16(uint16(len(animationList))) // Amount of animations
-
-	for _, an := range animationList {
-		chunk.WriteUTF8(an.ObjectId)                     // Id of object
-		chunk.WriteUInt16(uint16(len(an.AnimationList))) // Amount of animation parts
-
-		for _, part := range an.AnimationList {
-			chunk.WriteUInt16(part.Offset) // Offset of part
-
-			// Write animation data
-			WriteAnimationFileInfo(chunk, part.Animation)
-			WriteAnimationFrames(chunk, part.Animation)
-			WriteEnd(chunk)
-		}
-	}
-	stream.WriteSection(core.ANIMATION_SECTION_MARKET, "ANIMATION_LIST", chunk)
+// GetInfo of audio files
+func (r ClipApi) GetInfo(args ArgsResourceId) core.ResourceInfo {
+	info, err := core.GetResourceInfoById(core.DataDir+"/clip", args.ResourceId, "clip", "ac")
+	rapi_core.FatalIfError(err)
+	return info
 }
 
 // GetList of audio files
-func (r ClipApi) GetList() []core.ClipInfo {
+func (r ClipApi) GetList() []core.ResourceInfo {
+	return core.GetResourceList(core.DataDir+"/clip", "clip", "ac")
+}
+
+func (r ClipApi) GetFile(ctx *rapi_core.Context, args ArgsName) string {
+	ctx.IsServeFile = true
+	return core.DataDir + "/clip/" + args.Name + "/clip.ac"
+}
+
+// GetList of audio files
+/*func (r ClipApi) GetList() []core.ClipInfo {
 	list := make([]core.ClipInfo, 0)
 
 	fileList, _ := cmhp_file.ListAll(core.DataDir + "/clip")
@@ -87,9 +53,9 @@ func (r ClipApi) GetList() []core.ClipInfo {
 	}
 
 	return list
-}
+}*/
 
-func (r ClipApi) GetInfo(args ArgsResourceId) core.ClipInfo {
+/*func (r ClipApi) GetInfo(args ArgsResourceId) core.ClipInfo {
 	obj := core.ClipInfo{}
 
 	allFiles, _ := cmhp_file.ListAll(core.DataDir + "/clip")
@@ -119,7 +85,7 @@ func (r ClipApi) GetInfo(args ArgsResourceId) core.ClipInfo {
 	rapi_core.Fatal(rapi_core.Error{Description: "File not found", Code: 404})
 
 	return obj
-}
+}*/
 
 func (r ClipApi) GetIndex(args ArgsName) core.Clip {
 	stream, err := cmhp_data.FromFile(core.DataDir+"/clip/"+args.Name+"/clip.ac", true)
@@ -174,7 +140,7 @@ func (r ClipApi) GetIndex(args ArgsName) core.Clip {
 				for j := 0; j < int(amountOfList); j++ {
 					part := core.AnimationPart{}
 					part.Offset = section.ReadUint16()
-					part.Animation = ReadAnimation(section)
+					part.Animation = core.ReadAnimation(section)
 					controller.AnimationList = append(controller.AnimationList, part)
 				}
 
@@ -198,7 +164,7 @@ func (r ClipApi) GetIndex(args ArgsName) core.Clip {
 }
 
 // UpdateInfo write some info
-func (r ClipApi) UpdateInfo(pathDir string) {
+/*func (r ClipApi) UpdateInfo(pathDir string) {
 	// Open file info
 	info := core.ClipInfo{}
 	cmhp_file.ReadJSON(pathDir+"/info.json", &info)
@@ -221,10 +187,10 @@ func (r ClipApi) UpdateInfo(pathDir string) {
 
 	// Write back
 	cmhp_file.Write(pathDir+"/info.json", &info)
-}
+}*/
 
 // GetResourceInfo get some info
-func (r ClipApi) GetResourceInfo(pathDir string) (core.ClipInfo, error) {
+/*func (r ClipApi) GetResourceInfo(pathDir string) (core.ClipInfo, error) {
 	// Open file info
 	info := core.ClipInfo{}
 	err := cmhp_file.ReadJSON(pathDir+"/info.json", &info)
@@ -232,31 +198,29 @@ func (r ClipApi) GetResourceInfo(pathDir string) (core.ClipInfo, error) {
 		return info, err
 	}
 	return info, nil
-}
+}*/
 
-func (r ClipApi) PutIndex(args struct {
-	Clip string `json:"clip"`
-}) core.ClipInfo {
+func (r ClipApi) PutIndex(args ArgsData) core.ResourceInfo {
+	// Parse data
 	clip := core.Clip{}
-	json.Unmarshal([]byte(args.Clip), &clip)
+	err := json.Unmarshal([]byte(args.Data), &clip)
+	rapi_core.FatalIfError(err)
 
 	// Write clip data
 	stream := cmhp_data.Allocate(0, true)
-	WriteClipObjectList(stream, clip.ObjectList)
-	WriteClipAnimationList(stream, clip.AnimationList)
-	WriteEnd(stream)
+	core.WriteClipObjectList(stream, clip.ObjectList)
+	core.WriteClipAnimationList(stream, clip.AnimationList)
+	core.WriteEnd(stream)
 
-	// Clip
-	err := cmhp_file.Write(core.DataDir+"/clip/"+clip.Name+"/clip.ac", stream.Data)
+	// Write to file
+	err = cmhp_file.Write(core.DataDir+"/clip/"+clip.Name+"/clip.ac", stream.Data)
 	rapi_core.FatalIfError(err)
 
 	// Update info
-	wd, _ := os.Getwd()
-	wd = strings.ReplaceAll(wd, "\\", "/")
-	r.UpdateInfo(wd + "/" + core.DataDir + "/clip/" + clip.Name)
+	core.UpdateResourceInfo(fmt.Sprintf("%v/clip/%v", core.DataDir, clip.Name), "clip", "ac")
 
 	// Get info
-	info, err := r.GetResourceInfo(wd + "/" + core.DataDir + "/clip/" + clip.Name)
+	info, err := core.GetResourceInfo(core.DataDir + "/clip/" + clip.Name)
 	rapi_core.FatalIfError(err)
 
 	return info

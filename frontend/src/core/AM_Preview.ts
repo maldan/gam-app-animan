@@ -12,7 +12,7 @@ import { MathUtils } from 'three';
 import { AM_Core } from '@/core/AM_Core';
 
 export class AM_Preview {
-  public static async init(el: HTMLElement, modelPath: string): Promise<void> {
+  public static async init(el: HTMLElement, filePath: string): Promise<void> {
     // Camera
     const camera = new THREE.PerspectiveCamera(
       45,
@@ -68,7 +68,7 @@ export class AM_Preview {
     renderer.domElement.style.zIndex = '0';
 
     // Load model
-    const obj = await AM_State.loadObject(modelPath);
+    const obj = await AM_State.loadObject(filePath);
   }
 
   public static async getPreview(virtualObject: { filePath: string }): Promise<string> {

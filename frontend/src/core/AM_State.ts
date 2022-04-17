@@ -162,7 +162,7 @@ export class AM_State {
 
           object.traverse((child) => {
             if (child instanceof THREE.Mesh) {
-              console.log(child.material);
+              // console.log(child.material);
             }
           });
           /* object.traverse(function (child) {

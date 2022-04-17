@@ -6,16 +6,13 @@ import (
 	"github.com/maldan/gam-app-animan/internal/app/animan/core"
 	"github.com/maldan/go-cmhp/cmhp_data"
 	"github.com/maldan/go-cmhp/cmhp_file"
-	"github.com/maldan/go-cmhp/cmhp_slice"
 	"github.com/maldan/go-rapi/rapi_core"
-	"os"
-	"strings"
 )
 
 type PoseApi struct {
 }
 
-func (r PoseApi) GetIndex(args ArgsAnimationName) core.AnimationFrame {
+func (r PoseApi) GetIndex(args ArgsName) core.AnimationFrame {
 	stream, err := cmhp_data.FromFile(core.DataDir+"/pose/"+args.Name+"/pose.kp", true)
 	rapi_core.FatalIfError(err)
 
@@ -68,7 +65,11 @@ func (r PoseApi) GetIndex(args ArgsAnimationName) core.AnimationFrame {
 
 // GetInfo of audio files
 func (r PoseApi) GetInfo(args ArgsResourceId) core.ResourceInfo {
-	obj := core.ResourceInfo{}
+	info, err := core.GetResourceInfoById(core.DataDir+"/pose", args.ResourceId, "pose", "kp")
+	rapi_core.FatalIfError(err)
+	return info
+
+	/*obj := core.ResourceInfo{}
 
 	// Get file list
 	allFiles, _ := cmhp_file.ListAll(core.DataDir + "/pose")
@@ -98,12 +99,14 @@ func (r PoseApi) GetInfo(args ArgsResourceId) core.ResourceInfo {
 
 	rapi_core.Fatal(rapi_core.Error{Description: "File not found", Code: 404})
 
-	return obj
+	return obj*/
 }
 
 // GetList of audio files
 func (r PoseApi) GetList() []core.ResourceInfo {
-	list := make([]core.ResourceInfo, 0)
+	return core.GetResourceList(core.DataDir+"/pose", "pose", "kp")
+
+	/*list := make([]core.ResourceInfo, 0)
 
 	fileList, _ := cmhp_file.ListAll(core.DataDir + "/pose")
 	fileList = cmhp_slice.Filter(fileList, func(t cmhp_file.FileInfo) bool {
@@ -124,7 +127,7 @@ func (r PoseApi) GetList() []core.ResourceInfo {
 		list = append(list, clipInfo)
 	}
 
-	return list
+	return list*/
 }
 
 func (r PoseApi) PutIndex(args struct {
@@ -182,7 +185,7 @@ func (r PoseApi) PutIndex(args struct {
 	rapi_core.FatalIfError(err)
 
 	// Update info
-	core.UpdateResourceInfo(fmt.Sprintf("%v/pose/%v", core.DataDir, args.Name), "pose")
+	core.UpdateResourceInfo(fmt.Sprintf("%v/pose/%v", core.DataDir, args.Name), "pose", "kp")
 
 	// Get info
 	info, err := core.GetResourceInfo(core.DataDir + "/pose/" + args.Name)

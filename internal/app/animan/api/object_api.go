@@ -3,18 +3,14 @@ package api
 import (
 	"fmt"
 	"github.com/maldan/gam-app-animan/internal/app/animan/core"
-	"github.com/maldan/go-cmhp/cmhp_crypto"
 	"github.com/maldan/go-cmhp/cmhp_file"
-	"github.com/maldan/go-cmhp/cmhp_slice"
 	"github.com/maldan/go-rapi/rapi_core"
-	"os"
-	"strings"
 )
 
 type ObjectApi struct {
 }
 
-func (r ObjectApi) GetIndex(args core.ObjectInfo) core.ObjectInfo {
+/*func (r ObjectApi) GetIndex(args core.ObjectInfo) core.ObjectInfo {
 	obj := core.ObjectInfo{}
 
 	allFiles, _ := cmhp_file.ListAll(core.DataDir + "/object")
@@ -49,10 +45,15 @@ func (r ObjectApi) GetIndex(args core.ObjectInfo) core.ObjectInfo {
 	rapi_core.Fatal(rapi_core.Error{Description: "File not found", Code: 404})
 
 	return obj
+}*/
+
+func (r ObjectApi) GetFile(ctx *rapi_core.Context, args ArgsName) string {
+	ctx.IsServeFile = true
+	return core.DataDir + "/object/" + args.Name + "/object.gltf"
 }
 
-func (r ObjectApi) GetList() []core.ObjectInfo {
-	list := make([]core.ObjectInfo, 0)
+func (r ObjectApi) GetList() []core.ResourceInfo {
+	/*list := make([]core.ObjectInfo, 0)
 
 	fileList, _ := cmhp_file.ListAll(core.DataDir + "/object")
 	fileList = cmhp_slice.Filter(fileList, func(t cmhp_file.FileInfo) bool {
@@ -73,41 +74,8 @@ func (r ObjectApi) GetList() []core.ObjectInfo {
 		list = append(list, objectInfo)
 	}
 
-	return list
-
-	/*list := make([]core.ObjectInfo, 0)
-	if args.Category == "" {
-		return list
-	}
-
-	fileList, _ := cmhp_file.List(core.DataDir + "/object/" + args.Category)
-
-	for _, file := range fileList {
-		if !file.IsDir() {
-			continue
-		}
-
-		// Preview
-		previewPath := ""
-		if cmhp_file.Exists(core.DataDir + "/object/" + args.Category + "/" + file.Name() + "/preview.jpg") {
-			previewPath = "data/object/" + args.Category + "/" + file.Name() + "/preview.jpg"
-		}
-
-		// Get file info
-		fileInfo := core.ObjectInfo{}
-		cmhp_file.ReadJSON(core.DataDir+"/object/"+args.Category+"/"+file.Name()+"/info.json", &fileInfo)
-
-		// Add to list
-		list = append(list, core.ObjectInfo{
-			UUID:        fileInfo.UUID,
-			Name:        file.Name(),
-			Category:    args.Category,
-			ModelPath:   "data/object/" + args.Category + "/" + file.Name() + "/model.glb",
-			PreviewPath: previewPath,
-		})
-	}
-
 	return list*/
+	return core.GetResourceList(core.DataDir+"/object", "object", "gltf")
 }
 
 func (r ObjectApi) PutPreview(args struct {
@@ -117,7 +85,7 @@ func (r ObjectApi) PutPreview(args struct {
 	err := cmhp_file.Write(core.DataDir+"/object/"+args.Name+"/preview.jpg", args.Preview.Data)
 	rapi_core.FatalIfError(err)
 
-	info, err := r.GetObjectInfo(core.DataDir + "/object/" + args.Name)
+	info, err := core.GetResourceInfo(core.DataDir + "/object/" + args.Name)
 	if err == nil {
 		info.PreviewPath = core.DataDir + "/object/" + args.Name + "/preview.jpg"
 		cmhp_file.Write(core.DataDir+"/object/"+args.Name+"/info.json", &info)
@@ -125,7 +93,7 @@ func (r ObjectApi) PutPreview(args struct {
 }
 
 // GetObjectInfo get some info
-func (r ObjectApi) GetObjectInfo(pathDir string) (core.ObjectInfo, error) {
+/*func (r ObjectApi) GetObjectInfo(pathDir string) (core.ObjectInfo, error) {
 	// Open file info
 	info := core.ObjectInfo{}
 	err := cmhp_file.ReadJSON(pathDir+"/info.json", &info)
@@ -133,10 +101,17 @@ func (r ObjectApi) GetObjectInfo(pathDir string) (core.ObjectInfo, error) {
 		return info, err
 	}
 	return info, nil
+}*/
+
+// GetInfo of audio files
+func (r ObjectApi) GetInfo(args ArgsResourceId) core.ResourceInfo {
+	info, err := core.GetResourceInfoById(core.DataDir+"/object", args.ResourceId, "object", "gltf")
+	rapi_core.FatalIfError(err)
+	return info
 }
 
 // UpdateObjectInfo write some info
-func (r ObjectApi) UpdateObjectInfo(pathDir string) {
+/*func (r ObjectApi) UpdateObjectInfo(pathDir string) {
 	// Open file info
 	info := core.ObjectInfo{}
 	cmhp_file.ReadJSON(pathDir+"/info.json", &info)
@@ -162,18 +137,24 @@ func (r ObjectApi) UpdateObjectInfo(pathDir string) {
 
 	// Write back
 	cmhp_file.Write(pathDir+"/info.json", &info)
-}
+}*/
 
 func (r ObjectApi) PutIndex(args struct {
 	Name  string         `json:"name"`
 	Model rapi_core.File `json:"model"`
-}) {
+}) core.ResourceInfo {
 	if args.Name == "" {
 		rapi_core.Fatal(rapi_core.Error{Description: "Incorrect Name"})
 	}
-	err := cmhp_file.Write(fmt.Sprintf("%v/object/%v/model.glb", core.DataDir, args.Name), args.Model.Data)
+	err := cmhp_file.Write(fmt.Sprintf("%v/object/%v/object.gltf", core.DataDir, args.Name), args.Model.Data)
 	rapi_core.FatalIfError(err)
 
 	// Update file info
-	r.UpdateObjectInfo(fmt.Sprintf("%v/object/%v", core.DataDir, args.Name))
+	core.UpdateResourceInfo(fmt.Sprintf("%v/object/%v", core.DataDir, args.Name), "object", "gltf")
+
+	// Get info
+	info, err := core.GetResourceInfo(core.DataDir + "/object/" + args.Name)
+	rapi_core.FatalIfError(err)
+
+	return info
 }
