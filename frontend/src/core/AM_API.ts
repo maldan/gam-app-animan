@@ -37,7 +37,7 @@ export class AM_API {
       return (
         await Axios.put(`${AM_API.API_URL}/pose`, {
           name,
-          pose: JSON.stringify({
+          data: JSON.stringify({
             keys: [],
           }),
         })
@@ -364,7 +364,7 @@ export class AM_API {
   public static async createClip(name: string): Promise<AM_IResourceInfo> {
     return (
       await Axios.put(`${this.API_URL}/clip`, {
-        clip: JSON.stringify({
+        data: JSON.stringify({
           name,
           objectList: [],
           animationList: [],

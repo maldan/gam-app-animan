@@ -3,14 +3,14 @@
     <div :class="$style.list">
       <desktop-ui-button
         @click="
-          $store.state.modal.data.name = x;
+          $store.state.modal.data.name = x.name;
           $store.dispatch('modal/ok');
         "
         class="clickable"
         :class="$style.item"
         v-for="x in list"
         :key="x"
-        :text="x"
+        :text="x.name"
       />
     </div>
     <desktop-ui-button @click="$store.dispatch('modal/close')" text="Close" />
