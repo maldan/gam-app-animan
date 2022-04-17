@@ -6,7 +6,7 @@ import { AM_AnimationController, AM_IAnimationPart } from '@/core/animation/AM_A
 import { AM_Core } from '@/core/AM_Core';
 import { AM_Character } from '@/core/am/AM_Character';
 import { AM_Bone } from '@/core/am/AM_Bone';
-import { AM_IAnimationInfo, AM_IClipInfo, AM_IResourceInfo } from '@/core/AM_Type';
+import { AM_IResourceInfo } from '@/core/AM_Type';
 
 export class AM_UI {
   public scene = {
@@ -65,8 +65,8 @@ export class AM_State {
   public static isAnimationPlay = false;
   public static animationTime = 0;
   public static mode = '';
-  public static clipInfo?: AM_IClipInfo;
-  public static animationInfo?: AM_IAnimationInfo;
+  public static clipInfo?: AM_IResourceInfo;
+  public static animationInfo?: AM_IResourceInfo;
   public static poseInfo?: AM_IResourceInfo;
 
   private static _globalFrameId = 0;

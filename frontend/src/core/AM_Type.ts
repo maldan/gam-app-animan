@@ -15,6 +15,7 @@ export interface AM_IObjectInfo {
   scale: AM_IVector3;
 }
 
+/*
 export interface AM_IAudioInfo {
   resourceId: string;
   name: string;
@@ -34,7 +35,7 @@ export interface AM_IAnimationInfo {
   name: string;
   category: string;
   filePath: string;
-}
+}*/
 
 export interface AM_IResourceInfo {
   resourceId: string;

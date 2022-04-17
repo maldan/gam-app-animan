@@ -130,13 +130,10 @@ func (r PoseApi) GetList() []core.ResourceInfo {
 	return list*/
 }
 
-func (r PoseApi) PutIndex(args struct {
-	Name string `json:"name"`
-	Pose string `json:"pose"`
-}) core.ResourceInfo {
+func (r PoseApi) PutIndex(args ArgsData) core.ResourceInfo {
 	// Parse data
 	frame := core.AnimationFrame{}
-	err := json.Unmarshal([]byte(args.Pose), &frame)
+	err := json.Unmarshal([]byte(args.Data), &frame)
 	rapi_core.FatalIfError(err)
 
 	// Allocate stream

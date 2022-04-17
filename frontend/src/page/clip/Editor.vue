@@ -42,7 +42,7 @@ export default defineComponent({
       const clip = await AM_API.getClip(name);
 
       for (let i = 0; i < clip.objectList.length; i++) {
-        const objectInfo = await AM_API.getObject(clip.objectList[i].resourceId);
+        const objectInfo = await AM_API.object.getInfo(clip.objectList[i].resourceId);
         const obj = await AM_State.loadObject(
           objectInfo.filePath,
           objectInfo.category === 'character' ? 'character' : '',

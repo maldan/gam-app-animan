@@ -81,7 +81,7 @@ export default defineComponent({
         onSuccess: async () => {
           const resourceId = store.state.modal.data.resourceId;
           const name = store.state.modal.data.name;
-          const info = await AM_API.getObject(resourceId);
+          const info = await AM_API.object.getInfo(resourceId);
           const obj = await AM_State.loadObject(
             info.filePath,
             info.category === 'character' ? 'character' : '',

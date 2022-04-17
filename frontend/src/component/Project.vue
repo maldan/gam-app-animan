@@ -31,7 +31,7 @@ import { AM_AnimationController, AM_IAnimationPart } from '@/core/animation/AM_A
 import { AM_Object } from '@/core/am/AM_Object';
 import { AM_Bone } from '@/core/am/AM_Bone';
 import { AM_API } from '@/core/AM_API';
-import { AM_IAnimationInfo, AM_IClipInfo, AM_IResourceInfo } from '@/core/AM_Type';
+import { AM_IResourceInfo } from '@/core/AM_Type';
 import { AM_Character } from '@/core/am/AM_Character';
 
 export default defineComponent({
@@ -59,11 +59,11 @@ export default defineComponent({
       if (this.r < 0) return '';
       return AM_State.mode;
     },
-    clipInfo(): AM_IClipInfo | undefined {
+    clipInfo(): AM_IResourceInfo | undefined {
       if (this.r < 0) return undefined;
       return AM_State.clipInfo;
     },
-    animationInfo(): AM_IAnimationInfo | undefined {
+    animationInfo(): AM_IResourceInfo | undefined {
       if (this.r < 0) return undefined;
       return AM_State.animationInfo;
     },
@@ -99,7 +99,7 @@ export default defineComponent({
 
       this.isLoading = true;
       AM_State.animationController.compile();
-      await AM_API.saveAnimation(
+      await AM_API.animation.save(
         AM_State.animationInfo.name,
         AM_State.animationController.animation,
       );

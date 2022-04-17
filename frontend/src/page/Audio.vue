@@ -3,12 +3,12 @@
     <desktop-ui-button @click="uploadModal" icon="arrow_up" text="Upload" />
 
     <div :class="$style.list">
-      <div :class="$style.audio" v-for="x in list" :key="x.audioPath">
+      <div :class="$style.audio" v-for="x in list" :key="x.filePath">
         <div :class="$style.title">{{ x.name }}</div>
         <desktop-ui-button
           :class="$style.button"
-          @click="togglePlay(x.audioPath)"
-          :text="isPlay(x.audioPath) ? 'Pause' : 'Play'"
+          @click="togglePlay(x.filePath)"
+          :text="isPlay(x.filePath) ? 'Pause' : 'Play'"
         />
       </div>
     </div>
@@ -18,7 +18,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { AM_API } from '@/core/AM_API';
-import { AM_IAudioInfo } from '@/core/AM_Type';
+import { AM_IResourceInfo } from '@/core/AM_Type';
 
 export default defineComponent({
   components: {},
@@ -55,7 +55,7 @@ export default defineComponent({
   },
   data: () => {
     return {
-      list: [] as AM_IAudioInfo[],
+      list: [] as AM_IResourceInfo[],
       audioCache: {} as Record<string, HTMLAudioElement>,
       category: '',
     };

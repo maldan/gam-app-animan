@@ -21,7 +21,7 @@
 import { defineComponent } from 'vue';
 import { AM_Preview } from '@/core/AM_Preview';
 import { AM_API } from '@/core/AM_API';
-import { AM_IClip, AM_IClipInfo, AM_IObjectInfo } from '@/core/AM_Type';
+import { AM_IClip, AM_IObjectInfo, AM_IResourceInfo } from '@/core/AM_Type';
 
 export default defineComponent({
   components: {},
@@ -55,7 +55,7 @@ export default defineComponent({
   },
   data: () => {
     return {
-      list: [] as AM_IClipInfo[],
+      list: [] as AM_IResourceInfo[],
     };
   },
 });
