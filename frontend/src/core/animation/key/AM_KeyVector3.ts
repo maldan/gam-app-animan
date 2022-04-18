@@ -1,13 +1,22 @@
 import { AM_Key } from '@/core/animation/key/AM_Key';
 import { AM_IVector3 } from '@/core/AM_Type';
+import * as THREE from 'three';
 
 export class AM_KeyVector3 extends AM_Key {
   private _value: AM_IVector3 = { x: 0, y: 0, z: 0 };
 
-  constructor(name: string, v: AM_IVector3) {
+  constructor(name: string, v: AM_IVector3 | THREE.Vector3) {
     super();
     this.name = name;
-    this._value = v;
+    if (v instanceof THREE.Vector3) {
+      this._value = {
+        x: v.x,
+        y: v.y,
+        z: v.z,
+      };
+    } else {
+      this._value = v;
+    }
   }
 
   public interpolate(from: AM_KeyVector3, to: AM_KeyVector3, len: number): AM_KeyVector3[] {

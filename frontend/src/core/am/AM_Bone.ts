@@ -6,8 +6,9 @@ export class AM_Bone extends AM_Object {
 
   public startPosition: THREE.Vector3 = new THREE.Vector3();
   public startRotation: THREE.Quaternion = new THREE.Quaternion();
+  public startScale: THREE.Vector3 = new THREE.Vector3();
 
-  public positionOffset: THREE.Vector3 = new THREE.Vector3();
+  public positionOffset: THREE.Vector3 = new THREE.Vector3(0, 0, 0);
   public rotationOffset: THREE.Quaternion = new THREE.Quaternion();
   public scaleOffset: THREE.Vector3 = new THREE.Vector3();
 
@@ -20,18 +21,52 @@ export class AM_Bone extends AM_Object {
     this.parent = parent;
     this.startRotation = bone.quaternion.clone();
     this.startPosition = bone.position.clone();
+    this.startScale = bone.scale.clone();
   }
 
   public update(): void {
-    this.bone.setRotationFromQuaternion(this.startRotation.clone().multiply(this.rotationOffset));
+    // Set bone trs
+    this.bone.position
+      .set(this.startPosition.x, this.startPosition.y, this.startPosition.z)
+      .add(this.positionOffset);
 
+    if (this.bone.name === 'Head_1')
+      console.log(this.startPosition, this.positionOffset, this.bone.position);
+
+    this.bone.setRotationFromQuaternion(this.startRotation.clone().multiply(this.rotationOffset));
+    this.bone.scale
+      .set(this.startScale.x, this.startScale.y, this.startScale.z)
+      .add(this.scaleOffset);
+
+    // Calculate helper position
     const gp = new THREE.Vector3();
     this.bone.getWorldPosition(gp);
     const gr = new THREE.Quaternion();
     this.bone.getWorldQuaternion(gr);
+    const gs = new THREE.Vector3();
+    this.bone.getWorldScale(gs);
 
     this.position = { x: gp.x, y: gp.y, z: gp.z };
     this.rotation = { x: gr.x, y: gr.y, z: gr.z, w: gr.w };
+    this.scale = { x: gs.x, y: gs.y, z: gs.z };
+  }
+
+  public onSelect(): void {
+    super.onSelect();
+
+    // @ts-ignore
+    this.model.material.color.set(0x00ff00);
+    // @ts-ignore
+    this.model.material.opacity = 0.7;
+  }
+
+  public onUnselect(): void {
+    super.onUnselect();
+
+    // @ts-ignore
+    this.model.material.color.set(0xffffff);
+    // @ts-ignore
+    this.model.material.opacity = 0.15;
   }
 
   public mirrorFromBone(fromBone: AM_Bone): void {

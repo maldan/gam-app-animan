@@ -55,7 +55,8 @@ export class AM_Character extends AM_Object {
       if (this._boneList[object.name]) return;
 
       // Adjust bine size
-      let size = 0.01;
+      let size = 0.005;
+      let length = size * 8;
       if (
         object.name.includes('Finger') ||
         object.name.includes('Toe') ||
@@ -65,9 +66,27 @@ export class AM_Character extends AM_Object {
       )
         size = 0.005;
 
+      if (object.children.length) {
+        // console.log(object.name, object.children);
+
+        const gp1 = new THREE.Vector3();
+        object.getWorldPosition(gp1);
+        const gp2 = new THREE.Vector3();
+        object.children[0].getWorldPosition(gp2);
+
+        length = gp1.distanceTo(gp2);
+      }
+
+      // Offset geometry
+      const geom = new THREE.BoxGeometry(size, length, size);
+      const vertex = geom.attributes.position.array as Float32Array;
+      for (let i = 0; i < vertex.length; i += 3) {
+        vertex[i + 1] += length / 2;
+      }
+
       // Create helper
       const boneHelper = new THREE.Mesh(
-        new THREE.BoxGeometry(size, size * 8, size),
+        geom,
         new THREE.MeshBasicMaterial({
           color: 0xfefefe,
           depthTest: false,
