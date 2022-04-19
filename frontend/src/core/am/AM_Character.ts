@@ -5,20 +5,44 @@ import { AM_Bone } from '@/core/am/AM_Bone';
 import { SkinnedMesh } from 'three';
 import { AM_State } from '@/core/AM_State';
 import { AM_Key } from '@/core/animation/key/AM_Key';
-import { AM_IVector4 } from '@/core/AM_Type';
+import { AM_IVector2, AM_IVector4 } from '@/core/AM_Type';
 
 export class AM_Character extends AM_Object {
-  public exposedKeys = ['transform.position', 'transform.rotation', 'transform.scale'];
+  public exposedKeys = [
+    'transform.position',
+    'transform.rotation',
+    'transform.scale',
+    'eye.L.position',
+    'eye.R.position',
+    'eye.L.scale',
+    'eye.R.scale',
+  ];
 
   private _boneList: Record<string, AM_Bone> = {};
   private _shapeList: { name: string; value: number }[] = [];
   private _shapeCache: Record<string, { mesh: THREE.SkinnedMesh; keyIndex: number }> = {};
+  private _eyeL?: THREE.Mesh;
+  private _eyeR?: THREE.Mesh;
 
   constructor(o: THREE.Object3D) {
     super(o);
 
+    this.prepareEyes(o);
     this.prepareSkeleton(o);
     this.prepareShapes(o);
+  }
+
+  private prepareEyes(skeleton: THREE.Object3D): void {
+    skeleton.traverse((object) => {
+      if (object.name === 'EyeL' && object instanceof THREE.Mesh) {
+        this._eyeL = object;
+        object.material.map = object.material.map.clone();
+      }
+      if (object.name === 'EyeR' && object instanceof THREE.Mesh) {
+        this._eyeR = object;
+        object.material.map = object.material.map.clone();
+      }
+    });
   }
 
   private prepareShapes(skeleton: THREE.Object3D) {
@@ -143,6 +167,12 @@ export class AM_Character extends AM_Object {
       const shapeName = key.name.split('.').slice(1).join('.');
       this.setShapeKey(shapeName, key.value as number);
     }
+
+    if (prefix === 'eye') {
+      const op = key.name.split('.')[2];
+      if (op === 'position') this.setEyePosition(name, key.value as AM_IVector2);
+      if (op === 'scale') this.setEyeScale(name, key.value as AM_IVector2);
+    }
   }
 
   public setShapeKey(name: string, value: number): void {
@@ -156,6 +186,70 @@ export class AM_Character extends AM_Object {
         this._shapeCache[name].mesh.morphTargetInfluences[this._shapeCache[name].keyIndex] = value;
       }
     }
+  }
+
+  public setEyePosition(side: string, position: AM_IVector2): void {
+    if (side === 'L' && this._eyeL) {
+      // @ts-ignore
+      this._eyeL.material.map.center.set(0.5, 0.5);
+      // @ts-ignore
+      this._eyeL.material.map.offset.set(-position.x, position.y);
+    }
+    if (side === 'R' && this._eyeR) {
+      // @ts-ignore
+      this._eyeR.material.map.center.set(0.5, 0.5);
+      // @ts-ignore
+      this._eyeR.material.map.offset.set(position.x, position.y);
+    }
+  }
+
+  public setEyeScale(side: string, scale: AM_IVector2): void {
+    if (side === 'L' && this._eyeL) {
+      // @ts-ignore
+      this._eyeL.material.map.center.set(0.5, 0.5);
+      // @ts-ignore
+      this._eyeL.material.map.repeat.set(1 + scale.x, 1 + scale.y);
+    }
+    if (side === 'R' && this._eyeL) {
+      // @ts-ignore
+      this._eyeR.material.map.center.set(0.5, 0.5);
+      // @ts-ignore
+      this._eyeR.material.map.repeat.set(1 + scale.x, 1 + scale.y);
+    }
+  }
+
+  public getEyeData(side: string): { offset: AM_IVector2; scale: AM_IVector2 } {
+    if (side === 'L' && this._eyeL)
+      return {
+        offset: {
+          // @ts-ignore
+          x: -this._eyeL.material.map.offset.x,
+          // @ts-ignore
+          y: this._eyeL.material.map.offset.y,
+        },
+        scale: {
+          // @ts-ignore
+          x: this._eyeL.material.map.repeat.x - 1,
+          // @ts-ignore
+          y: this._eyeL.material.map.repeat.y - 1,
+        },
+      };
+    if (side === 'R' && this._eyeR)
+      return {
+        offset: {
+          // @ts-ignore
+          x: this._eyeR.material.map.offset.x,
+          // @ts-ignore
+          y: this._eyeR.material.map.offset.y,
+        },
+        scale: {
+          // @ts-ignore
+          x: this._eyeR.material.map.repeat.x - 1,
+          // @ts-ignore
+          y: this._eyeR.material.map.repeat.y - 1,
+        },
+      };
+    return { offset: { x: 0, y: 0 }, scale: { x: 0, y: 0 } };
   }
 
   public get shapeList(): { name: string; value: number }[] {

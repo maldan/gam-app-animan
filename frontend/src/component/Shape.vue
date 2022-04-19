@@ -1,10 +1,23 @@
 <template>
   <div :class="$style.shapeList">
+    <!-- Shape list -->
     <div :class="$style.shape" v-for="(x, i) in shapeList" :key="x">
       <div :class="$style.name">{{ x.name }}</div>
       <div :class="$style.value">
         <desktop-ui-slider v-model="shapeValues[i]" @change="setShapeKey(x.name, $event)" />
       </div>
+    </div>
+
+    <div>
+      <desktop-ui-slider v-model="eyeL.offset.x" @change="setEyeOffset('L')" :min="-4" :max="4" />
+      <desktop-ui-slider v-model="eyeL.offset.y" @change="setEyeOffset('L')" :min="-4" :max="4" />
+      <desktop-ui-slider v-model="eyeL.scale.x" @change="setEyeScale('L')" :min="0" :max="8" />
+      <desktop-ui-slider v-model="eyeL.scale.y" @change="setEyeScale('L')" :min="0" :max="8" />
+
+      <desktop-ui-slider v-model="eyeR.offset.x" @change="setEyeOffset('R')" :min="-4" :max="4" />
+      <desktop-ui-slider v-model="eyeR.offset.y" @change="setEyeOffset('R')" :min="-4" :max="4" />
+      <desktop-ui-slider v-model="eyeR.scale.x" @change="setEyeScale('R')" :min="0" :max="8" />
+      <desktop-ui-slider v-model="eyeR.scale.y" @change="setEyeScale('R')" :min="0" :max="8" />
     </div>
   </div>
 </template>
@@ -13,8 +26,9 @@
 import { defineComponent } from 'vue';
 import { AM_State } from '@/core/AM_State';
 import { AM_Character } from '@/core/am/AM_Character';
-import { AM_KeyQuaternion } from '@/core/animation/key/AM_KeyQuaternion';
 import { AM_KeyFloat } from '@/core/animation/key/AM_KeyFloat';
+import { AM_KeyVector2 } from '@/core/animation/key/AM_KeyVector2';
+import { AM_IVector2 } from '@/core/AM_Type';
 
 export default defineComponent({
   props: {},
@@ -51,6 +65,13 @@ export default defineComponent({
         for (let i = 0; i < this.shapeList.length; i++) {
           this.shapeValues[i] = this.shapeList[i].value;
         }
+        if (this.character) {
+          const d = this.character.getEyeData('L');
+          this.eyeL.offset.x = d.offset.x;
+          this.eyeL.offset.y = d.offset.y;
+          this.eyeL.scale.x = d.scale.x;
+          this.eyeL.scale.y = d.scale.y;
+        }
       });
     },
     setShapeKey(name: string, value: number) {
@@ -67,11 +88,47 @@ export default defineComponent({
 
       AM_State.ui.refresh();
     },
+    setEyeOffset(side: string) {
+      const eye = side === 'L' ? this.eyeL : this.eyeR;
+      this.character?.setEyePosition(side, eye.offset);
+      AM_State.selectedAnimation?.setCurrentKey(
+        new AM_KeyVector2(`eye.${side}.position`, { ...eye.offset }),
+      );
+      AM_State.ui.refresh();
+    },
+    setEyeScale(side: string) {
+      const eye = side === 'L' ? this.eyeL : this.eyeR;
+      this.character?.setEyeScale(side, eye.scale);
+      AM_State.selectedAnimation?.setCurrentKey(
+        new AM_KeyVector2(`eye.${side}.scale`, { ...eye.scale }),
+      );
+      AM_State.ui.refresh();
+    },
   },
   data: () => {
     return {
       r: 0,
       shapeValues: new Array(64).fill(0),
+      eyeL: {
+        offset: {
+          x: 0,
+          y: 0,
+        } as AM_IVector2,
+        scale: {
+          x: 0,
+          y: 0,
+        } as AM_IVector2,
+      },
+      eyeR: {
+        offset: {
+          x: 0,
+          y: 0,
+        } as AM_IVector2,
+        scale: {
+          x: 0,
+          y: 0,
+        } as AM_IVector2,
+      },
     };
   },
 });

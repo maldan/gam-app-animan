@@ -17,6 +17,7 @@ import {
 } from '@/core/AM_Type';
 import { AM_Character } from '@/core/am/AM_Character';
 import { AM_Key } from '@/core/animation/key/AM_Key';
+import { AM_KeyVector2 } from '@/core/animation/key/AM_KeyVector2';
 
 export class AM_API {
   public static API_URL = process.env.VUE_APP_API_URL || `${window.location.origin}/api`;
@@ -136,9 +137,13 @@ export class AM_API {
                   vQuaternion: { x: 0, y: 0, z: 0, w: 0 },
                 };
                 if (x instanceof AM_KeyFloat) {
+                  out.type = 1;
                   out.vFloat = x.value;
                 }
-                // if (x instanceof AM_KeyVector2) type = 2;
+                if (x instanceof AM_KeyVector2) {
+                  out.type = 2;
+                  out.vVector2 = x.value;
+                }
                 if (x instanceof AM_KeyVector3) {
                   out.type = 3;
                   out.vVector3 = x.value;
@@ -172,12 +177,15 @@ export class AM_API {
             type: number;
             vBool: boolean;
             vFloat: number;
+            vVector2: AM_IVector2;
             vVector3: AM_IVector3;
             vQuaternion: AM_IVector4;
           };
 
           if (key.type === 1)
             animation.frames[i].keys[key.name] = new AM_KeyFloat(key.name, key.vFloat);
+          if (key.type === 2)
+            animation.frames[i].keys[key.name] = new AM_KeyVector2(key.name, key.vVector2);
           if (key.type === 3)
             animation.frames[i].keys[key.name] = new AM_KeyVector3(key.name, key.vVector3);
           if (key.type === 4)
@@ -376,7 +384,7 @@ export class AM_API {
   public static async createAnimation(name: string): Promise<AM_IResourceInfo> {
     return (
       await Axios.put(`${this.API_URL}/animation`, {
-        animation: JSON.stringify({
+        data: JSON.stringify({
           name,
           fps: 24,
           frameCount: 4,
