@@ -251,8 +251,6 @@ export class AM_Core {
         AM_State.selectedObject.model.worldToLocal(xx);
 
         const posDiff = this._manipulatorStartPosition.sub(xx);
-
-        posDiff.applyQuaternion(AM_State.selectedObject.model.quaternion.clone());
         AM_State.selectedObject.positionOffset.add(posDiff);
       }
 

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { AM_Object } from '@/core/am/AM_Object';
+import { MathUtils } from 'three';
 
 export class AM_Bone extends AM_Object {
   public bone!: THREE.Bone;
@@ -21,19 +22,31 @@ export class AM_Bone extends AM_Object {
     this.parent = parent;
     this.startRotation = bone.quaternion.clone();
     this.startPosition = bone.position.clone();
+    // bone.worldToLocal(this.startPosition);
     this.startScale = bone.scale.clone();
+
+    if (this.bone.name === 'Nose') {
+      //this.rotationOffset.setFromEuler(new THREE.Euler(0, 0, MathUtils.degToRad(-90)));
+      // this.positionOffset.set(0, 0.2, 0);
+    }
+    /*if (this.bone.name === 'Head_1') {
+      //this.rotationOffset.setFromEuler(new THREE.Euler(0, 0, MathUtils.degToRad(-90)));
+      this.positionOffset.set(0, 0.1, 0);
+    }*/
   }
 
   public update(): void {
-    // Set bone trs
+    // Set bone rotation
+    this.bone.setRotationFromQuaternion(this.startRotation.clone().multiply(this.rotationOffset));
+
+    // Set bone position
+    const offset = this.positionOffset.clone();
+    offset.applyQuaternion(this.bone.quaternion);
     this.bone.position
       .set(this.startPosition.x, this.startPosition.y, this.startPosition.z)
-      .add(this.positionOffset);
+      .add(offset);
 
-    if (this.bone.name === 'Head_1')
-      console.log(this.startPosition, this.positionOffset, this.bone.position);
-
-    this.bone.setRotationFromQuaternion(this.startRotation.clone().multiply(this.rotationOffset));
+    // Set bone scale
     this.bone.scale
       .set(this.startScale.x, this.startScale.y, this.startScale.z)
       .add(this.scaleOffset);
@@ -49,6 +62,26 @@ export class AM_Bone extends AM_Object {
     this.position = { x: gp.x, y: gp.y, z: gp.z };
     this.rotation = { x: gr.x, y: gr.y, z: gr.z, w: gr.w };
     this.scale = { x: gs.x, y: gs.y, z: gs.z };
+
+    if (this.bone.name === 'Head_1') {
+      // console.log(this.startPosition, this.positionOffset, this.bone.position);
+      /*const rr = new THREE.Euler().setFromQuaternion(
+        new THREE.Quaternion(this.rotation.x, this.rotation.y, this.rotation.z, this.rotation.w),
+      );
+      const rr2 = new THREE.Euler().setFromQuaternion(this.bone.quaternion);
+      console.log(
+        'r',
+        MathUtils.radToDeg(rr.x),
+        MathUtils.radToDeg(rr.y),
+        MathUtils.radToDeg(rr.z),
+      );
+      console.log(
+        'r2',
+        MathUtils.radToDeg(rr2.x),
+        MathUtils.radToDeg(rr2.y),
+        MathUtils.radToDeg(rr2.z),
+      );*/
+    }
   }
 
   public onSelect(): void {
