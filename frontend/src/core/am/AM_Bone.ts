@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { AM_Object } from '@/core/am/AM_Object';
 import { MathUtils } from 'three';
+import { AM_Character } from '@/core/am/AM_Character';
+import { AM_State } from '@/core/AM_State';
 
 export class AM_Bone extends AM_Object {
   public bone!: THREE.Bone;
@@ -88,9 +90,16 @@ export class AM_Bone extends AM_Object {
     super.onSelect();
 
     // @ts-ignore
-    this.model.material.color.set(0x00ff00);
+    this.model.material.color.set(AM_State.selectedAnimation ? 0x00ff00 : 0xff0000);
+
     // @ts-ignore
     this.model.material.opacity = 0.7;
+
+    this.visible = true;
+
+    if (this.parent instanceof AM_Character) {
+      this.parent.showBones();
+    }
   }
 
   public onUnselect(): void {
@@ -100,6 +109,10 @@ export class AM_Bone extends AM_Object {
     this.model.material.color.set(0xffffff);
     // @ts-ignore
     this.model.material.opacity = 0.15;
+
+    if (this.parent instanceof AM_Character) {
+      this.parent.hideBones();
+    }
   }
 
   public mirrorFromBone(fromBone: AM_Bone): void {

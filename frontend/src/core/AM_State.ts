@@ -120,11 +120,16 @@ export class AM_State {
 
   public static selectObject(obj: AM_Object | undefined): void {
     // Obj changed
-    /*if (obj instanceof AM_Bone) {
-      if (obj.parent !== this.selectedObject) this.selectedAnimation = undefined;
+    if (obj instanceof AM_Bone) {
+      if (this.selectedObject instanceof AM_Bone) {
+      } else {
+        if (obj.parent !== this.selectedObject) this.selectedAnimation = undefined;
+      }
     } else {
-      if (obj !== this.selectedObject) this.selectedAnimation = undefined;
-    }*/
+      if (this.selectedObject instanceof AM_Bone) {
+        if (obj !== this.selectedObject.parent) this.selectedAnimation = undefined;
+      } else if (obj !== this.selectedObject) this.selectedAnimation = undefined;
+    }
 
     this.selectedObject?.onUnselect();
     this.selectedObject = obj;

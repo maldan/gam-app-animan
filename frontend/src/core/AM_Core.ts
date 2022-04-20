@@ -8,6 +8,7 @@ import Stats from 'three/examples/jsm/libs/stats.module';
 import { AM_KeyQuaternion } from '@/core/animation/key/AM_KeyQuaternion';
 import { AM_Character } from '@/core/am/AM_Character';
 import { AM_Bone } from '@/core/am/AM_Bone';
+import { MathUtils } from 'three';
 
 export class AM_Core {
   public static scene: THREE.Scene;
@@ -124,6 +125,14 @@ export class AM_Core {
     // Grid
     const grid = 5;
     scene.add(new THREE.GridHelper(grid, grid * 2, 0x666666, 0x222222));
+
+    // Floor
+    const geometry = new THREE.PlaneGeometry(grid, grid);
+    const material = new THREE.MeshBasicMaterial({ color: 0x2b2b2b, side: THREE.DoubleSide });
+    const plane = new THREE.Mesh(geometry, material);
+    plane.position.set(0, -0.001, 0);
+    plane.rotateX(MathUtils.degToRad(90));
+    scene.add(plane);
 
     // Light
     const l = new THREE.DirectionalLight(0xffffff, 1);

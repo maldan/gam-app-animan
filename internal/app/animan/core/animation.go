@@ -47,8 +47,8 @@ func WriteAnimationFrames(stream *cmhp_data.ByteArray, animation AnimationSequen
 
 			// Vector2 key
 			if key.Type == 2 {
-				frameSection.WriteFloat32(key.VVector3.X)
-				frameSection.WriteFloat32(key.VVector3.Y)
+				frameSection.WriteFloat32(key.VVector2.X)
+				frameSection.WriteFloat32(key.VVector2.Y)
 			}
 
 			// Vector3 key

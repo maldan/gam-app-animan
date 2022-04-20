@@ -58,6 +58,9 @@ export default defineComponent({
       return obj instanceof AM_Character;
     },
     isSelected(obj: AM_Object): boolean {
+      if (AM_State.selectedObject instanceof AM_Bone) {
+        return AM_State.selectedObject.parent === obj;
+      }
       return AM_State.selectedObject === obj;
     },
     removeObject(obj: AM_Object) {
