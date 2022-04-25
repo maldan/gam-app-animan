@@ -36,6 +36,8 @@ export class AM_Preview {
       controls.update();
     });
     renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
 
     // Scene control
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -53,9 +55,19 @@ export class AM_Preview {
     scene.add(new THREE.GridHelper(grid, grid * 2, 0x666666, 0x222222));
 
     // Light
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.25);
+    scene.add(ambientLight);
+
     const l = new THREE.DirectionalLight(0xffffff, 1);
     l.position.set(0, 5, 10);
+    l.castShadow = true;
+    l.shadow.mapSize.width = 2048; // default
+    l.shadow.mapSize.height = 2048; // default
+    l.shadow.camera.near = 0.1; // default
+    l.shadow.camera.far = 64; // default
+    l.shadow.bias = -0.004;
     scene.add(l);
+
     const l2 = new THREE.DirectionalLight(0xffffff, 1);
     l2.position.set(0, -5, -10);
     scene.add(l2);
@@ -83,6 +95,7 @@ export class AM_Preview {
     //const ambientLight = new THREE.AmbientLight();
     //scene.add(ambientLight);
     const l = new THREE.DirectionalLight(0xffffff, 1);
+    l.castShadow = true;
     l.position.set(0, 5, 10);
     scene.add(l);
 
@@ -118,6 +131,8 @@ export class AM_Preview {
               if ((child as THREE.Mesh).material) {
                 ((child as THREE.Mesh).material as THREE.MeshPhongMaterial).shininess = 2;
                 ((child as THREE.Mesh).material as THREE.MeshPhongMaterial).reflectivity = 0.1;
+                child.receiveShadow = true;
+                child.castShadow = true;
               }
             }
           });

@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { AM_Object } from '@/core/am/AM_Object';
-import { AM_Core } from '@/core/AM_Core';
 import { AM_Bone } from '@/core/am/AM_Bone';
 import { SkinnedMesh } from 'three';
 import { AM_State } from '@/core/AM_State';
@@ -163,7 +162,9 @@ export class AM_Character extends AM_Object {
     if (prefix === 'bone') {
       const boneName = key.name.split('.').slice(1, -1).join('.');
       const k = key.value as AM_IVector4;
-      this.boneList[boneName].rotationOffset = new THREE.Quaternion(k.x, k.y, k.z, k.w);
+      if (this.boneList[boneName]) {
+        this.boneList[boneName].rotationOffset = new THREE.Quaternion(k.x, k.y, k.z, k.w);
+      }
     }
 
     if (prefix === 'shape') {

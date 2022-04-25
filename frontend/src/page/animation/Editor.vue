@@ -80,11 +80,11 @@ export default defineComponent({
           name: 'timeline',
           position: { x: 2, y: 70, width: 50, height: 25 },
         },
-        {
+        /*{
           title: 'Shape',
           name: 'shape',
           position: { x: 54, y: 70, width: 15, height: 25 },
-        },
+        },*/
       ],
     };
   },

@@ -37,7 +37,7 @@ export class AM_Core {
 
     // Render
     let prevTime = 0;
-    this._renderer = new THREE.WebGLRenderer({ antialias: true });
+    this._renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     this._renderer.setSize(window.innerWidth, window.innerHeight);
     this._renderer.setAnimationLoop((time: number) => {
       const deltaTime = (time - prevTime) / 1000;

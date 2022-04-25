@@ -1,100 +1,107 @@
 <template>
   <!-- Animation list -->
   <div :class="$style.animation" @mouseover="isOver = true" @mouseout="isOver = false">
-    <!-- Header -->
-    <div :class="$style.header">
-      <desktop-ui-button
-        @click="backFromAnimation"
-        text="Back"
-        style="flex: none; margin-right: 10px"
-      />
+    <div :class="$style.left">
+      <!-- Header -->
+      <div :class="$style.header">
+        <desktop-ui-button
+          @click="backFromAnimation"
+          text="Back"
+          style="flex: none; margin-right: 10px"
+        />
 
-      <div class="button_group_round_compact">
-        <desktop-ui-button
-          @click="toggleKeyVisibility('position')"
-          text="P"
-          :isSelected="keyVisibility['position']"
-        />
-        <desktop-ui-button
-          @click="toggleKeyVisibility('rotation')"
-          text="R"
-          :isSelected="keyVisibility['rotation']"
-        />
-        <desktop-ui-button
-          @click="toggleKeyVisibility('scale')"
-          text="S"
-          :isSelected="keyVisibility['scale']"
-        />
-        <desktop-ui-button
-          @click="toggleKeyVisibility('boneFingers')"
-          text="Finger"
-          :isSelected="keyVisibility['boneFingers']"
-        />
-        <desktop-ui-button
-          @click="toggleKeyVisibility('boneToes')"
-          text="Toe"
-          :isSelected="keyVisibility['boneToes']"
-        />
-        <desktop-ui-button
-          @click="toggleKeyVisibility('left')"
-          text="L"
-          :isSelected="keyVisibility['left']"
-        />
-        <desktop-ui-button
-          @click="toggleKeyVisibility('right')"
-          text="R"
-          :isSelected="keyVisibility['right']"
-        />
+        <div class="button_group_round_compact">
+          <desktop-ui-button
+            @click="toggleKeyVisibility('position')"
+            text="P"
+            :isSelected="keyVisibility['position']"
+          />
+          <desktop-ui-button
+            @click="toggleKeyVisibility('rotation')"
+            text="R"
+            :isSelected="keyVisibility['rotation']"
+          />
+          <desktop-ui-button
+            @click="toggleKeyVisibility('scale')"
+            text="S"
+            :isSelected="keyVisibility['scale']"
+          />
+          <desktop-ui-button
+            @click="toggleKeyVisibility('boneFingers')"
+            text="Finger"
+            :isSelected="keyVisibility['boneFingers']"
+          />
+          <desktop-ui-button
+            @click="toggleKeyVisibility('boneToes')"
+            text="Toe"
+            :isSelected="keyVisibility['boneToes']"
+          />
+          <desktop-ui-button
+            @click="toggleKeyVisibility('left')"
+            text="L"
+            :isSelected="keyVisibility['left']"
+          />
+          <desktop-ui-button
+            @click="toggleKeyVisibility('right')"
+            text="R"
+            :isSelected="keyVisibility['right']"
+          />
+        </div>
       </div>
-    </div>
 
-    <!-- Numbers -->
-    <div :class="$style.numbers">
-      <div
-        :class="[$style.number]"
-        v-for="frameId in Math.min(animationController.frameCount, maxVisibleFrames)"
-        :key="frameId"
-        :style="{ opacity: (frameId - 1 + offsetX) % 5 === 0 ? 1 : 0 }"
-      >
-        {{ (frameId - 1 + offsetX) % 5 === 0 ? frameId - 1 + offsetX : '' }}
-      </div>
-    </div>
-
-    <!-- Keys -->
-    <div :class="$style.line" v-for="key in keys" :key="key">
-      <div :class="[$style.name, selectedKeys.find((x) => x.key === key) ? $style.selected : null]">
-        {{ key }}
-      </div>
-      <div :class="$style.keys">
+      <!-- Numbers -->
+      <div :class="$style.numbers">
         <div
-          @click="
-            goToFrame(frameId - 1);
-            clearKeySelection();
-            selectKey(key, frameId - 1);
-          "
-          @mouseover="
-            hoverKeyName = key;
-            hoverFrameId = frameId - 1;
-          "
-          @mousedown="
-            dragKeyName = key;
-            dragFrameId = frameId - 1;
-          "
-          @mouseup="dragKey"
-          class="clickable"
-          :class="[
-            $style.key,
-            animation.frames[frameId - 1].keys[key] ? $style.has : null,
-            animation.frameId === frameId - 1 ? $style.current : null,
-            animation.frames[frameId - 1].keys[key]?.isAuto ? $style.auto : null,
-            selectedKeys.find((x) => x.key === key && x.frameId === frameId - 1)
-              ? $style.selected
-              : null,
-          ]"
-          v-for="frameId in animation.frameCount"
+          :class="[$style.number]"
+          v-for="frameId in Math.min(animationController.frameCount, maxVisibleFrames)"
           :key="frameId"
-        ></div>
+          :style="{ opacity: (frameId - 1 + offsetX) % 5 === 0 ? 1 : 0 }"
+        >
+          {{ (frameId - 1 + offsetX) % 5 === 0 ? frameId - 1 + offsetX : '' }}
+        </div>
       </div>
+
+      <!-- Keys -->
+      <div :class="$style.line" v-for="key in keys" :key="key">
+        <div
+          :class="[$style.name, selectedKeys.find((x) => x.key === key) ? $style.selected : null]"
+        >
+          {{ key }}
+        </div>
+        <div :class="$style.keys">
+          <div
+            @click="
+              goToFrame(frameId - 1);
+              clearKeySelection();
+              selectKey(key, frameId - 1);
+            "
+            @mouseover="
+              hoverKeyName = key;
+              hoverFrameId = frameId - 1;
+            "
+            @mousedown="
+              dragKeyName = key;
+              dragFrameId = frameId - 1;
+            "
+            @mouseup="dragKey"
+            class="clickable"
+            :class="[
+              $style.key,
+              animation.frames[frameId - 1].keys[key] ? $style.has : null,
+              animation.frameId === frameId - 1 ? $style.current : null,
+              animation.frames[frameId - 1].keys[key]?.isAuto ? $style.auto : null,
+              selectedKeys.find((x) => x.key === key && x.frameId === frameId - 1)
+                ? $style.selected
+                : null,
+            ]"
+            v-for="frameId in animation.frameCount"
+            :key="frameId"
+          ></div>
+        </div>
+      </div>
+    </div>
+    <div :class="$style.right">
+      <timeline-shape />
     </div>
   </div>
 </template>
@@ -381,109 +388,118 @@ export default defineComponent({
 
 .animation {
   display: flex;
-  flex-direction: column;
+  // flex-direction: column;
 
-  .header {
+  .left {
     display: flex;
-    margin-bottom: 10px;
-    align-items: center;
-  }
+    flex-direction: column;
 
-  .numbers {
-    display: flex;
-    margin-bottom: 10px;
-    margin-left: 174px;
-
-    .number {
-      width: 8px;
-      margin-right: 1px;
-      font-size: 12px;
-      color: $text-gray;
-      box-sizing: border-box;
-      position: relative;
-      padding-left: 2px;
-
-      &:after {
-        content: '';
-        border-left: 1px solid $text-gray;
-        position: absolute;
-        left: -2px;
-        top: 0;
-        height: 21px;
-      }
-    }
-  }
-
-  .line {
-    display: flex;
-    margin-bottom: 1px;
-    min-height: 16px;
-
-    .name {
-      width: 164px;
-      font-size: 14px;
-      color: $text-gray;
-      background: lighten($gray-dark, 5%);
-      border-right: 4px solid #4c4c4c;
-      margin-right: 5px;
+    .header {
       display: flex;
+      margin-bottom: 10px;
       align-items: center;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    }
 
-      &.selected {
-        border-right: 4px solid #26b518;
-        background: #4a4a4a;
+    .numbers {
+      display: flex;
+      margin-bottom: 10px;
+      margin-left: 174px;
+
+      .number {
+        width: 8px;
+        margin-right: 1px;
+        font-size: 12px;
+        color: $text-gray;
+        box-sizing: border-box;
+        position: relative;
+        padding-left: 2px;
+
+        &:after {
+          content: '';
+          border-left: 1px solid $text-gray;
+          position: absolute;
+          left: -2px;
+          top: 0;
+          height: 21px;
+        }
       }
     }
 
-    .keys {
+    .line {
       display: flex;
+      margin-bottom: 1px;
+      min-height: 16px;
 
-      &.selected {
-        .key {
-          background: #262626;
-        }
-      }
-
-      .key {
-        width: 8px;
-        background: #161616;
-        margin-right: 1px;
-
-        &.current {
-          background: #0000ff;
-        }
+      .name {
+        width: 164px;
+        font-size: 14px;
+        color: $text-gray;
+        background: lighten($gray-dark, 5%);
+        border-right: 4px solid #4c4c4c;
+        margin-right: 5px;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
 
         &.selected {
-          background: #18b14a;
+          border-right: 4px solid #26b518;
+          background: #4a4a4a;
+        }
+      }
+
+      .keys {
+        display: flex;
+
+        &.selected {
+          .key {
+            background: #262626;
+          }
         }
 
-        &.has {
-          background: #fe0000;
+        .key {
+          width: 8px;
+          background: #161616;
+          margin-right: 1px;
 
           &.current {
-            background: lighten(#0000ff, 30%);
+            background: #0000ff;
           }
 
           &.selected {
             background: #18b14a;
           }
-        }
 
-        &.auto {
-          background: #feba33;
+          &.has {
+            background: #fe0000;
 
-          &.current {
-            background: lighten(#0000ff, 50%);
+            &.current {
+              background: lighten(#0000ff, 30%);
+            }
+
+            &.selected {
+              background: #18b14a;
+            }
           }
 
-          &.selected {
-            background: #18b14a;
+          &.auto {
+            background: #feba33;
+
+            &.current {
+              background: lighten(#0000ff, 50%);
+            }
+
+            &.selected {
+              background: #18b14a;
+            }
           }
         }
       }
     }
+  }
+
+  .right {
+    margin-left: auto;
   }
 }
 </style>

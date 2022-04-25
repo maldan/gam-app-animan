@@ -167,6 +167,10 @@ export class AM_State {
 
           object.traverse((child) => {
             if (child instanceof THREE.Mesh) {
+              //child.geometry.computeBoundingSphere();
+
+              child.castShadow = true;
+              child.receiveShadow = true;
               // console.log(child.material);
             }
           });
