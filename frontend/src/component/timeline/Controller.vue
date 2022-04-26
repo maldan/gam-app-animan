@@ -97,20 +97,21 @@
 import { defineComponent } from 'vue';
 import { AM_State } from '@/core/AM_State';
 import { AM_AnimationController, AM_IAnimationPart } from '@/core/animation/AM_AnimationController';
-import { AM_Animation } from '@/core/animation/AM_Animation';
 import { AM_Object } from '@/core/am/AM_Object';
 import { AM_Bone } from '@/core/am/AM_Bone';
 import { AM_API } from '@/core/AM_API';
 
 export default defineComponent({
-  props: {},
+  props: {
+    selectedObject: Object,
+  },
   components: {},
   computed: {
-    selectedObject(): AM_Object | undefined {
+    /*selectedObject(): AM_Object | undefined {
       if (this.r < 0) return undefined;
       if (AM_State.selectedObject instanceof AM_Bone) return AM_State.selectedObject.parent;
       return AM_State.selectedObject;
-    },
+    },*/
     animationController(): AM_AnimationController | undefined {
       if (this.r < 0) return undefined;
       return this.selectedObject?.animationController;

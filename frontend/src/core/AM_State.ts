@@ -45,12 +45,19 @@ export class AM_UI {
       this.ref?.refresh();
     },
   };
+  public clipEditor = {
+    ref: undefined as any,
+    refresh(): void {
+      this.ref?.refresh();
+    },
+  };
   public refresh(): void {
     this.main.refresh();
     this.scene.refresh();
     this.timeline.refresh();
     this.shape.refresh();
     this.project.refresh();
+    this.clipEditor.refresh();
   }
 }
 
@@ -68,11 +75,10 @@ export class AM_State {
   public static clipInfo?: AM_IResourceInfo;
   public static animationInfo?: AM_IResourceInfo;
   public static poseInfo?: AM_IResourceInfo;
+  public static animationObjectList: AM_Object[] = [];
 
   private static _globalFrameId = 0;
   private static _eventList: Record<string, ((...data: unknown[]) => void)[]> = {};
-
-  // public static interactionMode: 'pose' | 'object' = 'object';
 
   public static get globalFrameId(): number {
     return this._globalFrameId;
@@ -104,12 +110,19 @@ export class AM_State {
   public static destroy(): void {
     this.animationController.off('change');
     this.objectList.length = 0;
+    this.animationObjectList.length = 0;
     this.selectedObject = undefined;
     this.selectedAnimation = undefined;
     this.selectedAnimationPart = undefined;
     this.isAnimationPlay = false;
 
     this._eventList = {};
+  }
+
+  public static addAnimationObject(obj: AM_Object): void {
+    if (this.animationObjectList.indexOf(obj) !== -1) return;
+    this.animationObjectList.push(obj);
+    this.ui.refresh();
   }
 
   public static addObject(obj: AM_Object): void {

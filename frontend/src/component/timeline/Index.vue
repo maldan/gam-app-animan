@@ -1,7 +1,7 @@
 <template>
   <div v-if="animationController" :class="$style.timeline">
-    <timeline-controller ref="controller" v-if="!animation" />
-    <timeline-animation ref="animation" v-if="animation" />
+    <timeline-controller ref="controller" v-if="!animation" :selected-object="selectedObject" />
+    <timeline-animation ref="animation" v-if="animation" :selected-object="selectedObject" />
   </div>
 </template>
 
@@ -14,14 +14,16 @@ import { AM_Object } from '@/core/am/AM_Object';
 import { AM_Bone } from '@/core/am/AM_Bone';
 
 export default defineComponent({
-  props: {},
+  props: {
+    selectedObject: Object,
+  },
   components: {},
   computed: {
-    selectedObject(): AM_Object | undefined {
+    /*selectedObject(): AM_Object | undefined {
       if (this.r < 0) return undefined;
       if (AM_State.selectedObject instanceof AM_Bone) return AM_State.selectedObject.parent;
       return AM_State.selectedObject;
-    },
+    },*/
     animationController(): AM_AnimationController | undefined {
       if (this.r < 0) return undefined;
       return this.selectedObject?.animationController;

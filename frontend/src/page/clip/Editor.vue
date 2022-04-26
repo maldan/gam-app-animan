@@ -13,6 +13,13 @@
         <component :is="x.name" />
       </template>
     </desktop-ui-window>
+
+    <!-- Window list 2 -->
+    <desktop-ui-window v-for="x in s" :key="x.name" :title="x.title" :initData="x.position">
+      <template v-slot:body>
+        <timeline :selected-object="x.selectedObject" />
+      </template>
+    </desktop-ui-window>
   </div>
 </template>
 
@@ -24,10 +31,27 @@ import { AM_API } from '@/core/AM_API';
 
 export default defineComponent({
   components: {},
+  computed: {
+    s() {
+      if (this.r < 0) return [];
+      return AM_State.animationObjectList.map((x) => {
+        return {
+          title: `Timeline ${x.name}`,
+          name: 'timeline',
+          selectedObject: x,
+          position: { x: 1, y: 74, width: 50, height: 25 },
+        };
+      });
+    },
+  },
   async mounted() {
     AM_State.mode = 'clip';
     AM_State.init();
     AM_Core.init(this.$refs['scene'] as HTMLElement);
+
+    // Clip editor
+    AM_State.ui.clipEditor.ref = this;
+    AM_State.ui.clipEditor.refresh();
 
     const info = await AM_API.getClipInfo(this.$route.params.resourceId as string);
     AM_State.clipInfo = info;
@@ -38,6 +62,9 @@ export default defineComponent({
     AM_State.destroy();
   },
   methods: {
+    refresh() {
+      this.r = Math.random();
+    },
     async loadClip(name: string) {
       const clip = await AM_API.getClip(name);
 
@@ -74,6 +101,7 @@ export default defineComponent({
   },
   data: () => {
     return {
+      r: 0,
       windowList: [
         {
           title: 'Project',
@@ -90,16 +118,16 @@ export default defineComponent({
           name: 'clip-list',
           position: { x: 1, y: 27, width: 18, height: 20 },
         },*/
-        {
+        /*{
           title: 'Timeline',
           name: 'timeline',
           position: { x: 1, y: 74, width: 50, height: 25 },
-        },
-        {
+        },*/
+        /*{
           title: 'Shape',
           name: 'shape',
           position: { x: 52, y: 74, width: 15, height: 25 },
-        },
+        },*/
       ],
     };
   },

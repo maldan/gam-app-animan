@@ -9,6 +9,14 @@
     >
       {{ x.type }} {{ x.name }}
       <ui-icon
+        @click.stop="addAnimationObject(x)"
+        :class="$style.pencil"
+        name="pencil"
+        :width="18"
+        :height="18"
+        :color="isSelected(x) ? '#a6ff68' : undefined"
+      />
+      <ui-icon
         @click.stop="toggleVisibility(x)"
         :class="$style.visibility"
         name="eye"
@@ -73,6 +81,9 @@ export default defineComponent({
       obj.visible = !obj.visible;
       obj.update();
     },
+    addAnimationObject(obj: AM_Object) {
+      AM_State.addAnimationObject(obj);
+    },
     pickObject(): void {
       const store = this.$store;
 
@@ -122,8 +133,12 @@ export default defineComponent({
     align-items: center;
     border-radius: 2px;
 
-    .visibility {
+    .pencil {
       margin-left: auto;
+    }
+
+    .visibility {
+      margin-left: 5px;
     }
 
     .remove {

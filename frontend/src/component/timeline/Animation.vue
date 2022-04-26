@@ -118,14 +118,16 @@ import { AM_Character } from '@/core/am/AM_Character';
 import { AM_KeyQuaternion } from '@/core/animation/key/AM_KeyQuaternion';
 
 export default defineComponent({
-  props: {},
+  props: {
+    selectedObject: Object,
+  },
   components: {},
   computed: {
-    selectedObject(): AM_Object | undefined {
+    /*selectedObject(): AM_Object | undefined {
       if (this.r < 0) return undefined;
       if (AM_State.selectedObject instanceof AM_Bone) return AM_State.selectedObject.parent;
       return AM_State.selectedObject;
-    },
+    },*/
     selectedBone(): AM_Bone | undefined {
       if (this.r < 0) return undefined;
       if (AM_State.selectedObject instanceof AM_Bone) return AM_State.selectedObject;
@@ -137,7 +139,7 @@ export default defineComponent({
     },
     keys(): string[] {
       if (this.r < 0) return [];
-      const keys = (this.selectedObject?.exposedKeys || []).filter((x) => {
+      const keys = (this.selectedObject?.exposedKeys || []).filter((x: string) => {
         if (!this.keyVisibility['position'] && x.match('.position')) return false;
         if (!this.keyVisibility['rotation'] && x.match('.rotation')) return false;
         if (!this.keyVisibility['scale'] && x.match('.scale')) return false;
