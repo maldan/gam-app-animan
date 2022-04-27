@@ -90,7 +90,7 @@ export class AM_Bone extends AM_Object {
     super.onSelect();
 
     // @ts-ignore
-    this.model.material.color.set(AM_State.selectedAnimation ? 0x00ff00 : 0xff0000);
+    this.model.material.color.set(0x00ff00);
 
     // @ts-ignore
     this.model.material.opacity = 0.7;

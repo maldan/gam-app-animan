@@ -66,8 +66,8 @@ export class AM_State {
 
   public static objectList: AM_Object[] = [];
   public static selectedObject?: AM_Object;
-  public static selectedAnimation?: AM_Animation;
-  public static selectedAnimationPart?: AM_IAnimationPart;
+  //public static selectedAnimation?: AM_Animation;
+  //public static selectedAnimationPart?: AM_IAnimationPart;
   public static animationController: AM_AnimationController = new AM_AnimationController();
   public static isAnimationPlay = false;
   public static animationTime = 0;
@@ -112,8 +112,8 @@ export class AM_State {
     this.objectList.length = 0;
     this.animationObjectList.length = 0;
     this.selectedObject = undefined;
-    this.selectedAnimation = undefined;
-    this.selectedAnimationPart = undefined;
+    //this.selectedAnimation = undefined;
+    //this.selectedAnimationPart = undefined;
     this.isAnimationPlay = false;
 
     this._eventList = {};
@@ -133,7 +133,7 @@ export class AM_State {
 
   public static selectObject(obj: AM_Object | undefined): void {
     // Obj changed
-    if (obj instanceof AM_Bone) {
+    /*if (obj instanceof AM_Bone) {
       if (this.selectedObject instanceof AM_Bone) {
       } else {
         if (obj.parent !== this.selectedObject) this.selectedAnimation = undefined;
@@ -142,7 +142,7 @@ export class AM_State {
       if (this.selectedObject instanceof AM_Bone) {
         if (obj !== this.selectedObject.parent) this.selectedAnimation = undefined;
       } else if (obj !== this.selectedObject) this.selectedAnimation = undefined;
-    }
+    }*/
 
     this.selectedObject?.onUnselect();
     this.selectedObject = obj;

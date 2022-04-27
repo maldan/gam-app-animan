@@ -52,7 +52,7 @@ export default defineComponent({
         if (ch) return ch.shapeList;
         return [];
       }
-      if (!AM_State.selectedAnimation) return [];
+      //if (!AM_State.selectedAnimation) return [];
       if (AM_State.selectedObject instanceof AM_Character) return AM_State.selectedObject.shapeList;
       return [];
     },
@@ -84,27 +84,27 @@ export default defineComponent({
         AM_State.ui.refresh();
         return;
       }
-      if (!AM_State.selectedAnimation) return;
+      //if (!AM_State.selectedAnimation) return;
 
       this.character.setShapeKey(name, value);
-      AM_State.selectedAnimation.setCurrentKey(new AM_KeyFloat(`shape.${name}`, value));
+      //AM_State.selectedAnimation.setCurrentKey(new AM_KeyFloat(`shape.${name}`, value));
 
       AM_State.ui.refresh();
     },
     setEyeOffset(side: string) {
       const eye = side === 'L' ? this.eyeL : this.eyeR;
       this.character?.setEyePosition(side, eye.offset);
-      AM_State.selectedAnimation?.setCurrentKey(
+      /*AM_State.selectedAnimation?.setCurrentKey(
         new AM_KeyVector2(`eye.${side}.position`, { ...eye.offset }),
-      );
+      );*/
       AM_State.ui.refresh();
     },
     setEyeScale(side: string) {
       const eye = side === 'L' ? this.eyeL : this.eyeR;
       this.character?.setEyeScale(side, eye.scale);
-      AM_State.selectedAnimation?.setCurrentKey(
+      /*AM_State.selectedAnimation?.setCurrentKey(
         new AM_KeyVector2(`eye.${side}.scale`, { ...eye.scale }),
-      );
+      );*/
       AM_State.ui.refresh();
     },
   },

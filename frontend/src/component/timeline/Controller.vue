@@ -98,7 +98,6 @@ import { defineComponent } from 'vue';
 import { AM_State } from '@/core/AM_State';
 import { AM_AnimationController, AM_IAnimationPart } from '@/core/animation/AM_AnimationController';
 import { AM_Object } from '@/core/am/AM_Object';
-import { AM_Bone } from '@/core/am/AM_Bone';
 import { AM_API } from '@/core/AM_API';
 
 export default defineComponent({
@@ -122,7 +121,7 @@ export default defineComponent({
     },
     selectedAnimationPart(): AM_IAnimationPart | undefined {
       if (this.r < 0) return undefined;
-      return AM_State.selectedAnimationPart;
+      return this.animationController?.selectedAnimationPart;
     },
     isAnimationPlay(): boolean {
       if (this.r < 0) return false;
@@ -182,13 +181,16 @@ export default defineComponent({
       this.refresh();
     },
     selectAnimationPart(x: AM_IAnimationPart | undefined) {
-      AM_State.selectedAnimationPart = x;
+      (this.selectedObject as AM_Object).animationController.selectedAnimationPart = x;
+      // AM_State.selectedAnimationPart = x;
       this.refresh();
     },
     openAnimationPart(x: AM_IAnimationPart | undefined) {
       this.hoverAnimationPart = undefined;
-      AM_State.selectedAnimationPart = undefined;
-      AM_State.selectedAnimation = x?.animation;
+      (this.selectedObject as AM_Object).animationController.selectedAnimationPart = x;
+      (this.selectedObject as AM_Object).animationController.workingOnAnimationPart = x;
+      //AM_State.selectedAnimationPart = undefined;
+      //AM_State.selectedAnimation = x?.animation;
 
       AM_State.ui.refresh();
     },
@@ -220,6 +222,7 @@ export default defineComponent({
       maxVisibleKeys: 12,
 
       hoverAnimationPart: undefined as AM_IAnimationPart | undefined,
+      // selectedAnimationPart: undefined as AM_IAnimationPart | undefined,
 
       // Scroll
       offsetX: 0,

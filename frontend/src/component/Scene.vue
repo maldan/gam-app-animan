@@ -19,7 +19,7 @@
       <ui-icon
         @click.stop="toggleVisibility(x)"
         :class="$style.visibility"
-        name="eye"
+        :name="isVisible(x) ? 'eye' : 'close'"
         :width="18"
         :height="18"
         :color="isSelected(x) ? '#a6ff68' : undefined"
@@ -66,10 +66,15 @@ export default defineComponent({
       return obj instanceof AM_Character;
     },
     isSelected(obj: AM_Object): boolean {
+      if (this.r < 0) return false;
       if (AM_State.selectedObject instanceof AM_Bone) {
         return AM_State.selectedObject.parent === obj;
       }
       return AM_State.selectedObject === obj;
+    },
+    isVisible(obj: AM_Object): boolean {
+      if (this.r < 0) return false;
+      return obj.visible;
     },
     removeObject(obj: AM_Object) {
       AM_State.removeObject(obj);
@@ -80,6 +85,7 @@ export default defineComponent({
     toggleVisibility(obj: AM_Object) {
       obj.visible = !obj.visible;
       obj.update();
+      this.refresh();
     },
     addAnimationObject(obj: AM_Object) {
       AM_State.addAnimationObject(obj);

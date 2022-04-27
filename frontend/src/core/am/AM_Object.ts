@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import { AM_Key } from '@/core/animation/key/AM_Key';
-import { AM_AnimationController } from '@/core/animation/AM_AnimationController';
+import { AM_AnimationController, AM_IAnimationPart } from '@/core/animation/AM_AnimationController';
 import { AM_Core } from '@/core/AM_Core';
 import { AM_Animation } from '@/core/animation/AM_Animation';
-import { AM_IVector3, AM_IVector4 } from '@/core/AM_Type';
+import { AM_IAnimation, AM_IVector3, AM_IVector4 } from '@/core/AM_Type';
 
 export class AM_Object {
   public id = '';
@@ -47,6 +47,10 @@ export class AM_Object {
   public onSelect(): void {}
 
   public onUnselect(): void {}
+
+  public get workingAnimation(): AM_Animation | undefined {
+    return this.animationController?.workingOnAnimationPart?.animation;
+  }
 
   public set visible(status: boolean) {
     this.#_threeObject.visible = status;

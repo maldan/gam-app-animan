@@ -11,6 +11,9 @@ export class AM_AnimationController {
   private _eventList: Record<string, ((...data: unknown[]) => void)[]> = {};
   private _animation: AM_Animation = new AM_Animation();
 
+  public selectedAnimationPart: AM_IAnimationPart | undefined;
+  public workingOnAnimationPart: AM_IAnimationPart | undefined;
+
   public createAnimation(offset = 0): void {
     const animation = new AM_Animation();
     animation.controller = this;

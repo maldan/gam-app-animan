@@ -30,7 +30,7 @@ export default defineComponent({
     },
     animation(): AM_Animation | undefined {
       if (this.r < 0) return undefined;
-      return AM_State.selectedAnimation;
+      return this.animationController?.workingOnAnimationPart?.animation;
     },
     /*selectedObject(): AM_Object | undefined {
       if (this.r < 0) return undefined;

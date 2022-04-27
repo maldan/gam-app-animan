@@ -158,7 +158,7 @@ export default defineComponent({
     },
     animation(): AM_Animation | undefined {
       if (this.r < 0) return undefined;
-      return AM_State.selectedAnimation;
+      return this.animationController?.workingOnAnimationPart?.animation;
     },
   },
   async mounted() {
@@ -318,11 +318,16 @@ export default defineComponent({
       this.refresh();
     },
     backFromAnimation() {
+      if (this.animation) this.animation.off('change');
+
+      (this.selectedObject as AM_Object).animationController.selectedAnimationPart = undefined;
+      (this.selectedObject as AM_Object).animationController.workingOnAnimationPart = undefined;
+
       // Remove old listener
-      if (AM_State.selectedAnimation) AM_State.selectedAnimation.off('change');
+      /*if (AM_State.selectedAnimation) AM_State.selectedAnimation.off('change');
 
       AM_State.selectedAnimationPart = undefined;
-      AM_State.selectedAnimation = undefined;
+      AM_State.selectedAnimation = undefined;*/
 
       this.animationController?.compile();
       AM_State.ui.refresh();

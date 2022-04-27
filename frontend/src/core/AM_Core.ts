@@ -208,9 +208,10 @@ export class AM_Core {
 
         // Check intersects with bones
         const intersects = raycaster.intersectObjects(
-          AM_State.objectList.map((x) => x.model),
+          AM_State.objectList.filter((x) => x.visible).map((x) => x.model),
           true,
         );
+        console.log(intersects);
         const bone = intersects.find((x) => x.object.userData.amObject instanceof AM_Bone);
 
         // Has intersection
@@ -249,7 +250,7 @@ export class AM_Core {
         AM_State.selectedObject.rotationOffset.multiply(rotDiff);
         const rot = AM_State.selectedObject.rotationOffset;
 
-        AM_State.selectedAnimation?.setCurrentKey(
+        AM_State.selectedObject.parent.workingAnimation?.setCurrentKey(
           new AM_KeyQuaternion(`bone.${AM_State.selectedObject.name}.rotation`, rot),
         );
       }
@@ -278,21 +279,21 @@ export class AM_Core {
 
     // Translate
     if (this._manipulator.mode === 'translate') {
-      AM_State.selectedAnimation?.setCurrentKey(
+      AM_State.selectedObject.workingAnimation?.setCurrentKey(
         new AM_KeyVector3('transform.position', AM_State.selectedObject.model.position),
       );
     }
 
     // Rotation
     if (this._manipulator.mode === 'rotate') {
-      AM_State.selectedAnimation?.setCurrentKey(
+      AM_State.selectedObject.workingAnimation?.setCurrentKey(
         new AM_KeyQuaternion('transform.rotation', AM_State.selectedObject.model.quaternion),
       );
     }
 
     // Scale
     if (this._manipulator.mode === 'scale') {
-      AM_State.selectedAnimation?.setCurrentKey(
+      AM_State.selectedObject.workingAnimation?.setCurrentKey(
         new AM_KeyVector3('transform.scale', AM_State.selectedObject.model.scale),
       );
     }
