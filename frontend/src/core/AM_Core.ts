@@ -270,6 +270,7 @@ export class AM_Core {
         AM_State.selectedObject.scaleOffset.add(scaleDiff);
       }
 
+      AM_State.selectedObject?.parent.animationController.compile();
       AM_State.selectedObject?.parent.update();
       AM_State.ui.timeline.refresh();
       return;
@@ -286,6 +287,7 @@ export class AM_Core {
 
     // Rotation
     if (this._manipulator.mode === 'rotate') {
+      console.log(AM_State.selectedObject.model.quaternion);
       AM_State.selectedObject.workingAnimation?.setCurrentKey(
         new AM_KeyQuaternion('transform.rotation', AM_State.selectedObject.model.quaternion),
       );
@@ -298,6 +300,7 @@ export class AM_Core {
       );
     }
 
+    AM_State.selectedObject?.animationController.compile();
     AM_State.selectedObject?.update();
     AM_State.ui.timeline.refresh();
     return;

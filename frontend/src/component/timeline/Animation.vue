@@ -130,7 +130,7 @@ export default defineComponent({
     },*/
     selectedBone(): AM_Bone | undefined {
       if (this.r < 0) return undefined;
-      if (AM_State.selectedObject instanceof AM_Bone) return AM_State.selectedObject;
+      if (AM_State.selectedObject instanceof AM_Bone) return AM_State.selectedObject as AM_Bone;
       return undefined;
     },
     animationController(): AM_AnimationController | undefined {
@@ -291,9 +291,9 @@ export default defineComponent({
 
       this.animation?.off('change');
       this.animation?.on('change', () => {
-        if (AM_State.selectedObject instanceof AM_Bone)
-          AM_State.selectedObject.parent.applyAnimation(this.animation);
-        else AM_State.selectedObject?.applyAnimation(this.animation);
+        if (this.selectedObject instanceof AM_Bone)
+          this.selectedObject.parent.applyAnimation(this.animation);
+        else this.selectedObject?.applyAnimation(this.animation);
 
         AM_State.ui.shape.refresh();
       });

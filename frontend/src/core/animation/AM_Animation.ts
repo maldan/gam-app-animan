@@ -89,6 +89,15 @@ export class AM_Animation {
     this.interpolateKey(key.name);
   }
 
+  public clone(): AM_Animation {
+    const an = new AM_Animation();
+    an.fps = this.fps;
+    an.isLoop = this.isLoop;
+    an.name = this.name;
+    an.frames = this.frames.map((x) => x.clone());
+    return an;
+  }
+
   public on(eventName: string, fn: (...data: unknown[]) => void): void {
     if (!this._eventList[eventName]) this._eventList[eventName] = [];
     this._eventList[eventName].push(fn);
