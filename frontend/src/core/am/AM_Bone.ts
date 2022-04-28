@@ -173,13 +173,13 @@ export class AM_Bone extends AM_Object {
     this.bone.position.set(q.x, q.y, q.z);
 
     // Set visual bone rotation
-    const pp = new THREE.Vector3();
+    /*const pp = new THREE.Vector3();
     this.bone.localToWorld(pp);
     this.position = {
       x: pp.x,
       y: pp.y,
       z: pp.z,
-    };
+    };*/
   }
 
   public get rotationOffset(): AM_IVector4 {
@@ -195,14 +195,14 @@ export class AM_Bone extends AM_Object {
     this.bone.quaternion.set(q.x, q.y, q.z, q.w);
 
     // Set visual bone rotation
-    const qq = new THREE.Quaternion();
+    /*const qq = new THREE.Quaternion();
     this.bone.getWorldQuaternion(qq);
     this.rotation = {
       x: qq.x,
       y: qq.y,
       z: qq.z,
       w: qq.w,
-    };
+    };*/
   }
 
   public get scaleOffset(): AM_IVector3 {
@@ -216,13 +216,13 @@ export class AM_Bone extends AM_Object {
     this.bone.scale.set(q.x, q.y, q.z);
 
     // Set visual bone rotation
-    const pp = new THREE.Vector3();
+    /*const pp = new THREE.Vector3();
     this.bone.localToWorld(pp);
     this.scale = {
       x: pp.x,
       y: pp.y,
       z: pp.z,
-    };
+    };*/
   }
 
   public reset(): void {

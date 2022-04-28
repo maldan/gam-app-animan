@@ -40,9 +40,15 @@ export class AM_UI {
     },
   };
   public shape = {
-    ref: undefined as any,
+    refs: [] as unknown[],
+    addRef(x: unknown): void {
+      this.refs.push(x);
+    },
+    removeRef(x: unknown): void {
+      this.refs.splice(this.refs.indexOf(x), 1);
+    },
     refresh(): void {
-      this.ref?.refresh();
+      this.refs.forEach((x: any) => x.refresh());
     },
   };
   public project = {
@@ -108,6 +114,7 @@ export class AM_State {
         .filter((x) => x instanceof AM_Character)
         .forEach((x) => {
           x.applyAnimation(this.animationController?.animation);
+          x.update();
         });
       this.ui.timeline.refresh();
     });

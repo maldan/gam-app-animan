@@ -30,6 +30,8 @@ import { defineComponent } from 'vue';
 import { AM_State } from '@/core/AM_State';
 import { AM_Character } from '@/core/am/AM_Character';
 import { AM_IVector2 } from '@/core/AM_Type';
+import { AM_AnimationController } from '@/core/animation/AM_AnimationController';
+import { AM_KeyFloat } from '@/core/animation/key/AM_KeyFloat';
 
 export default defineComponent({
   props: {
@@ -56,10 +58,17 @@ export default defineComponent({
       if (this.selectedObject instanceof AM_Character) return this.selectedObject.shapeList;
       return [];
     },
+    animationController(): AM_AnimationController | undefined {
+      if (this.r < 0) return undefined;
+      return this.selectedObject?.animationController;
+    },
   },
   async mounted() {
-    AM_State.ui.shape.ref = this;
+    AM_State.ui.shape.addRef(this);
     AM_State.ui.shape.refresh();
+  },
+  beforeUnmount() {
+    AM_State.ui.shape.removeRef(this);
   },
   methods: {
     refresh() {
@@ -84,10 +93,11 @@ export default defineComponent({
         AM_State.ui.refresh();
         return;
       }
-      //if (!AM_State.selectedAnimation) return;
 
       this.character.setShapeKey(name, value);
-      //AM_State.selectedAnimation.setCurrentKey(new AM_KeyFloat(`shape.${name}`, value));
+      this.animationController?.workingOnAnimationPart?.animation.setCurrentKey(
+        new AM_KeyFloat(`shape.${name}`, value),
+      );
 
       AM_State.ui.refresh();
     },

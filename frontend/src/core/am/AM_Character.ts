@@ -143,9 +143,7 @@ export class AM_Character extends AM_Object {
   }
 
   public showBones(): void {
-    if (AM_State.mode !== 'pose') {
-      if (!this.animationController.workingOnAnimationPart) return;
-    }
+    if (!this.animationController.workingOnAnimationPart) return;
     for (const x in this.boneList) this.boneList[x].visible = true;
   }
 
@@ -164,7 +162,6 @@ export class AM_Character extends AM_Object {
 
     if (prefix === 'bone') {
       const boneName = key.name.split('.').slice(1, -1).join('.');
-      //  const k = key.value as AM_IVector4;
       const op = key.name.split('.').slice(-1).join('.');
 
       if (this.boneList[boneName]) {
@@ -269,7 +266,6 @@ export class AM_Character extends AM_Object {
 
   public update(): void {
     for (const x in this.boneList) {
-      // this.boneList[x].boneHelper.visible = this.visible;
       this.boneList[x].update();
     }
   }

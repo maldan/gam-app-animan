@@ -13,6 +13,21 @@
         <component :is="x.name" />
       </template>
     </desktop-ui-window>
+
+    <!-- Timeline -->
+    <desktop-ui-window
+      title="Timeline"
+      :initData="{ x: 2, y: 70, width: 50, height: 25 }"
+      @focus="$refs[`timeline`]?.[0]?.onFocus()"
+      @blur="$refs[`timeline`]?.[0]?.onBlur()"
+    >
+      <template v-slot:header style="display: flex; align-items: center">
+        <div>Timeline</div>
+      </template>
+      <template v-slot:body>
+        <timeline :ref="`timeline`" :selected-object="selectedObject" />
+      </template>
+    </desktop-ui-window>
   </div>
 </template>
 
@@ -25,6 +40,12 @@ import { AM_Character } from '@/core/am/AM_Character';
 
 export default defineComponent({
   components: {},
+  computed: {
+    selectedObject() {
+      if (this.r < 0) return undefined;
+      return AM_State.animationObjectList[0];
+    },
+  },
   async mounted() {
     AM_State.mode = 'animation';
     AM_State.init();
@@ -34,12 +55,24 @@ export default defineComponent({
     AM_State.animationInfo = info;
 
     await this.loadAnimation(info.name);
+
+    AM_State.on('addObject', (ch: unknown) => {
+      if (ch instanceof AM_Character) {
+        AM_State.animationObjectList.length = 0;
+        AM_State.addAnimationObject(ch);
+        AM_State.ui.refresh();
+        this.refresh();
+      }
+    });
   },
   beforeUnmount() {
     AM_Core.destroy();
     AM_State.destroy();
   },
   methods: {
+    refresh() {
+      this.r = Math.random();
+    },
     async loadAnimation(name: string) {
       const animation = await AM_API.animation.get(name);
       AM_State.objectList
@@ -59,6 +92,7 @@ export default defineComponent({
   },
   data: () => {
     return {
+      r: 0,
       windowList: [
         /*{
           title: 'Animation list',
@@ -75,11 +109,11 @@ export default defineComponent({
           name: 'project',
           position: { x: 80, y: 27, width: 18, height: 15 },
         },
-        {
+        /*{
           title: 'Timeline',
           name: 'timeline',
           position: { x: 2, y: 70, width: 50, height: 25 },
-        },
+        },*/
         /*{
           title: 'Shape',
           name: 'shape',

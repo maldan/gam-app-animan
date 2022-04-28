@@ -40,7 +40,9 @@ export default defineComponent({
     AM_State.ui.timeline.addRef(this);
     AM_State.ui.timeline.refresh();
   },
-  beforeUnmount() {},
+  beforeUnmount() {
+    AM_State.ui.timeline.removeRef(this);
+  },
   methods: {
     refresh() {
       this.r = Math.random();

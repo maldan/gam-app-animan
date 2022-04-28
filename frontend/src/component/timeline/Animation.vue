@@ -115,7 +115,6 @@ import { AM_Object } from '@/core/am/AM_Object';
 import { AM_Bone } from '@/core/am/AM_Bone';
 import { AM_Key } from '@/core/animation/key/AM_Key';
 import { AM_Character } from '@/core/am/AM_Character';
-import { AM_KeyQuaternion } from '@/core/animation/key/AM_KeyQuaternion';
 
 export default defineComponent({
   props: {
@@ -305,11 +304,15 @@ export default defineComponent({
 
       this.animation?.off('change');
       this.animation?.on('change', () => {
-        if (this.selectedObject instanceof AM_Bone)
+        /*if (this.selectedObject instanceof AM_Bone)
           this.selectedObject.parent.applyAnimation(this.animation);
         else this.selectedObject?.applyAnimation(this.animation);
 
+        AM_State.ui.shape.refresh();*/
+        (this.selectedObject as AM_Object).applyAnimation(this.animation);
+        (this.selectedObject as AM_Object).update();
         AM_State.ui.shape.refresh();
+        AM_State.ui.timeline.refresh();
       });
 
       if (this.animationController) {

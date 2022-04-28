@@ -9,6 +9,12 @@ import { AM_KeyQuaternion } from '@/core/animation/key/AM_KeyQuaternion';
 import { AM_Character } from '@/core/am/AM_Character';
 import { AM_Bone } from '@/core/am/AM_Bone';
 import { MathUtils } from 'three';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
+import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
+import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader';
+import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectionShader';
 
 export class AM_Core {
   public static scene: THREE.Scene;
@@ -24,33 +30,39 @@ export class AM_Core {
   private static _objectStartScale: THREE.Vector3 = new THREE.Vector3();
 
   private static _renderer: THREE.WebGLRenderer;
+  private static _scene: THREE.Scene;
+  private static _camera: THREE.PerspectiveCamera;
+  private static _composer: EffectComposer;
+  private static _outlinePass: OutlinePass;
 
   public static init(el: HTMLElement): void {
     // Camera
-    const camera = new THREE.PerspectiveCamera(
+    this._camera = new THREE.PerspectiveCamera(
       45,
       window.innerWidth / window.innerHeight,
       0.001,
       64,
     );
-    camera.position.z = 5;
+    this._camera.position.z = 5;
 
     // Scene
-    const scene = new THREE.Scene();
-    this.scene = scene;
+    this._scene = new THREE.Scene();
+    this.scene = this._scene;
 
     // Render
     let prevTime = 0;
     this._renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    this._renderer.shadowMap.enabled = true;
     this._renderer.setSize(window.innerWidth, window.innerHeight);
     this._renderer.setAnimationLoop((time: number) => {
       const deltaTime = (time - prevTime) / 1000;
       prevTime = time;
 
-      this._renderer.setClearColor(0x333333);
-      this._renderer.render(scene, camera);
+      //this._renderer.setClearColor(0x333333);
+      //this._renderer.render(scene, camera);
       controls.update();
       stats.update();
+      this._composer.render();
 
       // Play animation
       if (AM_State.isAnimationPlay) {
@@ -80,43 +92,25 @@ export class AM_Core {
         }
       }
 
-      // Ray cast with bones
-      /*AM_State.hoverBone = undefined;
-      raycaster.setFromCamera(pointer, camera);
-      if (AM_State.selectedObject instanceof AM_Character) {
-        const bones = Object.values(AM_State.selectedObject.boneList);
+      const width = window.innerWidth;
+      const height = window.innerHeight;
 
-        // Fill bones with white color
-        bones.forEach((x) => {
-          // @ts-ignore
-          x.boneHelper.material.color.set(0xffffff);
-        });
-        if (AM_State.selectedBone) {
-          // @ts-ignore
-          AM_State.selectedBone.boneHelper.material.color.set(0xff0000);
-        }
+      this._camera.aspect = width / height;
+      this._camera.updateProjectionMatrix();
 
-        // Check intersects with bones
-        const intersects = raycaster.intersectObjects(
-          bones.map((x) => x.boneHelper),
-          true,
-        );
-        if (intersects.length > 0) {
-          const object = intersects[0].object as THREE.Mesh;
-          if (object !== AM_State.selectedBone?.boneHelper) {
-            // @ts-ignore
-            object.material.color.set(0x00ff00);
-          }
+      this._renderer.setSize(width, height);
 
-          // Set hover bone
-          AM_State.hoverBone = bones.find((x) => x.boneHelper === object);
-        }
-      }*/
+      // Outline
+      if (AM_State.selectedObject instanceof AM_Bone)
+        this._outlinePass.selectedObjects = [AM_State.selectedObject.parent.model];
+      else if (AM_State.selectedObject instanceof AM_Object)
+        this._outlinePass.selectedObjects = [AM_State.selectedObject.model];
+      else this._outlinePass.selectedObjects.length = 0;
     });
-    this._renderer.outputEncoding = THREE.sRGBEncoding;
+    // this._renderer.outputEncoding = THREE.sRGBEncoding;
 
     // Scene control
-    const controls = new OrbitControls(camera, this._renderer.domElement);
+    const controls = new OrbitControls(this._camera, this._renderer.domElement);
     controls.mouseButtons = {
       // @ts-ignore
       LEFT: null,
@@ -128,7 +122,7 @@ export class AM_Core {
 
     // Grid
     const grid = 5;
-    scene.add(new THREE.GridHelper(grid, grid * 2, 0x666666, 0x222222));
+    this._scene.add(new THREE.GridHelper(grid, grid * 2, 0x666666, 0x222222));
 
     // Floor
     const geometry = new THREE.PlaneGeometry(grid, grid);
@@ -136,18 +130,18 @@ export class AM_Core {
     const plane = new THREE.Mesh(geometry, material);
     plane.position.set(0, -0.001, 0);
     plane.rotateX(MathUtils.degToRad(90));
-    scene.add(plane);
+    this._scene.add(plane);
 
     // Light
     const l = new THREE.DirectionalLight(0xffffff, 1);
     l.position.set(0, 5, 10);
-    scene.add(l);
+    this._scene.add(l);
     const l2 = new THREE.DirectionalLight(0xffffff, 1);
     l2.position.set(0, -5, -10);
-    scene.add(l2);
+    this._scene.add(l2);
 
     // Manipulator
-    this._manipulator = new TransformControls(camera, this._renderer.domElement);
+    this._manipulator = new TransformControls(this._camera, this._renderer.domElement);
     this._manipulator.size = 0.5;
     this._manipulator.setSpace('local');
     this._manipulator.addEventListener('mouseDown', () => {
@@ -183,7 +177,7 @@ export class AM_Core {
     this._manipulator.addEventListener('mouseUp', () => {
       this.handleTRS();
     });
-    scene.add(this._manipulator);
+    this._scene.add(this._manipulator);
 
     // Ray cast
     const raycaster = new THREE.Raycaster();
@@ -221,7 +215,7 @@ export class AM_Core {
         this._isManipulatorLocked = false;
       }*/
       if (e.button === 0) {
-        raycaster.setFromCamera(pointer, camera);
+        raycaster.setFromCamera(pointer, this._camera);
 
         // Check intersects with bones
         const intersects = raycaster.intersectObjects(
@@ -249,6 +243,34 @@ export class AM_Core {
         }*/
       }
     });
+
+    this.initRenderPass();
+  }
+
+  private static initRenderPass() {
+    // PP
+    this._composer = new EffectComposer(this._renderer);
+    this._composer.renderer.outputEncoding = THREE.sRGBEncoding;
+    this._composer.setSize(window.innerWidth, window.innerHeight);
+
+    const renderPass = new RenderPass(this._scene, this._camera);
+    this._composer.addPass(renderPass);
+
+    this._outlinePass = new OutlinePass(
+      new THREE.Vector2(window.innerWidth, window.innerHeight),
+      this._scene,
+      this._camera,
+    );
+    this._outlinePass.pulsePeriod = 0;
+    this._outlinePass.usePatternTexture = false;
+    this._outlinePass.edgeStrength = 3;
+    this._outlinePass.edgeThickness = 1;
+    this._outlinePass.visibleEdgeColor.set('#ffffff');
+    this._outlinePass.hiddenEdgeColor.set('#190a05');
+    this._composer.addPass(this._outlinePass);
+
+    const gammaCorrection = new ShaderPass(GammaCorrectionShader);
+    this._composer.addPass(gammaCorrection);
   }
 
   private static updateTRS(): void {
@@ -322,7 +344,7 @@ export class AM_Core {
 
         AM_State.selectedObject.rotationOffset.multiply(rotDiff);*/
         /*const rot = AM_State.selectedObject.rotationOffset;*/
-        console.log(AM_State.selectedObject.parent.workingAnimation);
+
         AM_State.selectedObject.parent.workingAnimation?.setCurrentKey(
           new AM_KeyQuaternion(
             `bone.${AM_State.selectedObject.name}.rotation`,
@@ -338,12 +360,26 @@ export class AM_Core {
 
         const posDiff = this._manipulatorStartPosition.sub(xx);
         AM_State.selectedObject.positionOffset.add(posDiff);*/
+
+        AM_State.selectedObject.parent.workingAnimation?.setCurrentKey(
+          new AM_KeyVector3(
+            `bone.${AM_State.selectedObject.name}.position`,
+            AM_State.selectedObject.positionOffset,
+          ),
+        );
       }
 
       // Scale
       if (this._manipulator.mode === 'scale') {
         // const scaleDiff = AM_State.selectedObject.model.scale.sub(this._manipulatorStartScale);
         // AM_State.selectedObject.scaleOffset.add(scaleDiff);
+
+        AM_State.selectedObject.parent.workingAnimation?.setCurrentKey(
+          new AM_KeyVector3(
+            `bone.${AM_State.selectedObject.name}.scale`,
+            AM_State.selectedObject.scaleOffset,
+          ),
+        );
       }
 
       AM_State.selectedObject?.parent.animationController.compile();
