@@ -124,11 +124,6 @@ export default defineComponent({
   },
   components: {},
   computed: {
-    /*selectedObject(): AM_Object | undefined {
-      if (this.r < 0) return undefined;
-      if (AM_State.selectedObject instanceof AM_Bone) return AM_State.selectedObject.parent;
-      return AM_State.selectedObject;
-    },*/
     selectedBone(): AM_Bone | undefined {
       if (this.r < 0) return undefined;
       if (AM_State.selectedObject instanceof AM_Bone) return AM_State.selectedObject as AM_Bone;

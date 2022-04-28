@@ -19,6 +19,10 @@ export class AM_Core {
   private static _manipulatorStartPosition: THREE.Vector3 = new THREE.Vector3();
   private static _manipulatorStartRotation: THREE.Quaternion = new THREE.Quaternion();
   private static _manipulatorStartScale: THREE.Vector3 = new THREE.Vector3();
+  private static _objectStartRotation: THREE.Quaternion = new THREE.Quaternion();
+  private static _objectStartPosition: THREE.Vector3 = new THREE.Vector3();
+  private static _objectStartScale: THREE.Vector3 = new THREE.Vector3();
+
   private static _renderer: THREE.WebGLRenderer;
 
   public static init(el: HTMLElement): void {
@@ -157,11 +161,18 @@ export class AM_Core {
         this._manipulatorStartPosition = xx;
         this._manipulatorStartRotation = AM_State.selectedObject.model.quaternion.clone();
         this._manipulatorStartScale = AM_State.selectedObject.model.scale.clone();
+
+        this._objectStartRotation = AM_State.selectedObject.rotationOffset.clone();
+        this._objectStartScale = AM_State.selectedObject.scaleOffset.clone();
+        this._objectStartPosition = AM_State.selectedObject.positionOffset.clone();
       } else {
         this._manipulatorStartPosition = this._manipulator.position.clone();
         this._manipulatorStartRotation = this._manipulator.quaternion.clone();
         this._manipulatorStartScale = this._manipulator.scale.clone();
       }
+    });
+    this._manipulator.addEventListener('change', () => {
+      this.updateTRS();
     });
     this._manipulator.addEventListener('mouseUp', () => {
       this.handleTRS();
@@ -234,9 +245,10 @@ export class AM_Core {
     });
   }
 
-  private static handleTRS(): void {
+  private static updateTRS(): void {
     if (!this._manipulator) return;
     if (!AM_State.selectedObject) return;
+    if (!this._isManipulatorLocked) return;
 
     // As bone
     if (AM_State.selectedObject instanceof AM_Bone) {
@@ -246,8 +258,47 @@ export class AM_Core {
           .clone()
           .invert()
           .multiply(AM_State.selectedObject.model.quaternion);
+        const setRot = this._objectStartRotation.clone().multiply(rotDiff);
 
-        AM_State.selectedObject.rotationOffset.multiply(rotDiff);
+        AM_State.selectedObject.rotationOffset.set(setRot.x, setRot.y, setRot.z, setRot.w);
+      }
+
+      // Translate
+      if (this._manipulator.mode === 'translate') {
+        const xx = new THREE.Vector3();
+        AM_State.selectedObject.model.worldToLocal(xx);
+
+        const posDiff = this._manipulatorStartPosition.clone().sub(xx);
+        const setPos = this._objectStartPosition.clone().add(posDiff);
+        AM_State.selectedObject.positionOffset.set(setPos.x, setPos.y, setPos.z);
+      }
+
+      // Scale
+      if (this._manipulator.mode === 'scale') {
+        const scaleDiff = AM_State.selectedObject.model.scale.sub(this._manipulatorStartScale);
+        const setScale = this._objectStartScale.clone().add(scaleDiff);
+        AM_State.selectedObject.scaleOffset.set(setScale.x, setScale.y, setScale.z);
+      }
+
+      AM_State.selectedObject.update();
+      AM_State.selectedObject.parent.update();
+    }
+  }
+
+  private static handleTRS(): void {
+    if (!this._manipulator) return;
+    if (!AM_State.selectedObject) return;
+
+    // As bone
+    if (AM_State.selectedObject instanceof AM_Bone) {
+      // Rotation
+      if (this._manipulator.mode === 'rotate') {
+        /*const rotDiff = this._manipulatorStartRotation
+          .clone()
+          .invert()
+          .multiply(AM_State.selectedObject.model.quaternion);
+
+        AM_State.selectedObject.rotationOffset.multiply(rotDiff);*/
         const rot = AM_State.selectedObject.rotationOffset;
 
         AM_State.selectedObject.parent.workingAnimation?.setCurrentKey(
@@ -257,17 +308,17 @@ export class AM_Core {
 
       // Translate
       if (this._manipulator.mode === 'translate') {
-        const xx = new THREE.Vector3();
+        /*const xx = new THREE.Vector3();
         AM_State.selectedObject.model.worldToLocal(xx);
 
         const posDiff = this._manipulatorStartPosition.sub(xx);
-        AM_State.selectedObject.positionOffset.add(posDiff);
+        AM_State.selectedObject.positionOffset.add(posDiff);*/
       }
 
       // Scale
       if (this._manipulator.mode === 'scale') {
-        const scaleDiff = AM_State.selectedObject.model.scale.sub(this._manipulatorStartScale);
-        AM_State.selectedObject.scaleOffset.add(scaleDiff);
+        // const scaleDiff = AM_State.selectedObject.model.scale.sub(this._manipulatorStartScale);
+        // AM_State.selectedObject.scaleOffset.add(scaleDiff);
       }
 
       AM_State.selectedObject?.parent.animationController.compile();
