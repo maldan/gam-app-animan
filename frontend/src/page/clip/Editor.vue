@@ -14,10 +14,26 @@
       </template>
     </desktop-ui-window>
 
-    <!-- Window list 2 -->
-    <desktop-ui-window v-for="x in s" :key="x.name" :title="x.title" :initData="x.position">
+    <!-- Timeline list -->
+    <desktop-ui-window
+      v-for="x in s"
+      :key="x.name"
+      :title="x.title"
+      :initData="x.position"
+      :id="x.id"
+      @focus="$refs[`timeline-${x.id}`]?.[0]?.onFocus()"
+      @blur="$refs[`timeline-${x.id}`]?.[0]?.onBlur()"
+    >
+      <template v-slot:header style="display: flex; align-items: center">
+        <div>{{ x.title }} {{ $refs[`timeline-${x.id}`]?.[0]?.isFocus ? '*' : '' }}</div>
+        <desktop-ui-button
+          @click="closeTimeline(x.selectedObject)"
+          text="X"
+          style="margin-left: auto; flex: none"
+        />
+      </template>
       <template v-slot:body>
-        <timeline :selected-object="x.selectedObject" />
+        <timeline :ref="`timeline-${x.id}`" :selected-object="x.selectedObject" />
       </template>
     </desktop-ui-window>
   </div>
@@ -28,6 +44,7 @@ import { defineComponent } from 'vue';
 import { AM_Core } from '@/core/AM_Core';
 import { AM_State } from '@/core/AM_State';
 import { AM_API } from '@/core/AM_API';
+import { AM_Object } from '@/core/am/AM_Object';
 
 export default defineComponent({
   components: {},
@@ -36,6 +53,7 @@ export default defineComponent({
       if (this.r < 0) return [];
       return AM_State.animationObjectList.map((x) => {
         return {
+          id: 'timeline-win-' + x.id,
           title: `Timeline ${x.name}`,
           name: 'timeline',
           selectedObject: x,
@@ -64,6 +82,9 @@ export default defineComponent({
   methods: {
     refresh() {
       this.r = Math.random();
+    },
+    closeTimeline(x: AM_Object) {
+      AM_State.removeAnimationObject(x);
     },
     async loadClip(name: string) {
       const clip = await AM_API.getClip(name);

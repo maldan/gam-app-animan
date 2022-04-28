@@ -101,7 +101,7 @@
       </div>
     </div>
     <div :class="$style.right">
-      <timeline-shape />
+      <timeline-shape :selected-object="selectedObject" />
     </div>
   </div>
 </template>
@@ -120,6 +120,7 @@ import { AM_KeyQuaternion } from '@/core/animation/key/AM_KeyQuaternion';
 export default defineComponent({
   props: {
     selectedObject: Object,
+    isFocus: Boolean,
   },
   components: {},
   computed: {
@@ -162,115 +163,7 @@ export default defineComponent({
     },
   },
   async mounted() {
-    this.kd = (e: KeyboardEvent) => {
-      if (!this.animation) return;
-
-      if (e.key === 'Shift') this.isShiftPressed = true;
-
-      // Moving
-      if (e.key === 'ArrowRight') {
-        this.animation.frameId += 1;
-
-        if (AM_State.mode === 'clip') {
-          const offset = this.animation.controller?.getAnimationOffset(this.animation) ?? 0;
-          AM_State.globalFrameId = offset + this.animation.frameId;
-        }
-
-        this.refresh();
-      }
-      if (e.key === 'ArrowLeft') {
-        this.animation.frameId -= 1;
-
-        if (AM_State.mode === 'clip') {
-          const offset = this.animation.controller?.getAnimationOffset(this.animation) ?? 0;
-          AM_State.globalFrameId = offset + this.animation.frameId;
-        }
-
-        this.refresh();
-      }
-
-      // Delete key
-      if (e.key === 'Delete') {
-        for (let i = 0; i < this.selectedKeys.length; i++) {
-          delete this.animation.frames[this.selectedKeys[i].frameId].keys[this.selectedKeys[i].key];
-          this.animation.interpolateKey(this.selectedKeys[i].key);
-        }
-        this.refresh();
-      }
-
-      // Copy
-      if (e.ctrlKey && e.key === 'c') {
-        this.bufferKeys.length = 0;
-        for (let i = 0; i < this.selectedKeys.length; i++) {
-          const frameId = this.selectedKeys[i].frameId;
-          const key = this.selectedKeys[i].key;
-          const keyValue = this.animation.frames[frameId].keys[key];
-          if (!keyValue) continue;
-          if (keyValue.isAuto) continue;
-
-          this.bufferKeys.push({
-            key,
-            frameId,
-            value: keyValue.clone(),
-          });
-        }
-      }
-
-      // Paste
-      if (e.ctrlKey && e.key === 'v') {
-        const toFrameId = this.selectedKeys[0].frameId;
-
-        for (let i = 0; i < this.bufferKeys.length; i++) {
-          const key = this.bufferKeys[i].key;
-
-          this.animation.frames[toFrameId].keys[key] = this.bufferKeys[i].value;
-          this.animation.interpolateKey(key);
-        }
-
-        this.refresh();
-      }
-
-      // Mirror
-      if (e.key === 'm' && this.selectedBone && this.selectedObject instanceof AM_Character) {
-        // Calculate name
-        let mirrorBoneName = '';
-        if (this.selectedBone.name.match(/\.L$/))
-          mirrorBoneName = this.selectedBone.name.replace(/(.*)\.L$/, '$1.R');
-        else if (this.selectedBone.name.match(/\.R$/))
-          mirrorBoneName = this.selectedBone.name.replace(/(.*)\.R$/, '$1.L');
-        if (!mirrorBoneName) return;
-
-        // Mirror bone
-        const mirrorBone = this.selectedObject.boneList[mirrorBoneName];
-        mirrorBone.mirrorFromBone(this.selectedObject.boneList[this.selectedBone.name]);
-
-        // Set key
-        this.animation.setCurrentKey(
-          new AM_KeyQuaternion(`bone.${mirrorBoneName}.rotation`, mirrorBone.rotationOffset),
-        );
-        this.animation.controller?.compile();
-
-        this.selectedObject.update();
-        this.refresh();
-      }
-    };
-
-    this.ku = (e: KeyboardEvent) => {
-      if (e.key === 'Shift') this.isShiftPressed = false;
-    };
-
-    this.wheel = (e: WheelEvent) => {
-      if (!this.isOver) return;
-
-      if (e.deltaY > 0) this.offsetY += 1;
-      else this.offsetY -= 1;
-      if (this.offsetY <= 0) this.offsetY = 0;
-      this.refresh();
-    };
-
-    document.addEventListener('keydown', this.kd);
-    document.addEventListener('keyup', this.ku);
-    document.addEventListener('wheel', this.wheel);
+    this.initEvents();
 
     try {
       this.keyVisibility = JSON.parse(
@@ -281,11 +174,137 @@ export default defineComponent({
     }
   },
   beforeUnmount() {
-    document.removeEventListener('keydown', this.kd);
-    document.removeEventListener('keyup', this.ku);
-    document.removeEventListener('wheel', this.wheel);
+    this.removeEvents();
+  },
+  watch: {
+    isFocus(v: boolean) {
+      if (v) this.initEvents();
+      this.removeEvents();
+    },
   },
   methods: {
+    initEvents() {
+      this.removeEvents();
+
+      this.kd = (e: KeyboardEvent) => {
+        if (!this.animation) return;
+
+        if (e.key === 'Shift') this.isShiftPressed = true;
+
+        // Moving
+        if (e.key === 'ArrowRight') {
+          this.animation.frameId += 1;
+
+          if (AM_State.mode === 'clip') {
+            const offset = this.animation.controller?.getAnimationOffset(this.animation) ?? 0;
+            AM_State.globalFrameId = offset + this.animation.frameId;
+          }
+
+          this.refresh();
+        }
+        if (e.key === 'ArrowLeft') {
+          this.animation.frameId -= 1;
+
+          if (AM_State.mode === 'clip') {
+            const offset = this.animation.controller?.getAnimationOffset(this.animation) ?? 0;
+            AM_State.globalFrameId = offset + this.animation.frameId;
+          }
+
+          this.refresh();
+        }
+
+        // Delete key
+        if (e.key === 'Delete') {
+          for (let i = 0; i < this.selectedKeys.length; i++) {
+            delete this.animation.frames[this.selectedKeys[i].frameId].keys[
+              this.selectedKeys[i].key
+            ];
+            this.animation.interpolateKey(this.selectedKeys[i].key);
+          }
+          this.animation.controller?.compile();
+          this.refresh();
+        }
+
+        // Copy
+        if (e.ctrlKey && e.key === 'c') {
+          this.bufferKeys.length = 0;
+          for (let i = 0; i < this.selectedKeys.length; i++) {
+            const frameId = this.selectedKeys[i].frameId;
+            const key = this.selectedKeys[i].key;
+            const keyValue = this.animation.frames[frameId].keys[key];
+            if (!keyValue) continue;
+            if (keyValue.isAuto) continue;
+
+            this.bufferKeys.push({
+              key,
+              frameId,
+              value: keyValue.clone(),
+            });
+          }
+        }
+
+        // Paste
+        if (e.ctrlKey && e.key === 'v') {
+          const toFrameId = this.selectedKeys[0].frameId;
+
+          for (let i = 0; i < this.bufferKeys.length; i++) {
+            const key = this.bufferKeys[i].key;
+
+            this.animation.frames[toFrameId].keys[key] = this.bufferKeys[i].value;
+            this.animation.interpolateKey(key);
+          }
+
+          this.animation.controller?.compile();
+          this.refresh();
+        }
+
+        // Mirror
+        if (e.key === 'm' && this.selectedBone && this.selectedObject instanceof AM_Character) {
+          // Calculate name
+          let mirrorBoneName = '';
+          if (this.selectedBone.name.match(/\.L$/))
+            mirrorBoneName = this.selectedBone.name.replace(/(.*)\.L$/, '$1.R');
+          else if (this.selectedBone.name.match(/\.R$/))
+            mirrorBoneName = this.selectedBone.name.replace(/(.*)\.R$/, '$1.L');
+          if (!mirrorBoneName) return;
+
+          // Mirror bone
+          const mirrorBone = this.selectedObject.boneList[mirrorBoneName];
+          mirrorBone.mirrorFromBone(this.selectedObject.boneList[this.selectedBone.name]);
+
+          // Set key
+          this.animation.setCurrentKey(
+            new AM_KeyQuaternion(`bone.${mirrorBoneName}.rotation`, mirrorBone.rotationOffset),
+          );
+          this.animation.controller?.compile();
+
+          this.selectedObject.update();
+          this.refresh();
+        }
+      };
+
+      this.ku = (e: KeyboardEvent) => {
+        if (e.key === 'Shift') this.isShiftPressed = false;
+      };
+
+      this.wheel = (e: WheelEvent) => {
+        if (!this.isOver) return;
+
+        if (e.deltaY > 0) this.offsetY += 1;
+        else this.offsetY -= 1;
+        if (this.offsetY <= 0) this.offsetY = 0;
+        this.refresh();
+      };
+
+      document.addEventListener('keydown', this.kd);
+      document.addEventListener('keyup', this.ku);
+      document.addEventListener('wheel', this.wheel);
+    },
+    removeEvents() {
+      document.removeEventListener('keydown', this.kd);
+      document.removeEventListener('keyup', this.ku);
+      document.removeEventListener('wheel', this.wheel);
+    },
     refresh() {
       this.r = Math.random();
 

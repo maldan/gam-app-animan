@@ -103,14 +103,10 @@ import { AM_API } from '@/core/AM_API';
 export default defineComponent({
   props: {
     selectedObject: Object,
+    isFocus: Boolean,
   },
   components: {},
   computed: {
-    /*selectedObject(): AM_Object | undefined {
-      if (this.r < 0) return undefined;
-      if (AM_State.selectedObject instanceof AM_Bone) return AM_State.selectedObject.parent;
-      return AM_State.selectedObject;
-    },*/
     animationController(): AM_AnimationController | undefined {
       if (this.r < 0) return undefined;
       return this.selectedObject?.animationController;
@@ -129,36 +125,50 @@ export default defineComponent({
     },
   },
   async mounted() {
-    this.kd = (e: KeyboardEvent) => {
-      if (!this.animationController) return;
-
-      // Offset animation controller
-      if (AM_State.mode === 'animation') {
-        if (e.key === 'ArrowRight') {
-          this.animationController.frameId += 1;
-          this.refresh();
-        }
-        if (e.key === 'ArrowLeft') {
-          this.animationController.frameId -= 1;
-          this.refresh();
-        }
-      } else {
-        if (e.key === 'ArrowRight') {
-          AM_State.globalFrameId += 1;
-          this.refresh();
-        }
-        if (e.key === 'ArrowLeft') {
-          AM_State.globalFrameId -= 1;
-          this.refresh();
-        }
-      }
-    };
-    document.addEventListener('keydown', this.kd);
+    this.initEvents();
   },
   beforeUnmount() {
-    document.removeEventListener('keydown', this.kd);
+    this.removeEvents();
+  },
+  watch: {
+    isFocus(v: boolean) {
+      if (v) this.initEvents();
+      else this.removeEvents();
+    },
   },
   methods: {
+    initEvents() {
+      this.removeEvents();
+
+      this.kd = (e: KeyboardEvent) => {
+        if (!this.animationController) return;
+
+        // Offset animation controller
+        if (AM_State.mode === 'animation') {
+          if (e.key === 'ArrowRight') {
+            this.animationController.frameId += 1;
+            this.refresh();
+          }
+          if (e.key === 'ArrowLeft') {
+            this.animationController.frameId -= 1;
+            this.refresh();
+          }
+        } else {
+          if (e.key === 'ArrowRight') {
+            AM_State.globalFrameId += 1;
+            this.refresh();
+          }
+          if (e.key === 'ArrowLeft') {
+            AM_State.globalFrameId -= 1;
+            this.refresh();
+          }
+        }
+      };
+      document.addEventListener('keydown', this.kd);
+    },
+    removeEvents() {
+      document.removeEventListener('keydown', this.kd);
+    },
     refresh() {
       this.r = Math.random();
 

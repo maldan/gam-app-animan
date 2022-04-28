@@ -29,12 +29,12 @@
 import { defineComponent } from 'vue';
 import { AM_State } from '@/core/AM_State';
 import { AM_Character } from '@/core/am/AM_Character';
-import { AM_KeyFloat } from '@/core/animation/key/AM_KeyFloat';
-import { AM_KeyVector2 } from '@/core/animation/key/AM_KeyVector2';
 import { AM_IVector2 } from '@/core/AM_Type';
 
 export default defineComponent({
-  props: {},
+  props: {
+    selectedObject: Object,
+  },
   components: {},
   computed: {
     character(): AM_Character | undefined {
@@ -42,7 +42,7 @@ export default defineComponent({
       if (AM_State.mode === 'pose') {
         return AM_State.objectList.find((x) => x instanceof AM_Character) as AM_Character;
       }
-      if (AM_State.selectedObject instanceof AM_Character) return AM_State.selectedObject;
+      if (this.selectedObject instanceof AM_Character) return this.selectedObject;
       return undefined;
     },
     shapeList() {
@@ -52,8 +52,8 @@ export default defineComponent({
         if (ch) return ch.shapeList;
         return [];
       }
-      //if (!AM_State.selectedAnimation) return [];
-      if (AM_State.selectedObject instanceof AM_Character) return AM_State.selectedObject.shapeList;
+
+      if (this.selectedObject instanceof AM_Character) return this.selectedObject.shapeList;
       return [];
     },
   },

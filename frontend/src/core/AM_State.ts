@@ -22,9 +22,15 @@ export class AM_UI {
     },
   };
   public timeline = {
-    ref: undefined as any,
+    refs: [] as unknown[],
+    addRef(x: unknown): void {
+      this.refs.push(x);
+    },
+    removeRef(x: unknown): void {
+      this.refs.splice(this.refs.indexOf(x), 1);
+    },
     refresh(): void {
-      this.ref?.refresh();
+      this.refs.forEach((x: any) => x.refresh());
     },
   };
   public rig = {
@@ -122,6 +128,13 @@ export class AM_State {
   public static addAnimationObject(obj: AM_Object): void {
     if (this.animationObjectList.indexOf(obj) !== -1) return;
     this.animationObjectList.push(obj);
+    this.ui.refresh();
+  }
+
+  public static removeAnimationObject(obj: AM_Object): void {
+    const index = this.animationObjectList.indexOf(obj);
+    if (index === -1) return;
+    this.animationObjectList.splice(index, 1);
     this.ui.refresh();
   }
 
