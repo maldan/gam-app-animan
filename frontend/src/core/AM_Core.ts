@@ -155,16 +155,17 @@ export class AM_Core {
       this._isManipulatorLocked = true;
 
       if (AM_State.selectedObject instanceof AM_Bone) {
-        const xx = new THREE.Vector3();
-        AM_State.selectedObject.model.worldToLocal(xx);
+        //const xx = new THREE.Vector3();
+        //AM_State.selectedObject.model.worldToLocal(xx);
+        //this._manipulatorStartPosition = xx;
 
-        this._manipulatorStartPosition = xx;
+        this._manipulatorStartPosition = AM_State.selectedObject.model.position.clone();
         this._manipulatorStartRotation = AM_State.selectedObject.model.quaternion.clone();
         this._manipulatorStartScale = AM_State.selectedObject.model.scale.clone();
 
+        this._objectStartPosition = AM_State.selectedObject.positionOffset.clone();
         this._objectStartRotation = AM_State.selectedObject.rotationOffset.clone();
         this._objectStartScale = AM_State.selectedObject.scaleOffset.clone();
-        this._objectStartPosition = AM_State.selectedObject.positionOffset.clone();
       } else {
         this._manipulatorStartPosition = this._manipulator.position.clone();
         this._manipulatorStartRotation = this._manipulator.quaternion.clone();
@@ -175,7 +176,7 @@ export class AM_Core {
       this.updateTRS();
     });
     this._manipulator.addEventListener('mouseUp', () => {
-      this.handleTRS();
+      // this.handleTRS();
     });
     scene.add(this._manipulator);
 
@@ -259,18 +260,29 @@ export class AM_Core {
           .invert()
           .multiply(AM_State.selectedObject.model.quaternion);
         const setRot = this._objectStartRotation.clone().multiply(rotDiff);
-
         AM_State.selectedObject.rotationOffset.set(setRot.x, setRot.y, setRot.z, setRot.w);
+        AM_State.selectedObject.parent.update();
       }
 
       // Translate
       if (this._manipulator.mode === 'translate') {
-        const xx = new THREE.Vector3();
+        /*const xx = new THREE.Vector3();
         AM_State.selectedObject.model.worldToLocal(xx);
+        console.log(xx);*/
 
-        const posDiff = this._manipulatorStartPosition.clone().sub(xx);
+        const posDiff = AM_State.selectedObject.model.position
+          .clone()
+          .sub(this._manipulatorStartPosition);
+        //console.log(posDiff);
+
         const setPos = this._objectStartPosition.clone().add(posDiff);
+        const gg = new THREE.Quaternion();
+        AM_State.selectedObject.bone.getWorldQuaternion(gg);
+
+        setPos.applyQuaternion(gg);
+
         AM_State.selectedObject.positionOffset.set(setPos.x, setPos.y, setPos.z);
+        AM_State.selectedObject.parent.update();
       }
 
       // Scale
@@ -280,8 +292,13 @@ export class AM_Core {
         AM_State.selectedObject.scaleOffset.set(setScale.x, setScale.y, setScale.z);
       }
 
+      //AM_State.selectedObject.update();
+      return;
+    }
+
+    // Rotation
+    if (this._manipulator.mode === 'rotate') {
       AM_State.selectedObject.update();
-      AM_State.selectedObject.parent.update();
     }
   }
 
@@ -322,7 +339,7 @@ export class AM_Core {
       }
 
       AM_State.selectedObject?.parent.animationController.compile();
-      AM_State.selectedObject?.parent.update();
+      // AM_State.selectedObject?.parent.update();
       AM_State.ui.timeline.refresh();
       return;
     }
@@ -407,6 +424,10 @@ export class AM_Core {
 
   public static setManipulatorTo(obj: AM_Object | undefined): void {
     if (!obj) this._manipulator.detach();
-    else this._manipulator.attach(obj.model);
+    else {
+      if (obj instanceof AM_Bone) {
+        this._manipulator.attach(obj.bone);
+      } else this._manipulator.attach(obj.model);
+    }
   }
 }

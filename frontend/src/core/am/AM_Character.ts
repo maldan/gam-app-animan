@@ -143,7 +143,9 @@ export class AM_Character extends AM_Object {
   }
 
   public showBones(): void {
-    if (!this.animationController.workingOnAnimationPart) return;
+    if (AM_State.mode !== 'pose') {
+      if (!this.animationController.workingOnAnimationPart) return;
+    }
     for (const x in this.boneList) this.boneList[x].visible = true;
   }
 

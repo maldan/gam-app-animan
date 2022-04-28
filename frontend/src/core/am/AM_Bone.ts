@@ -23,13 +23,21 @@ export class AM_Bone extends AM_Object {
     this.bone = bone;
     this.parent = parent;
     this.startRotation = bone.quaternion.clone();
-    this.startPosition = bone.position.clone();
-    // bone.worldToLocal(this.startPosition);
+    //this.startPosition = bone.position.clone();
+    // bone.localToWorld(this.startPosition);
     this.startScale = bone.scale.clone();
 
-    if (this.bone.name === 'Nose') {
+    //bone.localToWorld(this.startPosition);
+
+    if (this.bone.name === 'Belly') {
+      /*console.log(
+        bone.position.clone(),
+        bone.localToWorld(new THREE.Vector3()),
+        bone.worldToLocal(new THREE.Vector3()),
+      );*/
       //this.rotationOffset.setFromEuler(new THREE.Euler(0, 0, MathUtils.degToRad(-90)));
       // this.positionOffset.set(0, 0.2, 0);
+      // this.positionOffset.set(0, 0.1, 0);
     }
     /*if (this.bone.name === 'Head_1') {
       //this.rotationOffset.setFromEuler(new THREE.Euler(0, 0, MathUtils.degToRad(-90)));
@@ -38,32 +46,59 @@ export class AM_Bone extends AM_Object {
   }
 
   public update(): void {
+    const pp = new THREE.Vector3();
+    this.bone.localToWorld(pp);
+    this.position = {
+      x: pp.x,
+      y: pp.y,
+      z: pp.z,
+    };
+
+    const qq = new THREE.Quaternion();
+    this.bone.getWorldQuaternion(qq);
+    this.rotation = {
+      x: qq.x,
+      y: qq.y,
+      z: qq.z,
+      w: qq.w,
+    };
+
     // Set bone rotation
-    this.bone.setRotationFromQuaternion(this.startRotation.clone().multiply(this.rotationOffset));
+    /*this.bone.setRotationFromQuaternion(this.startRotation.clone().multiply(this.rotationOffset));
+    const gr = new THREE.Quaternion();
+    this.bone.getWorldQuaternion(gr);
+    this.rotation = { x: gr.x, y: gr.y, z: gr.z, w: gr.w };
 
     // Set bone position
     const offset = this.positionOffset.clone();
-    offset.applyQuaternion(this.bone.quaternion);
+    // offset.applyQuaternion(this.bone.quaternion);
+    const gg = new THREE.Quaternion();
+    this.bone.getWorldQuaternion(gg);
+    offset.applyQuaternion(gg);
+
     this.bone.position
       .set(this.startPosition.x, this.startPosition.y, this.startPosition.z)
       .add(offset);
-
-    // Set bone scale
-    this.bone.scale
-      .set(this.startScale.x, this.startScale.y, this.startScale.z)
-      .add(this.scaleOffset);
-
-    // Calculate helper position
     const gp = new THREE.Vector3();
     this.bone.getWorldPosition(gp);
-    const gr = new THREE.Quaternion();
-    this.bone.getWorldQuaternion(gr);
-    const gs = new THREE.Vector3();
-    this.bone.getWorldScale(gs);
+    this.position = { x: gp.x, y: gp.y, z: gp.z };*/
 
-    this.position = { x: gp.x, y: gp.y, z: gp.z };
-    this.rotation = { x: gr.x, y: gr.y, z: gr.z, w: gr.w };
-    this.scale = { x: gs.x, y: gs.y, z: gs.z };
+    /*// Set bone scale
+     this.bone.scale
+       .set(this.startScale.x, this.startScale.y, this.startScale.z)
+       .add(this.scaleOffset);
+
+     // Calculate helper position
+     const gp = new THREE.Vector3();
+     this.bone.getWorldPosition(gp);
+     const gr = new THREE.Quaternion();
+     this.bone.getWorldQuaternion(gr);
+     const gs = new THREE.Vector3();
+     this.bone.getWorldScale(gs);
+
+     this.position = { x: gp.x, y: gp.y, z: gp.z };
+
+     this.scale = { x: gs.x, y: gs.y, z: gs.z };*/
 
     if (this.bone.name === 'Head_1') {
       // console.log(this.startPosition, this.positionOffset, this.bone.position);
