@@ -42,6 +42,11 @@ export default defineComponent({
         for (let i = 0; i < this.pose.keys.length; i++) {
           ch.applyKey(AM_KeyHelper.fromJSON(this.pose.keys[i]));
         }
+
+        // Set default animation
+        ch.animationController.createAnimation(0);
+        ch.animationController.workingOnAnimationPart = ch.animationController.animationList[0];
+        ch.animationController.compile();
       }
     });
   },

@@ -16,7 +16,6 @@ import {
   AM_IVector4,
 } from '@/core/AM_Type';
 import { AM_Character } from '@/core/am/AM_Character';
-import { AM_Key } from '@/core/animation/key/AM_Key';
 import { AM_KeyVector2 } from '@/core/animation/key/AM_KeyVector2';
 
 export class AM_API {
@@ -53,7 +52,7 @@ export class AM_API {
       for (const x in character.boneList) {
         const bone = character.boneList[x];
 
-        if (bone.isRotationOffsetIsChanged) {
+        if (bone.isRotationChanged) {
           poseData.keys.push({
             name: `bone.${character.boneList[x].name}.rotation`,
             type: 4,
@@ -61,12 +60,19 @@ export class AM_API {
             vFloat: 0,
             vVector2: { x: 0, y: 0 },
             vVector3: { x: 0, y: 0, z: 0 },
-            vQuaternion: {
-              x: bone.rotationOffset.x,
-              y: bone.rotationOffset.y,
-              z: bone.rotationOffset.z,
-              w: bone.rotationOffset.w,
-            },
+            vQuaternion: bone.rotationOffset,
+          });
+        }
+
+        if (bone.isPositionChanged) {
+          poseData.keys.push({
+            name: `bone.${character.boneList[x].name}.position`,
+            type: 3,
+            vBool: false,
+            vFloat: 0,
+            vVector2: { x: 0, y: 0 },
+            vVector3: bone.positionOffset,
+            vQuaternion: { x: 0, y: 0, z: 0, w: 1 },
           });
         }
       }

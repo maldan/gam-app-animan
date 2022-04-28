@@ -268,9 +268,9 @@ export default defineComponent({
           mirrorBone.mirrorFromBone(this.selectedObject.boneList[this.selectedBone.name]);
 
           // Set key
-          this.animation.setCurrentKey(
+          /*this.animation.setCurrentKey(
             new AM_KeyQuaternion(`bone.${mirrorBoneName}.rotation`, mirrorBone.rotationOffset),
-          );
+          );*/
           this.animation.controller?.compile();
 
           this.selectedObject.update();

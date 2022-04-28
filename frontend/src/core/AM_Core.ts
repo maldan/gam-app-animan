@@ -163,9 +163,9 @@ export class AM_Core {
         this._manipulatorStartRotation = AM_State.selectedObject.model.quaternion.clone();
         this._manipulatorStartScale = AM_State.selectedObject.model.scale.clone();
 
-        this._objectStartPosition = AM_State.selectedObject.positionOffset.clone();
+        /*this._objectStartPosition = AM_State.selectedObject.positionOffset.clone();
         this._objectStartRotation = AM_State.selectedObject.rotationOffset.clone();
-        this._objectStartScale = AM_State.selectedObject.scaleOffset.clone();
+        this._objectStartScale = AM_State.selectedObject.scaleOffset.clone();*/
       } else {
         this._manipulatorStartPosition = this._manipulator.position.clone();
         this._manipulatorStartRotation = this._manipulator.quaternion.clone();
@@ -173,10 +173,15 @@ export class AM_Core {
       }
     });
     this._manipulator.addEventListener('change', () => {
-      this.updateTRS();
+      // this.updateTRS();
+      if (AM_State.selectedObject instanceof AM_Bone) {
+        AM_State.selectedObject.parent.update();
+      } else {
+        AM_State.selectedObject?.update();
+      }
     });
     this._manipulator.addEventListener('mouseUp', () => {
-      // this.handleTRS();
+      this.handleTRS();
     });
     scene.add(this._manipulator);
 
@@ -260,7 +265,7 @@ export class AM_Core {
           .invert()
           .multiply(AM_State.selectedObject.model.quaternion);
         const setRot = this._objectStartRotation.clone().multiply(rotDiff);
-        AM_State.selectedObject.rotationOffset.set(setRot.x, setRot.y, setRot.z, setRot.w);
+        //AM_State.selectedObject.rotationOffset.set(setRot.x, setRot.y, setRot.z, setRot.w);
         AM_State.selectedObject.parent.update();
       }
 
@@ -281,7 +286,7 @@ export class AM_Core {
 
         setPos.applyQuaternion(gg);
 
-        AM_State.selectedObject.positionOffset.set(setPos.x, setPos.y, setPos.z);
+        //AM_State.selectedObject.positionOffset.set(setPos.x, setPos.y, setPos.z);
         AM_State.selectedObject.parent.update();
       }
 
@@ -289,7 +294,7 @@ export class AM_Core {
       if (this._manipulator.mode === 'scale') {
         const scaleDiff = AM_State.selectedObject.model.scale.sub(this._manipulatorStartScale);
         const setScale = this._objectStartScale.clone().add(scaleDiff);
-        AM_State.selectedObject.scaleOffset.set(setScale.x, setScale.y, setScale.z);
+        //AM_State.selectedObject.scaleOffset.set(setScale.x, setScale.y, setScale.z);
       }
 
       //AM_State.selectedObject.update();
@@ -316,10 +321,13 @@ export class AM_Core {
           .multiply(AM_State.selectedObject.model.quaternion);
 
         AM_State.selectedObject.rotationOffset.multiply(rotDiff);*/
-        const rot = AM_State.selectedObject.rotationOffset;
-
+        /*const rot = AM_State.selectedObject.rotationOffset;*/
+        console.log(AM_State.selectedObject.parent.workingAnimation);
         AM_State.selectedObject.parent.workingAnimation?.setCurrentKey(
-          new AM_KeyQuaternion(`bone.${AM_State.selectedObject.name}.rotation`, rot),
+          new AM_KeyQuaternion(
+            `bone.${AM_State.selectedObject.name}.rotation`,
+            AM_State.selectedObject.rotationOffset,
+          ),
         );
       }
 

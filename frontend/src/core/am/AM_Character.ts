@@ -4,7 +4,7 @@ import { AM_Bone } from '@/core/am/AM_Bone';
 import { SkinnedMesh } from 'three';
 import { AM_State } from '@/core/AM_State';
 import { AM_Key } from '@/core/animation/key/AM_Key';
-import { AM_IVector2, AM_IVector4 } from '@/core/AM_Type';
+import { AM_IVector2, AM_IVector3, AM_IVector4 } from '@/core/AM_Type';
 
 export class AM_Character extends AM_Object {
   public exposedKeys = [
@@ -164,9 +164,13 @@ export class AM_Character extends AM_Object {
 
     if (prefix === 'bone') {
       const boneName = key.name.split('.').slice(1, -1).join('.');
-      const k = key.value as AM_IVector4;
+      //  const k = key.value as AM_IVector4;
+      const op = key.name.split('.').slice(-1).join('.');
+
       if (this.boneList[boneName]) {
-        this.boneList[boneName].rotationOffset = new THREE.Quaternion(k.x, k.y, k.z, k.w);
+        if (op === 'rotation') this.boneList[boneName].rotationOffset = key.value as AM_IVector4;
+        if (op === 'position') this.boneList[boneName].positionOffset = key.value as AM_IVector3;
+        if (op === 'scale') this.boneList[boneName].scaleOffset = key.value as AM_IVector3;
       }
     }
 
