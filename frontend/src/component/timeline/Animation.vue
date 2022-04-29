@@ -44,7 +44,6 @@
           <div
             @click="
               goToFrame(frameId - 1);
-              clearKeySelection();
               selectKey(key, frameId - 1);
             "
             @mouseover="
@@ -169,6 +168,7 @@ export default defineComponent({
         if (!this.animation) return;
 
         if (e.key === 'Shift') this.isShiftPressed = true;
+        if (e.key === 'Control') this.isCtrlPressed = true;
 
         // Moving
         if (e.key === 'ArrowRight') {
@@ -293,6 +293,7 @@ export default defineComponent({
 
       this.ku = (e: KeyboardEvent) => {
         if (e.key === 'Shift') this.isShiftPressed = false;
+        if (e.key === 'Control') this.isCtrlPressed = false;
       };
 
       this.wheel = (e: WheelEvent) => {
@@ -342,6 +343,7 @@ export default defineComponent({
       this.selectedKeys.length = 0;
     },
     selectKey(key: string, frameId: number): void {
+      if (!this.isCtrlPressed) this.clearKeySelection();
       this.selectedKeys.push({ key, frameId });
     },
     goToFrame(id: number) {
@@ -388,6 +390,7 @@ export default defineComponent({
       ku: undefined as any,
       wheel: undefined as any,
 
+      isCtrlPressed: false,
       isShiftPressed: false,
       frameWidth: 9,
 

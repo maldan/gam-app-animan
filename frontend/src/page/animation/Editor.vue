@@ -80,7 +80,7 @@ export default defineComponent({
         .forEach((x) => {
           (x as AM_Character).resetPose();
         });
-      AM_State.animationController.animationList = [{ offset: 0, animation }];
+      AM_State.animationController.animationList = [{ offset: 0, repeat: 1, animation }];
       AM_State.animationController.compile();
       AM_State.objectList
         .filter((x) => x instanceof AM_Character)

@@ -3,6 +3,7 @@ import { AM_Frame } from '@/core/animation/AM_Frame';
 
 export interface AM_IAnimationPart {
   offset: number;
+  repeat: number;
   animation: AM_Animation;
 }
 
@@ -17,13 +18,13 @@ export class AM_AnimationController {
   public createAnimation(offset = 0): void {
     const animation = new AM_Animation();
     animation.controller = this;
-    this.animationList.push({ offset, animation });
+    this.animationList.push({ offset, repeat: 1, animation });
     this.compile();
   }
 
   public appendAnimation(animation: AM_Animation, offset = 0): void {
     animation.controller = this;
-    this.animationList.push({ offset, animation });
+    this.animationList.push({ offset, repeat: 1, animation });
     this.compile();
   }
 
@@ -46,7 +47,8 @@ export class AM_AnimationController {
     for (let i = 0; i < this.animationList.length; i++) {
       this._animation.frameCount = Math.max(
         this._animation.frameCount,
-        this.animationList[i].offset + this.animationList[i].animation.frameCount,
+        this.animationList[i].offset +
+          this.animationList[i].animation.frameCount * this.animationList[i].repeat,
       );
     }
 
@@ -60,11 +62,12 @@ export class AM_AnimationController {
       const an = this.animationList[i];
 
       // Go over frames
-      for (let j = 0; j < an.animation.frames.length; j++) {
-        for (const key in an.animation.frames[j].keys) {
+      const anFrames = an.animation.frames.length;
+      for (let j = 0; j < anFrames * an.repeat; j++) {
+        for (const key in an.animation.frames[j % anFrames].keys) {
           // Clone key
           this._animation.frames[j + an.offset].keys[key] =
-            an.animation.frames[j].keys[key].clone();
+            an.animation.frames[j % anFrames].keys[key].clone();
         }
       }
     }

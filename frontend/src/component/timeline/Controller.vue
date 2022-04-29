@@ -56,7 +56,7 @@
           v-for="x in animationList"
           :style="{
             left: (x.offset - offsetX) * frameWidth + 'px',
-            width: frameWidth * x.animation.frameCount + 'px',
+            width: frameWidth * x.animation.frameCount * x.repeat + 'px',
           }"
           :key="x"
         >
@@ -76,6 +76,14 @@
         <desktop-ui-number
           @change="refresh"
           v-model="selectedAnimationPart.animation.frameCount"
+          style="margin-bottom: 5px"
+        />
+        <desktop-ui-number
+          @change="
+            refresh();
+            compileAnimation();
+          "
+          v-model="selectedAnimationPart.repeat"
           style="margin-bottom: 5px"
         />
         <desktop-ui-input
