@@ -60,6 +60,11 @@ export class AM_Core {
 
       //this._renderer.setClearColor(0x333333);
       //this._renderer.render(scene, camera);
+      /*const before = AM_State.selectedObject;
+      AM_Core.setManipulatorTo(undefined);
+
+      AM_Core.setManipulatorTo(before);*/
+
       controls.update();
       stats.update();
       this._composer.render();
@@ -264,9 +269,10 @@ export class AM_Core {
     this._outlinePass.pulsePeriod = 0;
     this._outlinePass.usePatternTexture = false;
     this._outlinePass.edgeStrength = 3;
-    this._outlinePass.edgeThickness = 1;
-    this._outlinePass.visibleEdgeColor.set('#ffffff');
-    this._outlinePass.hiddenEdgeColor.set('#190a05');
+    this._outlinePass.edgeThickness = 0.1;
+    this._outlinePass.edgeGlow = 0;
+    this._outlinePass.visibleEdgeColor.set('#ff8801');
+    //this._outlinePass.hiddenEdgeColor.set('#fe0000');
     this._composer.addPass(this._outlinePass);
 
     const gammaCorrection = new ShaderPass(GammaCorrectionShader);

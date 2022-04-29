@@ -12,39 +12,11 @@
 
         <div class="button_group_round_compact">
           <desktop-ui-button
-            @click="toggleKeyVisibility('position')"
-            text="P"
-            :isSelected="keyVisibility['position']"
-          />
-          <desktop-ui-button
-            @click="toggleKeyVisibility('rotation')"
-            text="R"
-            :isSelected="keyVisibility['rotation']"
-          />
-          <desktop-ui-button
-            @click="toggleKeyVisibility('scale')"
-            text="S"
-            :isSelected="keyVisibility['scale']"
-          />
-          <desktop-ui-button
-            @click="toggleKeyVisibility('boneFingers')"
-            text="Finger"
-            :isSelected="keyVisibility['boneFingers']"
-          />
-          <desktop-ui-button
-            @click="toggleKeyVisibility('boneToes')"
-            text="Toe"
-            :isSelected="keyVisibility['boneToes']"
-          />
-          <desktop-ui-button
-            @click="toggleKeyVisibility('left')"
-            text="L"
-            :isSelected="keyVisibility['left']"
-          />
-          <desktop-ui-button
-            @click="toggleKeyVisibility('right')"
-            text="R"
-            :isSelected="keyVisibility['right']"
+            v-for="x in keyList"
+            @click="toggleKeyVisibility(x.name)"
+            :text="x.short"
+            :isSelected="keyVisibility[x.name]"
+            :key="x.name"
           />
         </div>
       </div>
@@ -115,6 +87,7 @@ import { AM_Object } from '@/core/am/AM_Object';
 import { AM_Bone } from '@/core/am/AM_Bone';
 import { AM_Key } from '@/core/animation/key/AM_Key';
 import { AM_Character } from '@/core/am/AM_Character';
+import { AM_KeyQuaternion } from '@/core/animation/key/AM_KeyQuaternion';
 
 export default defineComponent({
   props: {
@@ -138,8 +111,20 @@ export default defineComponent({
         if (!this.keyVisibility['position'] && x.match('.position')) return false;
         if (!this.keyVisibility['rotation'] && x.match('.rotation')) return false;
         if (!this.keyVisibility['scale'] && x.match('.scale')) return false;
+
         if (!this.keyVisibility['boneFingers'] && x.match('bone.Finger_')) return false;
         if (!this.keyVisibility['boneToes'] && x.match('bone.Toe_')) return false;
+        if (!this.keyVisibility['boneDick'] && x.match(/bone\.(Dick_|Ball)/)) return false;
+        if (!this.keyVisibility['boneBreast'] && x.match('bone.Breast')) return false;
+        if (!this.keyVisibility['boneArm'] && x.match(/bone\.(Arm|Forearm|Hand|Scapula|Shoulder)/))
+          return false;
+        if (!this.keyVisibility['boneLeg'] && x.match(/bone\.(Thigh|Shin|Knee|Foot|Heel|Butt)/))
+          return false;
+        if (!this.keyVisibility['boneBody'] && x.match(/bone\.(Root|Belly|Chest|Neck|Head)/))
+          return false;
+
+        if (!this.keyVisibility['shape'] && x.match('shape.')) return false;
+
         if (!this.keyVisibility['left'] && x.match('.L.')) return false;
         if (!this.keyVisibility['right'] && x.match('.R.')) return false;
         return true;
@@ -267,12 +252,41 @@ export default defineComponent({
           mirrorBone.mirrorFromBone(this.selectedObject.boneList[this.selectedBone.name]);
 
           // Set key
-          /*this.animation.setCurrentKey(
+          this.animation.setCurrentKey(
             new AM_KeyQuaternion(`bone.${mirrorBoneName}.rotation`, mirrorBone.rotationOffset),
-          );*/
+          );
           this.animation.controller?.compile();
 
           this.selectedObject.update();
+          this.refresh();
+        }
+
+        // Paste
+        if (e.key === 'p' && this.selectedObject instanceof AM_Character) {
+          for (let i = 0; i < this.selectedKeys.length; i++) {
+            const currentKey = this.selectedKeys[i];
+            const totalLength = this.animation.frameCount - currentKey.frameId;
+
+            for (let j = totalLength; j > 0; j--) {
+              // Last frame
+              /*if (currentKey.frameId + j + 1 >= this.animation?.frameCount - 2) {
+                delete this.animation.frames[currentKey.frameId + j + 1].keys[currentKey.key];
+                continue;
+              }*/
+
+              try {
+                this.animation.frames[currentKey.frameId + j + 1].keys[currentKey.key] =
+                  this.animation.frames[currentKey.frameId + j].keys[currentKey.key];
+              } catch {
+                //
+              }
+            }
+            this.animation.interpolateKey(currentKey.key);
+            // console.log(this.selectedKeys[i]);
+            // this.animation.frames
+          }
+
+          this.animation.controller?.compile();
           this.refresh();
         }
       };
@@ -378,19 +392,45 @@ export default defineComponent({
       frameWidth: 9,
 
       maxVisibleFrames: 48,
-      maxVisibleKeys: 12,
+      maxVisibleKeys: 16,
 
       dragKeyName: '',
       dragFrameId: 0,
       hoverKeyName: '',
       hoverFrameId: 0,
 
+      keyList: [
+        { name: 'position', short: 'P' },
+        { name: 'rotation', short: 'R' },
+        { name: 'scale', short: 'S' },
+
+        { name: 'boneFingers', short: 'FN' },
+        { name: 'boneToes', short: 'TE' },
+        { name: 'boneDick', short: 'DK' },
+        { name: 'boneBreast', short: 'BB' },
+        { name: 'boneArm', short: 'AM' },
+        { name: 'boneLeg', short: 'LG' },
+        { name: 'boneBody', short: 'BD' },
+
+        { name: 'left', short: 'L' },
+        { name: 'right', short: 'R' },
+        { name: 'shape', short: 'SH' },
+      ],
+
       keyVisibility: {
         position: true,
         rotation: true,
         scale: true,
+
         boneFingers: true,
         boneToes: true,
+        boneDick: true,
+        boneBreast: true,
+        boneArm: true,
+        boneLeg: true,
+        boneBody: true,
+
+        shape: true,
         left: true,
         right: true,
       } as Record<string, boolean>,
@@ -452,11 +492,11 @@ export default defineComponent({
     .line {
       display: flex;
       margin-bottom: 1px;
-      min-height: 16px;
+      min-height: 14px;
 
       .name {
         width: 164px;
-        font-size: 14px;
+        font-size: 12px;
         color: $text-gray;
         background: lighten($gray-dark, 5%);
         border-right: 4px solid #4c4c4c;

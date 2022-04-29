@@ -1,5 +1,5 @@
 <template>
-  <ui-header :items="menu" style="position: relative; z-index: 2" />
+  <ui-header :items="menu" style="position: relative; z-index: 2" :by-match="true" />
   <router-view />
   <ui-modal-view />
 </template>

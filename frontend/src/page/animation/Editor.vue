@@ -17,7 +17,7 @@
     <!-- Timeline -->
     <desktop-ui-window
       title="Timeline"
-      :initData="{ x: 2, y: 70, width: 50, height: 25 }"
+      :initData="{ x: 2, y: 70, width: 50, height: 28 }"
       @focus="$refs[`timeline`]?.[0]?.onFocus()"
       @blur="$refs[`timeline`]?.[0]?.onBlur()"
     >

@@ -179,7 +179,7 @@ export class AM_Character extends AM_Object {
     if (prefix === 'eye') {
       const op = key.name.split('.')[2];
       if (op === 'position') this.setEyePosition(name, key.value as AM_IVector2);
-      if (op === 'scale') this.setEyeScale(name, key.value as AM_IVector2);
+      if (op === 'scale') this.setEyeScale(name, key.value as number);
     }
   }
 
@@ -197,36 +197,50 @@ export class AM_Character extends AM_Object {
   }
 
   public setEyePosition(side: string, position: AM_IVector2): void {
+    // @ts-ignore
+    const map = this._eyeL.material.map as THREE.Texture;
+
     if (side === 'L' && this._eyeL) {
       // @ts-ignore
-      this._eyeL.material.map.center.set(0.5, 0.5);
+      //this._eyeL.material.map.center.set(0.5, 0.5);
       // @ts-ignore
-      this._eyeL.material.map.offset.set(-position.x, position.y);
+      //this._eyeL.material.map.offset.set(-position.x, position.y);
     }
     if (side === 'R' && this._eyeR) {
       // @ts-ignore
-      this._eyeR.material.map.center.set(0.5, 0.5);
+      //this._eyeR.material.map.center.set(0.5, 0.5);
       // @ts-ignore
-      this._eyeR.material.map.offset.set(position.x, position.y);
+      //this._eyeR.material.map.offset.set(position.x, position.y);
     }
   }
 
-  public setEyeScale(side: string, scale: AM_IVector2): void {
+  public setEyeScale(side: string, scale: number): void {
+    // @ts-ignore
+    const mapL = this._eyeL.material.map as THREE.Texture;
+    // @ts-ignore
+    const mapR = this._eyeR.material.map as THREE.Texture;
+
     if (side === 'L' && this._eyeL) {
       // @ts-ignore
-      this._eyeL.material.map.center.set(0.5, 0.5);
+      /*this._eyeL.material.map.center.set(
+        // @ts-ignore
+        0.5 - -this._eyeL.material.map.offset.x,
+        // @ts-ignore
+        this._eyeL.material.map.offset.y + 0.5,
+      );*/
       // @ts-ignore
-      this._eyeL.material.map.repeat.set(1 + scale.x, 1 + scale.y);
+      //this._eyeL.material.map.repeat.set(1 + scale, 1 + scale);
+      mapL.repeat.set(1 + scale, 1 + scale);
     }
     if (side === 'R' && this._eyeL) {
       // @ts-ignore
-      this._eyeR.material.map.center.set(0.5, 0.5);
+      //this._eyeR.material.map.center.set(0.5, 0.5);
       // @ts-ignore
-      this._eyeR.material.map.repeat.set(1 + scale.x, 1 + scale.y);
+      //this._eyeR.material.map.repeat.set(1 + scale, 1 + scale);
     }
   }
 
-  public getEyeData(side: string): { offset: AM_IVector2; scale: AM_IVector2 } {
+  public getEyeData(side: string): { offset: AM_IVector2; scale: number } {
     if (side === 'L' && this._eyeL)
       return {
         offset: {
@@ -235,12 +249,8 @@ export class AM_Character extends AM_Object {
           // @ts-ignore
           y: this._eyeL.material.map.offset.y,
         },
-        scale: {
-          // @ts-ignore
-          x: this._eyeL.material.map.repeat.x - 1,
-          // @ts-ignore
-          y: this._eyeL.material.map.repeat.y - 1,
-        },
+        // @ts-ignore
+        scale: this._eyeL.material.map.repeat.x - 1,
       };
     if (side === 'R' && this._eyeR)
       return {
@@ -250,14 +260,10 @@ export class AM_Character extends AM_Object {
           // @ts-ignore
           y: this._eyeR.material.map.offset.y,
         },
-        scale: {
-          // @ts-ignore
-          x: this._eyeR.material.map.repeat.x - 1,
-          // @ts-ignore
-          y: this._eyeR.material.map.repeat.y - 1,
-        },
+        // @ts-ignore
+        scale: this._eyeR.material.map.repeat.x - 1,
       };
-    return { offset: { x: 0, y: 0 }, scale: { x: 0, y: 0 } };
+    return { offset: { x: 0, y: 0 }, scale: 0 };
   }
 
   public get shapeList(): { name: string; value: number }[] {

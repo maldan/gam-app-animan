@@ -143,23 +143,17 @@ export class AM_Bone extends AM_Object {
   }
 
   public mirrorFromBone(fromBone: AM_Bone): void {
-    /*const r = new THREE.Quaternion(
-      fromBone.rotationOffset.x,
-      fromBone.rotationOffset.y,
-      fromBone.rotationOffset.z,
-      fromBone.rotationOffset.w,
-    );
+    const off = fromBone.rotationOffset;
+    const r = new THREE.Quaternion(off.x, off.y, off.z, off.w);
     const e = new THREE.Euler().setFromQuaternion(r);
     e.y *= -1;
     e.z *= -1;
     const nr = new THREE.Quaternion().setFromEuler(e);
 
-    this.rotationOffset.x = nr.x;
-    this.rotationOffset.y = nr.y;
-    this.rotationOffset.z = nr.z;
-    this.rotationOffset.w = nr.w;
+    this.rotationOffset = { x: nr.x, y: nr.y, z: nr.z, w: nr.w };
 
-    this.update();*/
+    this.update();
+    this.parent.update();
   }
 
   public get positionOffset(): AM_IVector3 {

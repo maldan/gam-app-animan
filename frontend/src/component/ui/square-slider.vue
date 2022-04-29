@@ -5,8 +5,8 @@
       @mousedown="startDrag"
       :class="$style.box"
       :style="{
-        left: (modelValue.x + 0.5) * 64 + 'px',
-        top: (modelValue.y + 0.5) * 64 + 'px',
+        left: (remap(modelValue.x, minX, maxX, -0.5, 0.5) + 0.5) * 64 + 'px',
+        top: (remap(modelValue.y, minY, maxY, -0.5, 0.5) + 0.5) * 64 + 'px',
       }"
     ></div>
   </div>
@@ -21,13 +21,21 @@ export default defineComponent({
       type: Object,
       required: true,
     },
-    min: {
+    minX: {
       type: Number,
-      default: 0,
+      default: -0.5,
     },
-    max: {
+    maxX: {
       type: Number,
-      default: 1,
+      default: 0.5,
+    },
+    minY: {
+      type: Number,
+      default: -0.5,
+    },
+    maxY: {
+      type: Number,
+      default: 0.5,
     },
   },
   components: {},
@@ -44,6 +52,14 @@ export default defineComponent({
           y: this.startModelValue.y + delta.y / 64,
         };
 
+        if (newValue.x < -0.5) newValue.x = -0.5;
+        if (newValue.y < -0.5) newValue.y = -0.5;
+        if (newValue.x > 0.5) newValue.x = 0.5;
+        if (newValue.y > 0.5) newValue.y = 0.5;
+
+        newValue.x = this.remap(newValue.x, -0.5, 0.5, this.minX, this.maxX);
+        newValue.y = this.remap(newValue.y, -0.5, 0.5, this.minY, this.maxY);
+
         this.$emit('update:modelValue', {
           x: newValue.x,
           y: newValue.y,
@@ -52,6 +68,7 @@ export default defineComponent({
           x: newValue.x,
           y: newValue.y,
         });
+
         /*let bp = this.startBoxPosition.x + (delta / this.boxWidth) * 100;
         if (bp <= 0) bp = 0;
         if (bp >= 100) bp = 100;*/
@@ -73,9 +90,9 @@ export default defineComponent({
   methods: {
     startDrag(e: MouseEvent) {
       this.startDragPosition.x = e.pageX;
-      this.startModelValue.x = this.modelValue.x;
+      this.startModelValue.x = this.remap(this.modelValue.x, this.minX, this.maxX, -0.5, 0.5);
       this.startDragPosition.y = e.pageY;
-      this.startModelValue.y = this.modelValue.y;
+      this.startModelValue.y = this.remap(this.modelValue.y, this.minY, this.maxY, -0.5, 0.5);
 
       this.isDrag = true;
     },
@@ -111,12 +128,14 @@ export default defineComponent({
   height: 64px;
   background: $gray-dark;
   position: relative;
+  overflow: hidden;
 
   .box {
     position: absolute;
     width: 16px;
     height: 16px;
     background: $gray-light;
+    transform: translateX(-8px) translateY(-8px);
   }
 }
 </style>

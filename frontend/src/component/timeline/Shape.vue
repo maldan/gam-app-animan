@@ -8,8 +8,10 @@
       </div>
     </div>
 
-    <div>
-      <desktop-ui-slider v-model="eyeL.offset.x" @change="setEyeOffset('L')" :min="-4" :max="4" />
+    <desktop-ui-slider v-model="eyeL.scale" @change="setEyeScale('L')" :min="0" :max="8" />
+
+    <div style="display: flex">
+      <!--<desktop-ui-slider v-model="eyeL.offset.x" @change="setEyeOffset('L')" :min="-4" :max="4" />
       <desktop-ui-slider v-model="eyeL.offset.y" @change="setEyeOffset('L')" :min="-4" :max="4" />
       <desktop-ui-slider v-model="eyeL.scale.x" @change="setEyeScale('L')" :min="0" :max="8" />
       <desktop-ui-slider v-model="eyeL.scale.y" @change="setEyeScale('L')" :min="0" :max="8" />
@@ -17,10 +19,26 @@
       <desktop-ui-slider v-model="eyeR.offset.x" @change="setEyeOffset('R')" :min="-4" :max="4" />
       <desktop-ui-slider v-model="eyeR.offset.y" @change="setEyeOffset('R')" :min="-4" :max="4" />
       <desktop-ui-slider v-model="eyeR.scale.x" @change="setEyeScale('R')" :min="0" :max="8" />
-      <desktop-ui-slider v-model="eyeR.scale.y" @change="setEyeScale('R')" :min="0" :max="8" />
+      <desktop-ui-slider v-model="eyeR.scale.y" @change="setEyeScale('R')" :min="0" :max="8" />-->
 
-      <ui-square-slider v-model="eyeL.offset" @change="setEyeOffset('L')" :min="-4" :max="4" />
-      <ui-square-slider v-model="eyeR.offset" @change="setEyeOffset('R')" :min="-4" :max="4" />
+      <ui-square-slider
+        v-model="eyeR.offset"
+        @change="setEyeOffset('R')"
+        :minX="-4"
+        :maxX="4"
+        :minY="4"
+        :maxY="-4"
+        style="margin-right: 10px"
+      />
+      <ui-square-slider
+        v-model="eyeL.offset"
+        @change="setEyeOffset('L')"
+        :minX="-(eyeL.scale + 0.5)"
+        :maxX="eyeL.scale + 0.5"
+        :minY="eyeL.scale + 0.5"
+        :maxY="-(eyeL.scale + 0.5)"
+        style="margin-right: 10px"
+      />
     </div>
   </div>
 </template>
@@ -81,8 +99,7 @@ export default defineComponent({
           const d = this.character.getEyeData('L');
           this.eyeL.offset.x = d.offset.x;
           this.eyeL.offset.y = d.offset.y;
-          this.eyeL.scale.x = d.scale.x;
-          this.eyeL.scale.y = d.scale.y;
+          this.eyeL.scale = d.scale;
         }
       });
     },
@@ -127,20 +144,14 @@ export default defineComponent({
           x: 0,
           y: 0,
         } as AM_IVector2,
-        scale: {
-          x: 0,
-          y: 0,
-        } as AM_IVector2,
+        scale: 0,
       },
       eyeR: {
         offset: {
           x: 0,
           y: 0,
         } as AM_IVector2,
-        scale: {
-          x: 0,
-          y: 0,
-        } as AM_IVector2,
+        scale: 0,
       },
     };
   },
