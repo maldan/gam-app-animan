@@ -74,6 +74,9 @@ export default defineComponent({
     const info = await AM_API.getClipInfo(this.$route.params.resourceId as string);
     AM_State.clipInfo = info;
     await this.loadClip(info.name);
+
+    // @ts-ignore
+    this.$root.projectName = info.name;
   },
   beforeUnmount() {
     AM_Core.destroy();

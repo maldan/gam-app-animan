@@ -1,10 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="331bac90-ead6-4d56-a2f8-56a23d8695cb" name="Changes" comment="">
+    <list default="true" id="331bac90-ead6-4d56-a2f8-56a23d8695cb" name="Changes" comment="Fix&#10;-- None">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/App.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/desktop/ui.button.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/desktop/ui.button.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/desktop/ui.input.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/desktop/ui.input.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/desktop/ui.number.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/desktop/ui.number.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/desktop/ui.slider.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/desktop/ui.slider.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/desktop/ui.window.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/desktop/ui.window.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/modal/approve.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/modal/approve.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/modal/prompt.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/modal/prompt.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.button.group.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.button.group.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.button.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.button.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.header.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.header.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.icon.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.icon.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.number.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.number.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.window.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.window.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/event.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/event.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/fix_icons.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/fix_icons.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/ui.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/ui.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/page/clip/Editor.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/page/clip/Editor.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -12,8 +27,21 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/frontend/src/gam_sdk_ui" value="experimental" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="ROOT_SYNC" value="DONT_SYNC" />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
   </component>
   <component name="GoLibraries">
     <option name="indexEntireGoPath" value="false" />
