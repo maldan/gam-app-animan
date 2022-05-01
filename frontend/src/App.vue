@@ -1,5 +1,7 @@
 <template>
-  <ui-header :items="menu" style="position: relative; z-index: 2" :by-match="true" />
+  <ui-header :items="menu" style="position: relative; z-index: 2" :by-match="true">
+    <template v-slot:content>{{ projectName }}</template>
+  </ui-header>
   <router-view />
   <ui-modal-view />
 </template>
@@ -23,6 +25,7 @@ export default defineComponent({
         { name: 'Pose', url: '/pose' },
         { name: 'Audio', url: '/audio' },
       ],
+      projectName: '',
     };
   },
 });
