@@ -1,8 +1,8 @@
 <template>
   <div :class="$style.characterList">
-    <ui-button
-      @click="loadCharacter(ch)"
-      v-for="ch in $store.state.scene.characterList"
+    <desktop-ui-button
+      @click="addToScene(ch)"
+      v-for="ch in list"
       :key="ch.name"
       :text="ch.name"
       :class="$style.button"
@@ -14,22 +14,38 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { MainScene } from '@/core/MainScene';
-import { IVirtualObject } from '@/Types';
+import { AM_API } from '@/core/AM_API';
+import { AM_State } from '@/core/AM_State';
+import { AM_Core } from '@/core/AM_Core';
+import { AM_Character } from '@/core/am/AM_Character';
+import { AM_IObjectInfo } from '@/core/AM_Type';
 
 export default defineComponent({
   props: {},
   components: {},
   async mounted() {
-    await this.$store.dispatch('scene/getCharacterList');
+    this.list = await AM_API.getCharacterList();
   },
   methods: {
-    loadCharacter(character: IVirtualObject) {
-      MainScene.loadCharacter(character.modelPath);
+    async addToScene(obj: AM_IObjectInfo) {
+      const chList = AM_State.objectList.filter((x) => x instanceof AM_Character);
+      chList.forEach((x) => {
+        AM_State.removeObject(x);
+      });
+
+      const ch = await AM_State.loadObject(obj.filePath, 'character');
+      ch.animationController = AM_State.animationController;
+      AM_State.addObject(ch);
+      AM_State.selectObject(ch);
+      AM_Core.setManipulatorTo(ch);
+      ch.applyAnimation(ch.animationController.animation);
+      ch.update();
     },
   },
   data: () => {
-    return {};
+    return {
+      list: [] as AM_IObjectInfo[],
+    };
   },
 });
 </script>
@@ -40,8 +56,7 @@ export default defineComponent({
   flex-direction: column;
 
   .button {
-    padding: 5px;
-    border-radius: 0;
+    margin-bottom: 5px;
   }
 }
 </style>

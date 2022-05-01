@@ -1,79 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="AutoImportSettings">
-    <option name="autoReloadType" value="SELECTIVE" />
-  </component>
-  <component name="ChangeListManager">
-    <list default="true" id="9668e35c-ea9a-4132-b9b6-9d497ed6cd52" name="Changes" comment="" />
-    <option name="SHOW_DIALOG" value="false" />
-    <option name="HIGHLIGHT_CONFLICTS" value="true" />
-    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
-    <option name="LAST_RESOLUTION" value="IGNORE" />
-  </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="TypeScript File" />
-      </list>
-    </option>
-  </component>
-  <component name="GOROOT" url="file://C:/Program Files/Go" />
-  <component name="Git.Settings">
-    <option name="RECENT_BRANCH_BY_REPOSITORY">
-      <map>
-        <entry key="$PROJECT_DIR$" value="experimental" />
-      </map>
-    </option>
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-    <option name="ROOT_SYNC" value="DONT_SYNC" />
-  </component>
-  <component name="GoLibraries">
-    <option name="indexEntireGoPath" value="false" />
-  </component>
-  <component name="MarkdownSettingsMigration">
-    <option name="stateVersion" value="1" />
-  </component>
-  <component name="ProjectId" id="26ViMq8nncGVEttAVmmEUwNJSuP" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
-  <component name="ProjectViewState">
-    <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showLibraryContents" value="true" />
-  </component>
   <component name="PropertiesComponent">
-    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="add_unversioned_files" value="$PROJECT_DIR$/s3.json&#10;D:/gam_app/animan/db/object/character/Coco/info.json&#10;D:/gam_app/animan/db/object/character/CocoFuta/info.json&#10;D:/gam_app/animan/db/audio/sex/female/ah/2/info.json&#10;D:/gam_app/animan/db/audio/sex/female/ah/3/info.json&#10;D:/gam_app/animan/db/object/character/coco/info.json&#10;D:/gam_app/animan/todo.txt&#10;D:/gam_app/animan/db/object/character/pony/model.gltf" />
-    <property name="go.format.on.save.advertiser.fired" value="true" />
-    <property name="go.formatter.settings.were.checked" value="true" />
-    <property name="go.import.settings.migrated" value="true" />
-    <property name="go.sdk.automatically.set" value="true" />
-    <property name="go.watchers.conflict.with.on.save.actions.check.performed" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/frontend/src/component/ui" />
-    <property name="node.js.detected.package.eslint" value="true" />
-    <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="nodejs_interpreter_path" value="C:/Program Files/nodejs/node" />
-    <property name="nodejs_package_manager_path" value="pnpm" />
-    <property name="prettierjs.PrettierConfiguration.Package" value="D:\gam_app\animan\frontend\node_modules\prettier" />
-    <property name="settings.editor.selected.configurable" value="settings.javascript.prettier" />
-    <property name="ts.external.directory.path" value="C:\Program Files\JetBrains\IntelliJ IDEA 2021.3\plugins\JavaScriptLanguage\jsLanguageServicesImpl\external" />
-    <property name="vue.rearranger.settings.migration" value="true" />
-  </component>
-  <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="D:\gam_app\animan\frontend\src\component\ui" />
-      <recent name="D:\gam_app\animan\frontend\src\core\animation\key" />
-      <recent name="D:\gam_app\animan\frontend\src\page\pose" />
-      <recent name="D:\gam_app\animan\frontend\src\component\modal\create" />
-      <recent name="D:\gam_app\animan\frontend\src\page\animation" />
-    </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\gam_app\animan\backup" />
-      <recent name="D:\gam_app\animan\frontend\src\component\timeline" />
-      <recent name="D:\gam_app\animan\internal\app\animan\api" />
-      <recent name="D:\gam_app\animan\frontend\src\page\animation" />
-      <recent name="D:\gam_app\animan\frontend\src\page\clip" />
-    </key>
   </component>
   <component name="RunManager">
     <configuration default="true" type="Applet" factoryName="Applet">
@@ -146,49 +74,5 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Dev" type="ShConfigurationType">
-      <option name="SCRIPT_TEXT" value="pnpm dev" />
-      <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
-      <option name="SCRIPT_PATH" value="" />
-      <option name="SCRIPT_OPTIONS" value="" />
-      <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="false" />
-      <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$/frontend" />
-      <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
-      <option name="INTERPRETER_PATH" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="EXECUTE_IN_TERMINAL" value="true" />
-      <option name="EXECUTE_SCRIPT_FILE" value="false" />
-      <envs />
-      <method v="2" />
-    </configuration>
-  </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
-  <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="3" />
-  </component>
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State />
-          </value>
-        </entry>
-      </map>
-    </option>
-  </component>
-  <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fix&#10;-- Save and load animation" />
-    <MESSAGE value="Fix&#10;-- Copy &amp; paste keys&#10;-- Move keys&#10;-- Animation timeline scroll x&#10;-- Change frame count" />
-    <MESSAGE value="Fix&#10;-- Save and load poses" />
-    <MESSAGE value="Fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix" />
-  </component>
-  <component name="VgoProject">
-    <integration-enabled>true</integration-enabled>
-  </component>
-  <component name="XSLT-Support.FileAssociations.UIState">
-    <expand />
-    <select />
   </component>
 </project>

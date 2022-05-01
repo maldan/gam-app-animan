@@ -1,23 +1,64 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
-import Main from '../page/Main.vue';
-import Repo from '../page/Repo.vue';
-import Preview from '../page/Preview.vue';
+import AnimationEditor from '../page/animation/Editor.vue';
+import AnimationList from '../page/animation/List.vue';
+import ClipEditor from '../page/clip/Editor.vue';
+import ClipList from '../page/clip/List.vue';
+import ObjectList from '../page/object/List.vue';
+import ObjectPreview from '../page/object/Preview.vue';
+import PoseEditor from '../page/pose/Editor.vue';
+import PoseList from '../page/pose/List.vue';
+
+import Audio from '../page/Audio.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/',
-    name: 'Main',
-    component: Main,
+    path: '/animation',
+    name: 'Animation List',
+    component: AnimationList,
   },
   {
-    path: '/repo',
-    name: 'Repo',
-    component: Repo,
+    path: '/animation/:resourceId',
+    name: 'Animation Editor',
+    component: AnimationEditor,
+  },
+
+  {
+    path: '/pose',
+    name: 'Pose List',
+    component: PoseList,
   },
   {
-    path: '/preview/:category/:name',
-    name: 'Preview',
-    component: Preview,
+    path: '/pose/:resourceId',
+    name: 'Pose Editor',
+    component: PoseEditor,
+  },
+
+  {
+    path: '/clip',
+    name: 'Clip List',
+    component: ClipList,
+  },
+  {
+    path: '/clip/:resourceId',
+    name: 'Clip Editor',
+    component: ClipEditor,
+  },
+
+  {
+    path: '/object',
+    name: 'Object List',
+    component: ObjectList,
+  },
+  {
+    path: '/object/:resourceId',
+    name: 'Object Preview',
+    component: ObjectPreview,
+  },
+
+  {
+    path: '/audio',
+    name: 'Audio',
+    component: Audio,
   },
 ];
 

@@ -2,20 +2,48 @@
   <div :class="$style.scene">
     <div
       class="clickable"
-      :class="[$style.object, isSelected(x.uuid) ? $style.selected : null]"
+      :class="[$style.object, isSelected(x) ? $style.selected : null]"
       v-for="x in objectList"
-      :key="x.uuid + '_' + r"
-      @click="selectObject(x.uuid)"
+      :key="x.name"
+      @click="selectObject(x)"
     >
       {{ x.type }} {{ x.name }}
-      <ui-icon @click.stop="removeObject(x.uuid)" :class="$style.remove" name="trash" />
+      <ui-icon
+        @click.stop="addAnimationObject(x)"
+        :class="$style.pencil"
+        name="pencil"
+        :width="18"
+        :height="18"
+        :color="isSelected(x) ? '#a6ff68' : undefined"
+      />
+      <ui-icon
+        @click.stop="toggleVisibility(x)"
+        :class="$style.visibility"
+        :name="isVisible(x) ? 'eye' : 'close'"
+        :width="18"
+        :height="18"
+        :color="isSelected(x) ? '#a6ff68' : undefined"
+      />
+      <ui-icon
+        @click.stop="removeObject(x)"
+        :class="$style.remove"
+        name="trash"
+        :width="18"
+        :height="18"
+        :color="isSelected(x) ? '#a6ff68' : undefined"
+      />
     </div>
+    <desktop-ui-button @click="pickObject" text="Add" />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { MainScene } from '@/core/MainScene';
+import { AM_State } from '@/core/AM_State';
+import { AM_Object } from '@/core/am/AM_Object';
+import { AM_API } from '@/core/AM_API';
+import { AM_Character } from '@/core/am/AM_Character';
+import { AM_Bone } from '@/core/am/AM_Bone';
 
 export default defineComponent({
   props: {},
@@ -23,35 +51,68 @@ export default defineComponent({
   computed: {
     objectList() {
       if (this.r === 0) return [];
-      if (!MainScene.scene) return [];
-      return MainScene.scene.children
-        .filter((x) => x.name !== 'BoneHelper')
-        .map((x) => {
-          return {
-            uuid: x.uuid,
-            name: x.name,
-            type: x.type,
-          };
-        });
+      return AM_State.objectList.filter((x) => !(x instanceof AM_Bone));
     },
   },
   async mounted() {
-    MainScene.ui.scene.ref = this;
+    AM_State.ui.scene.ref = this;
+    AM_State.ui.scene.refresh();
   },
   methods: {
     refresh() {
       this.r = Math.random();
     },
-    isSelected(uuid: string): boolean {
-      return MainScene.selectedObject?.uuid === uuid;
+    isCharacter(obj: AM_Object): boolean {
+      return obj instanceof AM_Character;
     },
-    removeObject(uuid: string) {
-      MainScene.removeObject(MainScene.scene.children.find((x) => x.uuid === uuid));
+    isSelected(obj: AM_Object): boolean {
+      if (this.r < 0) return false;
+      if (AM_State.selectedObject instanceof AM_Bone) {
+        return AM_State.selectedObject.parent === obj;
+      }
+      return AM_State.selectedObject === obj;
+    },
+    isVisible(obj: AM_Object): boolean {
+      if (this.r < 0) return false;
+      return obj.visible;
+    },
+    removeObject(obj: AM_Object) {
+      AM_State.removeObject(obj);
+    },
+    selectObject(obj: AM_Object) {
+      AM_State.selectObject(obj);
+    },
+    toggleVisibility(obj: AM_Object) {
+      obj.visible = !obj.visible;
+      obj.update();
       this.refresh();
     },
-    selectObject(uuid: string) {
-      MainScene.selectObject(MainScene.scene.children.find((x) => x.uuid === uuid));
-      this.refresh();
+    addAnimationObject(obj: AM_Object) {
+      AM_State.addAnimationObject(obj);
+    },
+    pickObject(): void {
+      const store = this.$store;
+
+      this.$store.dispatch('modal/show', {
+        name: 'pick/object',
+        data: {
+          resourceId: '',
+        },
+        onSuccess: async () => {
+          const resourceId = store.state.modal.data.resourceId;
+          const name = store.state.modal.data.name;
+          const info = await AM_API.object.getInfo(resourceId);
+          const obj = await AM_State.loadObject(
+            info.filePath,
+            info.category === 'character' ? 'character' : '',
+          );
+          obj.resourceId = resourceId;
+          obj.name = name;
+
+          AM_State.addObject(obj);
+          AM_State.ui.refresh();
+        },
+      });
     },
   },
   data: () => {
@@ -72,13 +133,22 @@ export default defineComponent({
   .object {
     background: #1b1b1b;
     color: #999999;
-    padding: 5px;
-    margin-bottom: 1px;
+    padding: 3px 5px;
+    margin-bottom: 2px;
     display: flex;
     align-items: center;
+    border-radius: 2px;
+
+    .pencil {
+      margin-left: auto;
+    }
+
+    .visibility {
+      margin-left: 5px;
+    }
 
     .remove {
-      margin-left: auto;
+      margin-left: 5px;
     }
 
     &.selected {
