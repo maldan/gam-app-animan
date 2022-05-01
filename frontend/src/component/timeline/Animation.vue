@@ -123,6 +123,7 @@ export default defineComponent({
           return false;
 
         if (!this.keyVisibility['shape'] && x.match('shape.')) return false;
+        if (!this.keyVisibility['eye'] && x.match('eye.')) return false;
 
         if (!this.keyVisibility['left'] && x.match('.L.')) return false;
         if (!this.keyVisibility['right'] && x.match('.R.')) return false;
@@ -418,6 +419,7 @@ export default defineComponent({
         { name: 'left', short: 'L' },
         { name: 'right', short: 'R' },
         { name: 'shape', short: 'SH' },
+        { name: 'eye', short: 'EE' },
       ],
 
       keyVisibility: {
@@ -433,9 +435,10 @@ export default defineComponent({
         boneLeg: true,
         boneBody: true,
 
-        shape: true,
         left: true,
         right: true,
+        shape: true,
+        eye: true,
       } as Record<string, boolean>,
 
       selectedKeys: [] as { key: string; frameId: number }[],

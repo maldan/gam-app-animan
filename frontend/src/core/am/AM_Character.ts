@@ -5,6 +5,7 @@ import { SkinnedMesh } from 'three';
 import { AM_State } from '@/core/AM_State';
 import { AM_Key } from '@/core/animation/key/AM_Key';
 import { AM_IVector2, AM_IVector3, AM_IVector4 } from '@/core/AM_Type';
+import { AM_Shader } from '@/core/AM_Shader';
 
 export class AM_Character extends AM_Object {
   public exposedKeys = [
@@ -27,6 +28,7 @@ export class AM_Character extends AM_Object {
     super(o);
 
     this.prepareEyes(o);
+
     this.prepareSkeleton(o);
     this.prepareShapes(o);
   }
@@ -35,11 +37,15 @@ export class AM_Character extends AM_Object {
     skeleton.traverse((object) => {
       if (object.name === 'EyeL' && object instanceof THREE.Mesh) {
         this._eyeL = object;
-        object.material.map = object.material.map.clone();
+        object.material = AM_Shader.eyeShader();
+        object.material.uniforms.eyeColor.value = new THREE.Vector3(1, 0, 0);
+        object.material.uniforms.eyePosition.value = new THREE.Vector3(0.2, 0, 0);
       }
       if (object.name === 'EyeR' && object instanceof THREE.Mesh) {
         this._eyeR = object;
-        object.material.map = object.material.map.clone();
+        object.material = AM_Shader.eyeShader();
+        object.material.uniforms.eyeColor.value = new THREE.Vector3(1, 0, 0);
+        object.material.uniforms.eyePosition.value = new THREE.Vector3(0.2, 0, 0);
       }
     });
   }
@@ -197,72 +203,62 @@ export class AM_Character extends AM_Object {
   }
 
   public setEyePosition(side: string, position: AM_IVector2): void {
-    // @ts-ignore
-    const map = this._eyeL.material.map as THREE.Texture;
-
     if (side === 'L' && this._eyeL) {
       // @ts-ignore
-      //this._eyeL.material.map.center.set(0.5, 0.5);
+      this._eyeL.material.uniforms.eyePosition.value.x = position.x;
       // @ts-ignore
-      //this._eyeL.material.map.offset.set(-position.x, position.y);
+      this._eyeL.material.uniforms.eyePosition.value.y = position.y;
     }
     if (side === 'R' && this._eyeR) {
       // @ts-ignore
-      //this._eyeR.material.map.center.set(0.5, 0.5);
+      this._eyeR.material.uniforms.eyePosition.value.x = position.x;
       // @ts-ignore
-      //this._eyeR.material.map.offset.set(position.x, position.y);
+      this._eyeR.material.uniforms.eyePosition.value.y = position.y;
     }
   }
 
   public setEyeScale(side: string, scale: number): void {
-    // @ts-ignore
-    const mapL = this._eyeL.material.map as THREE.Texture;
-    // @ts-ignore
-    const mapR = this._eyeR.material.map as THREE.Texture;
-
     if (side === 'L' && this._eyeL) {
       // @ts-ignore
-      /*this._eyeL.material.map.center.set(
-        // @ts-ignore
-        0.5 - -this._eyeL.material.map.offset.x,
-        // @ts-ignore
-        this._eyeL.material.map.offset.y + 0.5,
-      );*/
-      // @ts-ignore
-      //this._eyeL.material.map.repeat.set(1 + scale, 1 + scale);
-      mapL.repeat.set(1 + scale, 1 + scale);
+      this._eyeL.material.uniforms.eyePosition.value.z = scale;
     }
     if (side === 'R' && this._eyeL) {
       // @ts-ignore
-      //this._eyeR.material.map.center.set(0.5, 0.5);
-      // @ts-ignore
-      //this._eyeR.material.map.repeat.set(1 + scale, 1 + scale);
+      this._eyeR.material.uniforms.eyePosition.value.z = scale;
     }
   }
 
   public getEyeData(side: string): { offset: AM_IVector2; scale: number } {
-    if (side === 'L' && this._eyeL)
+    if (side === 'L' && this._eyeL) {
+      // @ts-ignore
+      const eyeUniform = this._eyeL.material.uniforms as { eyePosition: { value: THREE.Vector3 } };
+
       return {
         offset: {
           // @ts-ignore
-          x: -this._eyeL.material.map.offset.x,
+          x: eyeUniform.eyePosition.value.x,
           // @ts-ignore
-          y: this._eyeL.material.map.offset.y,
+          y: eyeUniform.eyePosition.value.y,
         },
         // @ts-ignore
-        scale: this._eyeL.material.map.repeat.x - 1,
+        scale: eyeUniform.eyePosition.value.z,
       };
-    if (side === 'R' && this._eyeR)
+    }
+    if (side === 'R' && this._eyeR) {
+      // @ts-ignore
+      const eyeUniform = this._eyeR.material.uniforms as { eyePosition: { value: THREE.Vector3 } };
+
       return {
         offset: {
           // @ts-ignore
-          x: this._eyeR.material.map.offset.x,
+          x: eyeUniform.eyePosition.value.x,
           // @ts-ignore
-          y: this._eyeR.material.map.offset.y,
+          y: eyeUniform.eyePosition.value.y,
         },
         // @ts-ignore
-        scale: this._eyeR.material.map.repeat.x - 1,
+        scale: eyeUniform.eyePosition.value.z,
       };
+    }
     return { offset: { x: 0, y: 0 }, scale: 0 };
   }
 

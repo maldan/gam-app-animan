@@ -8,7 +8,8 @@
       </div>
     </div>
 
-    <desktop-ui-slider v-model="eyeL.scale" @change="setEyeScale('L')" :min="0" :max="8" />
+    <desktop-ui-slider v-model="eyeL.scale" @change="setEyeScale('L')" :min="0" :max="0.5" />
+    <desktop-ui-slider v-model="eyeR.scale" @change="setEyeScale('R')" :min="0" :max="0.5" />
 
     <div style="display: flex">
       <!--<desktop-ui-slider v-model="eyeL.offset.x" @change="setEyeOffset('L')" :min="-4" :max="4" />
@@ -24,19 +25,19 @@
       <ui-square-slider
         v-model="eyeR.offset"
         @change="setEyeOffset('R')"
-        :minX="-4"
-        :maxX="4"
-        :minY="4"
-        :maxY="-4"
+        :minX="0.5"
+        :maxX="-0.5"
+        :minY="-0.5"
+        :maxY="0.5"
         style="margin-right: 10px"
       />
       <ui-square-slider
         v-model="eyeL.offset"
         @change="setEyeOffset('L')"
-        :minX="-(eyeL.scale + 0.5)"
-        :maxX="eyeL.scale + 0.5"
-        :minY="eyeL.scale + 0.5"
-        :maxY="-(eyeL.scale + 0.5)"
+        :minX="-0.5"
+        :maxX="0.5"
+        :minY="-0.5"
+        :maxY="0.5"
         style="margin-right: 10px"
       />
     </div>
@@ -50,6 +51,8 @@ import { AM_Character } from '@/core/am/AM_Character';
 import { AM_IVector2 } from '@/core/AM_Type';
 import { AM_AnimationController } from '@/core/animation/AM_AnimationController';
 import { AM_KeyFloat } from '@/core/animation/key/AM_KeyFloat';
+import { AM_KeyVector2 } from '@/core/animation/key/AM_KeyVector2';
+import { AM_Object } from '@/core/am/AM_Object';
 
 export default defineComponent({
   props: {
@@ -112,26 +115,28 @@ export default defineComponent({
       }
 
       this.character.setShapeKey(name, value);
-      this.animationController?.workingOnAnimationPart?.animation.setCurrentKey(
+      (this.selectedObject as AM_Object)?.workingAnimation?.setCurrentKey(
         new AM_KeyFloat(`shape.${name}`, value),
       );
-
+      this.animationController?.compile();
       AM_State.ui.refresh();
     },
     setEyeOffset(side: string) {
       const eye = side === 'L' ? this.eyeL : this.eyeR;
       this.character?.setEyePosition(side, eye.offset);
-      /*AM_State.selectedAnimation?.setCurrentKey(
+      (this.selectedObject as AM_Object)?.workingAnimation?.setCurrentKey(
         new AM_KeyVector2(`eye.${side}.position`, { ...eye.offset }),
-      );*/
+      );
+      this.animationController?.compile();
       AM_State.ui.refresh();
     },
     setEyeScale(side: string) {
       const eye = side === 'L' ? this.eyeL : this.eyeR;
       this.character?.setEyeScale(side, eye.scale);
-      /*AM_State.selectedAnimation?.setCurrentKey(
-        new AM_KeyVector2(`eye.${side}.scale`, { ...eye.scale }),
-      );*/
+      (this.selectedObject as AM_Object)?.workingAnimation?.setCurrentKey(
+        new AM_KeyFloat(`eye.${side}.scale`, eye.scale),
+      );
+      this.animationController?.compile();
       AM_State.ui.refresh();
     },
   },
