@@ -39,13 +39,14 @@ export class AM_Character extends AM_Object {
         this._eyeL = object;
         object.material = AM_Shader.eyeShader();
         object.material.uniforms.eyeColor.value = new THREE.Vector3(1, 0, 0);
-        object.material.uniforms.eyePosition.value = new THREE.Vector3(0.2, 0, 0);
+        object.material.uniforms.eyePosition.value = new THREE.Vector3(0, 0, 0);
+        object.material.skinning = true;
       }
       if (object.name === 'EyeR' && object instanceof THREE.Mesh) {
         this._eyeR = object;
         object.material = AM_Shader.eyeShader();
         object.material.uniforms.eyeColor.value = new THREE.Vector3(1, 0, 0);
-        object.material.uniforms.eyePosition.value = new THREE.Vector3(0.2, 0, 0);
+        object.material.uniforms.eyePosition.value = new THREE.Vector3(0, 0, 0);
       }
     });
   }

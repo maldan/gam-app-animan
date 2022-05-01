@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="331bac90-ead6-4d56-a2f8-56a23d8695cb" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/frontend/src/page/pose/List.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/page/pose/List.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/core/AM_Shader.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/core/AM_Shader.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/core/am/AM_Character.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/core/am/AM_Character.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -122,7 +124,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Merge branch 'experimental' of https://github.com/maldan/gam-app-animan into dev&#10;&#10;# Conflicts:&#10;#&#9;.idea/inspectionProfiles/Project_Default.xml&#10;#&#9;.idea/misc.xml&#10;#&#9;.idea/vcs.xml" />
-    <option name="LAST_COMMIT_MESSAGE" value="Merge branch 'experimental' of https://github.com/maldan/gam-app-animan into dev&#10;&#10;# Conflicts:&#10;#&#9;.idea/inspectionProfiles/Project_Default.xml&#10;#&#9;.idea/misc.xml&#10;#&#9;.idea/vcs.xml" />
+    <MESSAGE value="Fix&#10;-- None" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix&#10;-- None" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
