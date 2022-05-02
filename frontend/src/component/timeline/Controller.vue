@@ -7,7 +7,7 @@
         <div class="button_group_round_compact">
           <desktop-ui-button @click="createAnimation" text="New" icon="file" />
           <desktop-ui-button @click="pickAnimation" text="Append" icon="plus" />
-          <desktop-ui-button @click="compileAnimation" text="Compile" />
+          <desktop-ui-button @click="pickAudio" text="Add audio" icon="plus" />
         </div>
       </div>
 
@@ -63,6 +63,27 @@
           {{ x.animation.name }}
         </div>
       </div>
+
+      <!-- Audio list -->
+      <div
+        :class="$style.lines"
+        :style="{
+          width: Math.min(animationController.frameCount, maxVisibleFrames) * frameWidth + 'px',
+        }"
+      >
+        <div
+          class="clickable"
+          :class="[$style.audioPart]"
+          v-for="x in audioList"
+          :style="{
+            left: (x.offset - offsetX) * frameWidth + 'px',
+            width: frameWidth * x.audio.widthInFrames * x.repeat + 'px',
+          }"
+          :key="x"
+        >
+          {{ x.audio.name }}
+        </div>
+      </div>
     </div>
 
     <!-- Right menu -->
@@ -104,7 +125,11 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { AM_State } from '@/core/AM_State';
-import { AM_AnimationController, AM_IAnimationPart } from '@/core/animation/AM_AnimationController';
+import {
+  AM_AnimationController,
+  AM_IAnimationPart,
+  AM_IAudioPart,
+} from '@/core/animation/AM_AnimationController';
 import { AM_Object } from '@/core/am/AM_Object';
 import { AM_API } from '@/core/AM_API';
 
@@ -122,6 +147,10 @@ export default defineComponent({
     animationList(): AM_IAnimationPart[] {
       if (this.r < 0) return [];
       return this.animationController?.animationList || [];
+    },
+    audioList(): AM_IAudioPart[] {
+      if (this.r < 0) return [];
+      return this.animationController?.audioList || [];
     },
     selectedAnimationPart(): AM_IAnimationPart | undefined {
       if (this.r < 0) return undefined;
@@ -223,6 +252,17 @@ export default defineComponent({
         },
       });
     },
+    pickAudio(): void {
+      this.$store.dispatch('modal/show', {
+        name: 'pick/audio',
+        data: {},
+        onSuccess: async () => {
+          const audioInfo = await AM_API.audio.getInfo(this.$store.state.modal.data.resourceId);
+          this.animationController?.appendAudio(audioInfo);
+          AM_State.ui.refresh();
+        },
+      });
+    },
     deleteAnimationPart(x: AM_IAnimationPart) {
       this.animationController?.deleteAnimationPart(x);
       this.selectAnimationPart(undefined);
@@ -297,7 +337,8 @@ export default defineComponent({
       background: #1b1b1b;
       overflow: hidden;
 
-      .animationPart {
+      .animationPart,
+      .audioPart {
         height: 24px;
         background: #9a6927;
         position: relative;
@@ -312,6 +353,11 @@ export default defineComponent({
         &.selected {
           border: 1px solid #eca824;
         }
+      }
+
+      .audioPart {
+        background: #3a9a27;
+        overflow: hidden;
       }
     }
   }

@@ -18,6 +18,7 @@ import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectio
 
 export class AM_Core {
   public static scene: THREE.Scene;
+  public static audioListener: THREE.AudioListener;
 
   private static _manipulator: TransformControls;
   private static _isManipulatorLocked = false;
@@ -48,6 +49,10 @@ export class AM_Core {
     // Scene
     this._scene = new THREE.Scene();
     this.scene = this._scene;
+
+    // Audio listener
+    this.audioListener = new THREE.AudioListener();
+    this._camera.add(this.audioListener);
 
     // Render
     let prevTime = 0;
@@ -83,6 +88,7 @@ export class AM_Core {
               obj.animationController.frameId =
                 ~~(AM_State.animationTime * 24) % obj.animationController.frameCount;
               if (isChanged) {
+                obj.animationController.playAudio();
                 obj.applyAnimation(obj.animationController.animation);
                 AM_State.ui.timeline.refresh();
                 AM_State.ui.shape.refresh();

@@ -1,5 +1,8 @@
 import { AM_Animation } from '@/core/animation/AM_Animation';
 import { AM_Frame } from '@/core/animation/AM_Frame';
+import { AM_Audio } from '@/core/AM_Audio';
+import { AM_IResourceInfo } from '@/core/AM_Type';
+import { AM_State } from '@/core/AM_State';
 
 export interface AM_IAnimationPart {
   offset: number;
@@ -7,13 +10,28 @@ export interface AM_IAnimationPart {
   animation: AM_Animation;
 }
 
+export interface AM_IAudioPart {
+  offset: number;
+  repeat: number;
+  audio: AM_Audio;
+}
+
 export class AM_AnimationController {
   public animationList: AM_IAnimationPart[] = [];
+  public audioList: AM_IAudioPart[] = [];
   private _eventList: Record<string, ((...data: unknown[]) => void)[]> = {};
   private _animation: AM_Animation = new AM_Animation();
 
   public selectedAnimationPart: AM_IAnimationPart | undefined;
   public workingOnAnimationPart: AM_IAnimationPart | undefined;
+
+  public appendAudio(info: AM_IResourceInfo): void {
+    this.audioList.push({
+      offset: 0,
+      repeat: 1,
+      audio: new AM_Audio(info),
+    });
+  }
 
   public createAnimation(offset = 0): void {
     const animation = new AM_Animation();
@@ -37,6 +55,13 @@ export class AM_AnimationController {
     const index = this.animationList.indexOf(part);
     if (index !== -1) this.animationList.splice(index, 1);
     this.compile();
+  }
+
+  public playAudio(): void {
+    for (let i = 0; i < this.audioList.length; i++) {
+      const audio = this.audioList[i];
+      audio.audio.play();
+    }
   }
 
   public compile(): void {
@@ -82,7 +107,12 @@ export class AM_AnimationController {
     //if (value >= this.frameCount - 1) value = this.frameCount - 1;
     const changed = this._animation.frameId != value;
     this._animation.frameId = value;
-    if (changed) this.emit('change', value);
+    if (changed) {
+      //if (AM_State.isAnimationPlay) {
+      // this.audioList.forEach((x) => x.audio.play());
+      //}
+      this.emit('change', value);
+    }
   }
 
   public get animation(): AM_Animation {

@@ -64,6 +64,9 @@ export default defineComponent({
         this.refresh();
       }
     });
+
+    // @ts-ignore
+    this.$root.projectName = info.name;
   },
   beforeUnmount() {
     AM_Core.destroy();

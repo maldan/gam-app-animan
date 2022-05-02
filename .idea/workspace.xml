@@ -1,25 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="331bac90-ead6-4d56-a2f8-56a23d8695cb" name="Changes" comment="Fix&#10;-- None">
+    <list default="true" id="331bac90-ead6-4d56-a2f8-56a23d8695cb" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/frontend/src/component/modal/pick/Audio.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/core/AM_Audio.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/desktop/ui.button.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/desktop/ui.button.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/desktop/ui.input.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/desktop/ui.input.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/desktop/ui.number.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/desktop/ui.number.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/desktop/ui.slider.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/desktop/ui.slider.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/desktop/ui.window.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/desktop/ui.window.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/modal/approve.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/modal/approve.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/modal/prompt.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/modal/prompt.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.button.group.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.button.group.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.button.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.button.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.header.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.header.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.icon.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.icon.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.number.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.number.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.window.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.window.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/event.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/event.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/fix_icons.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/fix_icons.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/ui.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/ui.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/page/clip/Editor.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/page/clip/Editor.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/component/timeline/Controller.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/component/timeline/Controller.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/core/AM_API.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/core/AM_API.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/core/AM_Core.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/core/AM_Core.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/core/AM_State.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/core/AM_State.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/core/animation/AM_AnimationController.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/core/animation/AM_AnimationController.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/page/animation/Editor.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/page/animation/Editor.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/todo.txt" beforeDir="false" afterPath="$PROJECT_DIR$/todo.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,6 +57,7 @@
     <property name="go.formatter.settings.were.checked" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.watchers.conflict.with.on.save.actions.check.performed" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/frontend/src/component/modal/pick" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.standard" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
@@ -77,6 +71,11 @@
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
     <property name="ts.external.directory.path" value="D:\gam_app\animan\frontend\node_modules\typescript\lib" />
     <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\gam_app\animan\frontend\src\component\modal\pick" />
+    </key>
   </component>
   <component name="RunManager">
     <configuration default="true" type="Applet" factoryName="Applet">

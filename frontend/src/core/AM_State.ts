@@ -78,8 +78,6 @@ export class AM_State {
 
   public static objectList: AM_Object[] = [];
   public static selectedObject?: AM_Object;
-  //public static selectedAnimation?: AM_Animation;
-  //public static selectedAnimationPart?: AM_IAnimationPart;
   public static animationController: AM_AnimationController = new AM_AnimationController();
   public static isAnimationPlay = false;
   public static animationTime = 0;

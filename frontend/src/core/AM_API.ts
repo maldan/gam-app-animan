@@ -220,6 +220,23 @@ export class AM_API {
     },
   };
 
+  public static audio = {
+    async getList(): Promise<AM_IResourceInfo[]> {
+      return (await Axios.get(`${AM_API.API_URL}/audio/list`)).data.response.map(
+        (x: AM_IResourceInfo) => {
+          x.filePath = `${AM_API.ROOT_URL}/` + x.filePath;
+          return x;
+        },
+      );
+    },
+    async getInfo(resourceId: string): Promise<AM_IResourceInfo> {
+      const obj = (await Axios.get(`${AM_API.API_URL}/audio/info?resourceId=${resourceId}`)).data
+        .response as AM_IObjectInfo;
+      obj.filePath = `${AM_API.ROOT_URL}/` + obj.filePath;
+      return obj;
+    },
+  };
+
   public static async getObjectList(): Promise<AM_IObjectInfo[]> {
     return (await Axios.get(`${this.API_URL}/object/list`)).data.response.map(
       (x: AM_IObjectInfo) => {
