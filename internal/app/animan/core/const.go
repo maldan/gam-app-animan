@@ -58,15 +58,14 @@ type ObjectInfo struct {
 	Scale    Vector3    `json:"scale"`
 }
 
-/*
-type AudioInfo struct {
+type AudioPart struct {
+	ObjectId   string `json:"objectId"`
 	ResourceId string `json:"resourceId"`
-	Name       string `json:"name"`
-	Category   string `json:"category"`
-	AudioPath  string `json:"audioPath"`
+	Offset     int    `json:"offset"`
+	Repeat     int    `json:"repeat"`
 }
 
-type ClipInfo struct {
+/*type ClipInfo struct {
 	ResourceId string `json:"resourceId"`
 	Name       string `json:"name"`
 	Category   string `json:"category"`
@@ -92,6 +91,7 @@ type Clip struct {
 	Name          string                `json:"name"`
 	ObjectList    []ObjectInfo          `json:"objectList"`
 	AnimationList []AnimationController `json:"animationList"`
+	AudioList     []AudioPart           `json:"audioList"`
 }
 
 const ANIMATION_SECTION_MARKET uint32 = 1296649793

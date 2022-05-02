@@ -88,6 +88,9 @@ export class AM_Core {
               obj.animationController.frameId =
                 ~~(AM_State.animationTime * 24) % obj.animationController.frameCount;
               if (isChanged) {
+                // Stop all at start
+                if (obj.animationController.frameId === 0) obj.animationController.stopAudio();
+
                 obj.animationController.playAudio();
                 obj.applyAnimation(obj.animationController.animation);
                 AM_State.ui.timeline.refresh();

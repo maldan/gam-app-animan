@@ -237,6 +237,13 @@ export class AM_API {
     },
   };
 
+  public static clip = {
+    async getInfo(resourceId: string): Promise<AM_IResourceInfo> {
+      return (await Axios.get(`${AM_API.API_URL}/clip/info?resourceId=${resourceId}`)).data
+        .response;
+    },
+  };
+
   public static async getObjectList(): Promise<AM_IObjectInfo[]> {
     return (await Axios.get(`${this.API_URL}/object/list`)).data.response.map(
       (x: AM_IObjectInfo) => {
@@ -345,6 +352,19 @@ export class AM_API {
 */
 
   public static async saveClip(name: string, objectList: AM_Object[]): Promise<void> {
+    const audioList = [];
+
+    for (let i = 0; i < objectList.length; i++) {
+      for (let j = 0; j < objectList[i].animationController.audioList.length; j++) {
+        audioList.push({
+          objectId: objectList[i].id,
+          resourceId: objectList[i].animationController.audioList[j].audio.resourceId,
+          offset: objectList[i].animationController.audioList[j].offset,
+          repeat: objectList[i].animationController.audioList[j].repeat,
+        });
+      }
+    }
+
     const clipData = {
       name,
       objectList: objectList.map((x) => {
@@ -363,11 +383,13 @@ export class AM_API {
           animationList: x.animationController.animationList.map((x) => {
             return {
               offset: x.offset,
+              repeat: x.repeat,
               animation: AM_API.animation.toJSON(x.animation),
             };
           }),
         };
       }),
+      audioList: audioList,
     };
     // console.log(clipData);
     await Axios.put(`${this.API_URL}/clip`, {
@@ -426,9 +448,9 @@ export class AM_API {
     return (await Axios.get(`${this.API_URL}/clip?name=${name}`)).data.response;
   }
 
-  public static async getClipInfo(resourceId: string): Promise<AM_IResourceInfo> {
+  /*public static async getClipInfo(resourceId: string): Promise<AM_IResourceInfo> {
     return (await Axios.get(`${this.API_URL}/clip/info?resourceId=${resourceId}`)).data.response;
-  }
+  }*/
 
   /*public static async getAnimationInfo(resourceId: string): Promise<AM_IAnimationInfo> {
     return (await Axios.get(`${this.API_URL}/animation/info?resourceId=${resourceId}`)).data

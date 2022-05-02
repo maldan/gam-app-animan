@@ -29,64 +29,6 @@ func (r ClipApi) GetFile(ctx *rapi_core.Context, args ArgsName) string {
 	return core.DataDir + "/clip/" + args.Name + "/clip.ac"
 }
 
-// GetList of audio files
-/*func (r ClipApi) GetList() []core.ClipInfo {
-	list := make([]core.ClipInfo, 0)
-
-	fileList, _ := cmhp_file.ListAll(core.DataDir + "/clip")
-	fileList = cmhp_slice.Filter(fileList, func(t cmhp_file.FileInfo) bool {
-		return strings.Contains(t.Name, ".ac")
-	})
-
-	for _, file := range fileList {
-		fileDir := strings.Replace(file.FullPath, "/clip.ac", "", 1)
-
-		// Get file info
-		clipInfo, err := r.GetResourceInfo(fileDir)
-		if err != nil {
-			r.UpdateInfo(fileDir)
-			clipInfo, err = r.GetResourceInfo(fileDir)
-		}
-
-		// Add to list
-		list = append(list, clipInfo)
-	}
-
-	return list
-}*/
-
-/*func (r ClipApi) GetInfo(args ArgsResourceId) core.ClipInfo {
-	obj := core.ClipInfo{}
-
-	allFiles, _ := cmhp_file.ListAll(core.DataDir + "/clip")
-	allFiles = cmhp_slice.Filter(allFiles, func(t cmhp_file.FileInfo) bool {
-		return strings.Contains(t.FullPath, "info.json")
-	})
-	wd, _ := os.Getwd()
-	wd = strings.ReplaceAll(wd, "\\", "/")
-
-	for _, file := range allFiles {
-		info := core.ClipInfo{}
-
-		info.ClipPath = strings.Replace(
-			strings.Replace(strings.ReplaceAll(file.FullPath, "/info.json", "/clip.ac"), wd, "", 1),
-			"/db",
-			"data",
-			1,
-		)
-
-		cmhp_file.ReadJSON(file.FullPath, &info)
-
-		if info.ResourceId == args.ResourceId {
-			return info
-		}
-	}
-
-	rapi_core.Fatal(rapi_core.Error{Description: "File not found", Code: 404})
-
-	return obj
-}*/
-
 func (r ClipApi) GetIndex(args ArgsName) core.Clip {
 	stream, err := cmhp_data.FromFile(core.DataDir+"/clip/"+args.Name+"/clip.ac", true)
 	rapi_core.FatalIfError(err)
@@ -95,6 +37,7 @@ func (r ClipApi) GetIndex(args ArgsName) core.Clip {
 		Name:          args.Name,
 		ObjectList:    make([]core.ObjectInfo, 0),
 		AnimationList: make([]core.AnimationController, 0),
+		AudioList:     make([]core.AudioPart, 0),
 	}
 
 	for {
@@ -147,6 +90,21 @@ func (r ClipApi) GetIndex(args ArgsName) core.Clip {
 				clip.AnimationList = append(clip.AnimationList, controller)
 			}
 			break
+		case "AUDIO_LIST":
+			amount := section.ReadUint16() // Amount of total audio
+
+			for i := 0; i < int(amount); i++ {
+				part := core.AudioPart{
+					ObjectId:   section.ReadUTF8(),
+					ResourceId: section.ReadUTF8(),
+					Offset:     int(section.ReadUint32()),
+					Repeat:     int(section.ReadUint32()),
+				}
+
+				clip.AudioList = append(clip.AudioList, part)
+			}
+
+			break
 		case "END":
 			return clip
 		default:
@@ -163,43 +121,6 @@ func (r ClipApi) GetIndex(args ArgsName) core.Clip {
 	return clip
 }
 
-// UpdateInfo write some info
-/*func (r ClipApi) UpdateInfo(pathDir string) {
-	// Open file info
-	info := core.ClipInfo{}
-	cmhp_file.ReadJSON(pathDir+"/info.json", &info)
-
-	// Calculate name
-	nameTuple := strings.Split(pathDir, "/")
-	info.Name = nameTuple[len(nameTuple)-1]
-	info.ResourceId = cmhp_crypto.Sha1(info.Name)
-
-	// Get working directory
-	wd, _ := os.Getwd()
-	wd = strings.ReplaceAll(wd, "\\", "/")
-
-	// Calculate category
-	categoryTuple := strings.Split(strings.Replace(pathDir, wd+"/db/clip/", "", 1), "/")
-	info.Category = strings.Join(categoryTuple[0:len(categoryTuple)-1], "/")
-
-	// Audio path
-	info.ClipPath = strings.Replace(strings.Replace(pathDir, wd, "", 1), "/db", "db", 1) + "/clip.ac"
-
-	// Write back
-	cmhp_file.Write(pathDir+"/info.json", &info)
-}*/
-
-// GetResourceInfo get some info
-/*func (r ClipApi) GetResourceInfo(pathDir string) (core.ClipInfo, error) {
-	// Open file info
-	info := core.ClipInfo{}
-	err := cmhp_file.ReadJSON(pathDir+"/info.json", &info)
-	if err != nil {
-		return info, err
-	}
-	return info, nil
-}*/
-
 func (r ClipApi) PutIndex(args ArgsData) core.ResourceInfo {
 	// Parse data
 	clip := core.Clip{}
@@ -210,6 +131,7 @@ func (r ClipApi) PutIndex(args ArgsData) core.ResourceInfo {
 	stream := cmhp_data.Allocate(0, true)
 	core.WriteClipObjectList(stream, clip.ObjectList)
 	core.WriteClipAnimationList(stream, clip.AnimationList)
+	core.WriteAudioList(stream, clip.AudioList)
 	core.WriteEnd(stream)
 
 	// Write to file

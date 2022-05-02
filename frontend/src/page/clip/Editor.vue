@@ -71,7 +71,7 @@ export default defineComponent({
     AM_State.ui.clipEditor.ref = this;
     AM_State.ui.clipEditor.refresh();
 
-    const info = await AM_API.getClipInfo(this.$route.params.resourceId as string);
+    const info = await AM_API.clip.getInfo(this.$route.params.resourceId as string);
     AM_State.clipInfo = info;
     await this.loadClip(info.name);
 
@@ -120,6 +120,15 @@ export default defineComponent({
         });
         obj.animationController.compile();
         obj.applyAnimation(obj.animationController.animation);
+      }
+
+      // Audio list
+      for (let i = 0; i < clip.audioList.length; i++) {
+        const obj = AM_State.objectList.find((x) => x.id === clip.audioList[i].objectId);
+        if (!obj) continue;
+
+        const info = await AM_API.audio.getInfo(clip.audioList[i].resourceId);
+        obj.animationController.appendAudio(info);
       }
     },
   },

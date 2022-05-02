@@ -48,3 +48,17 @@ func WriteClipAnimationList(stream *cmhp_data.ByteArray, animationList []Animati
 	}
 	stream.WriteSection(ANIMATION_SECTION_MARKET, "ANIMATION_LIST", chunk)
 }
+
+func WriteAudioList(stream *cmhp_data.ByteArray, audioList []AudioPart) {
+	chunk := cmhp_data.Allocate(0, true)
+	chunk.WriteUInt16(uint16(len(audioList))) // Amount of audi
+
+	for _, an := range audioList {
+		chunk.WriteUTF8(an.ObjectId)
+		chunk.WriteUTF8(an.ResourceId)
+		chunk.WriteUInt32(uint32(an.Offset))
+		chunk.WriteUInt32(uint32(an.Repeat))
+	}
+
+	stream.WriteSection(ANIMATION_SECTION_MARKET, "AUDIO_LIST", chunk)
+}

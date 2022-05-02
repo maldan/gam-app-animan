@@ -2,7 +2,6 @@ import { AM_Animation } from '@/core/animation/AM_Animation';
 import { AM_Frame } from '@/core/animation/AM_Frame';
 import { AM_Audio } from '@/core/AM_Audio';
 import { AM_IResourceInfo } from '@/core/AM_Type';
-import { AM_State } from '@/core/AM_State';
 
 export interface AM_IAnimationPart {
   offset: number;
@@ -59,8 +58,13 @@ export class AM_AnimationController {
 
   public playAudio(): void {
     for (let i = 0; i < this.audioList.length; i++) {
-      const audio = this.audioList[i];
-      audio.audio.play();
+      this.audioList[i].audio.play();
+    }
+  }
+
+  public stopAudio(): void {
+    for (let i = 0; i < this.audioList.length; i++) {
+      this.audioList[i].audio.stop();
     }
   }
 

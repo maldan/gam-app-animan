@@ -8,16 +8,15 @@ export class AM_Audio {
   public name = '';
   public url = '';
   public audio!: Audio;
+  public resourceId = '';
   // public isPlay = false;
 
   constructor(info: AM_IResourceInfo) {
     this.url = info.filePath;
     this.name = info.name;
+    this.resourceId = info.resourceId;
 
     this.audio = new THREE.Audio(AM_Core.audioListener);
-    /*this.audio.so.onEnded = () => {
-      this.isPlay = false;
-    };*/
 
     const audioLoader = new THREE.AudioLoader();
     audioLoader.load(info.filePath, (buffer) => {
@@ -29,5 +28,9 @@ export class AM_Audio {
   public play(): void {
     if (this.audio.isPlaying) return;
     this.audio.play();
+  }
+
+  public stop(): void {
+    this.audio.stop();
   }
 }

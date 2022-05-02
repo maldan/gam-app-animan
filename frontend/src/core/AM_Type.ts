@@ -91,6 +91,12 @@ export interface AM_IClip {
     objectId: string;
     animationList: { offset: number; animation: AM_IAnimation }[];
   }[];
+  audioList: {
+    objectId: string;
+    resourceId: string;
+    offset: number;
+    repeat: number;
+  }[];
 }
 
 export interface AM_IPose {
