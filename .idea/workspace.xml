@@ -6,15 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="331bac90-ead6-4d56-a2f8-56a23d8695cb" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/core/AM_API.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/core/AM_API.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/component/timeline/Controller.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/component/timeline/Controller.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/core/AM_Audio.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/core/AM_Audio.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/core/AM_Core.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/core/AM_Core.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/core/AM_Type.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/core/AM_Type.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/core/animation/AM_AnimationController.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/core/animation/AM_AnimationController.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/page/clip/Editor.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/page/clip/Editor.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/animan/api/clip_api.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/animan/api/clip_api.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/animan/core/clip.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/animan/core/clip.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/animan/core/const.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/animan/core/const.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/desktop/ui.number.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/desktop/ui.number.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,7 +55,7 @@
     <property name="go.formatter.settings.were.checked" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.watchers.conflict.with.on.save.actions.check.performed" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/frontend/src/component/modal/pick" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/db/audio" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.standard" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
@@ -77,6 +72,7 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\gam_app\animan\db\audio" />
       <recent name="D:\gam_app\animan\frontend\src\component\modal\pick" />
     </key>
   </component>

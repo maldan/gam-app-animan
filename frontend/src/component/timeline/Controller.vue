@@ -73,7 +73,8 @@
       >
         <div
           class="clickable"
-          :class="[$style.audioPart]"
+          :class="[$style.audioPart, x === selectedAudioPart ? $style.selected : null]"
+          @click="selectAudioPart(x)"
           v-for="x in audioList"
           :style="{
             left: (x.offset - offsetX) * frameWidth + 'px',
@@ -118,6 +119,21 @@
           icon="trash"
         />
       </div>
+
+      <div v-if="selectedAudioPart">
+        <desktop-ui-number
+          @change="refresh"
+          v-model="selectedAudioPart.offset"
+          style="margin-bottom: 5px"
+        />
+        <desktop-ui-number
+          @change="refresh"
+          v-model="selectedAudioPart.volume"
+          :step="0.1"
+          style="margin-bottom: 5px"
+        />
+        <desktop-ui-button @click="deleteAudioPart(selectedAudioPart)" text="Delete" icon="trash" />
+      </div>
     </div>
   </div>
 </template>
@@ -155,6 +171,10 @@ export default defineComponent({
     selectedAnimationPart(): AM_IAnimationPart | undefined {
       if (this.r < 0) return undefined;
       return this.animationController?.selectedAnimationPart;
+    },
+    selectedAudioPart(): AM_IAudioPart | undefined {
+      if (this.r < 0) return undefined;
+      return this.animationController?.selectedAudioPart;
     },
     isAnimationPlay(): boolean {
       if (this.r < 0) return false;
@@ -228,8 +248,13 @@ export default defineComponent({
       this.refresh();
     },
     selectAnimationPart(x: AM_IAnimationPart | undefined) {
+      (this.selectedObject as AM_Object).animationController.selectedAudioPart = undefined;
       (this.selectedObject as AM_Object).animationController.selectedAnimationPart = x;
-      // AM_State.selectedAnimationPart = x;
+      this.refresh();
+    },
+    selectAudioPart(x: AM_IAudioPart | undefined) {
+      (this.selectedObject as AM_Object).animationController.selectedAudioPart = x;
+      (this.selectedObject as AM_Object).animationController.selectedAnimationPart = undefined;
       this.refresh();
     },
     openAnimationPart(x: AM_IAnimationPart | undefined) {
@@ -268,6 +293,11 @@ export default defineComponent({
       this.selectAnimationPart(undefined);
       this.refresh();
     },
+    deleteAudioPart(x: AM_IAudioPart) {
+      this.animationController?.deleteAudioPart(x);
+      this.selectAudioPart(undefined);
+      this.refresh();
+    },
   },
   data: () => {
     return {
@@ -276,7 +306,7 @@ export default defineComponent({
       kd: undefined as any,
 
       frameWidth: 9,
-      maxVisibleFrames: 48,
+      maxVisibleFrames: 64,
       maxVisibleKeys: 12,
 
       hoverAnimationPart: undefined as AM_IAnimationPart | undefined,
@@ -339,14 +369,14 @@ export default defineComponent({
 
       .animationPart,
       .audioPart {
-        height: 24px;
+        height: 16px;
         background: #9a6927;
         position: relative;
         border: 1px solid #fefefe00;
         box-sizing: border-box;
         display: flex;
         align-items: center;
-        font-size: 14px;
+        font-size: 12px;
         padding-left: 5px;
         margin-bottom: 2px;
 

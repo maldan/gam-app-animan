@@ -9,11 +9,12 @@ export class AM_Audio {
   public url = '';
   public audio!: Audio;
   public resourceId = '';
+  public volume = 1;
   // public isPlay = false;
 
   constructor(info: AM_IResourceInfo) {
     this.url = info.filePath;
-    this.name = info.name;
+    this.name = info.category + '/' + info.name;
     this.resourceId = info.resourceId;
 
     this.audio = new THREE.Audio(AM_Core.audioListener);
@@ -27,6 +28,7 @@ export class AM_Audio {
 
   public play(): void {
     if (this.audio.isPlaying) return;
+    this.audio.setVolume(this.volume);
     this.audio.play();
   }
 

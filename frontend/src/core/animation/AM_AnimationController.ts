@@ -12,6 +12,7 @@ export interface AM_IAnimationPart {
 export interface AM_IAudioPart {
   offset: number;
   repeat: number;
+  volume: number;
   audio: AM_Audio;
 }
 
@@ -21,6 +22,7 @@ export class AM_AnimationController {
   private _eventList: Record<string, ((...data: unknown[]) => void)[]> = {};
   private _animation: AM_Animation = new AM_Animation();
 
+  public selectedAudioPart: AM_IAudioPart | undefined;
   public selectedAnimationPart: AM_IAnimationPart | undefined;
   public workingOnAnimationPart: AM_IAnimationPart | undefined;
 
@@ -28,6 +30,7 @@ export class AM_AnimationController {
     this.audioList.push({
       offset: 0,
       repeat: 1,
+      volume: 1,
       audio: new AM_Audio(info),
     });
   }
@@ -56,9 +59,20 @@ export class AM_AnimationController {
     this.compile();
   }
 
+  public deleteAudioPart(part: AM_IAudioPart): void {
+    const index = this.audioList.indexOf(part);
+    if (index !== -1) this.audioList.splice(index, 1);
+  }
+
   public playAudio(): void {
     for (let i = 0; i < this.audioList.length; i++) {
-      this.audioList[i].audio.play();
+      if (
+        this.frameId > this.audioList[i].offset &&
+        this.frameId < this.audioList[i].offset + this.audioList[i].audio.widthInFrames
+      ) {
+        this.audioList[i].audio.volume = this.audioList[i].volume;
+        this.audioList[i].audio.play();
+      }
     }
   }
 
