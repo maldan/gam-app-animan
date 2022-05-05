@@ -83,6 +83,7 @@ func (r ClipApi) GetIndex(args ArgsName) core.Clip {
 				for j := 0; j < int(amountOfList); j++ {
 					part := core.AnimationPart{}
 					part.Offset = section.ReadUint16()
+					part.Repeat = section.ReadUint16()
 					part.Animation = core.ReadAnimation(section)
 					controller.AnimationList = append(controller.AnimationList, part)
 				}
@@ -99,6 +100,7 @@ func (r ClipApi) GetIndex(args ArgsName) core.Clip {
 					ResourceId: section.ReadUTF8(),
 					Offset:     int(section.ReadUint32()),
 					Repeat:     int(section.ReadUint32()),
+					Volume:     float64(section.ReadFloat32()),
 				}
 
 				clip.AudioList = append(clip.AudioList, part)

@@ -26,12 +26,14 @@ export class AM_AnimationController {
   public selectedAnimationPart: AM_IAnimationPart | undefined;
   public workingOnAnimationPart: AM_IAnimationPart | undefined;
 
-  public appendAudio(info: AM_IResourceInfo): void {
+  public appendAudio(info: AM_IResourceInfo, offset = 0, repeat = 1, volume = 1): void {
+    const audio = new AM_Audio(info);
+    audio.volume = volume;
     this.audioList.push({
-      offset: 0,
-      repeat: 1,
-      volume: 1,
-      audio: new AM_Audio(info),
+      offset,
+      repeat,
+      volume,
+      audio,
     });
   }
 
@@ -42,9 +44,9 @@ export class AM_AnimationController {
     this.compile();
   }
 
-  public appendAnimation(animation: AM_Animation, offset = 0): void {
+  public appendAnimation(animation: AM_Animation, offset = 0, repeat = 1): void {
     animation.controller = this;
-    this.animationList.push({ offset, repeat: 1, animation });
+    this.animationList.push({ offset, repeat, animation });
     this.compile();
   }
 

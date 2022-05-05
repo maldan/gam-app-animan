@@ -89,13 +89,14 @@ export interface AM_IClip {
   objectList: AM_IObjectInfo[];
   animationList: {
     objectId: string;
-    animationList: { offset: number; animation: AM_IAnimation }[];
+    animationList: { offset: number; repeat: number; animation: AM_IAnimation }[];
   }[];
   audioList: {
     objectId: string;
     resourceId: string;
     offset: number;
     repeat: number;
+    volume: number;
   }[];
 }
 

@@ -10,7 +10,7 @@
         :class="$style.item"
         v-for="x in list"
         :key="x"
-        :text="x.name"
+        :text="x.category + '/' + x.name"
       />
     </div>
     <desktop-ui-button @click="$store.dispatch('modal/close')" text="Close" />

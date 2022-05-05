@@ -4,7 +4,10 @@
 
     <div :class="$style.list">
       <div :class="$style.audio" v-for="x in list" :key="x.filePath">
-        <div :class="$style.title">{{ x.name }}</div>
+        <div>
+          <div :class="$style.title">{{ x.category }}</div>
+          <div :class="$style.title">{{ x.name }}</div>
+        </div>
         <desktop-ui-button
           :class="$style.button"
           @click="togglePlay(x.filePath)"

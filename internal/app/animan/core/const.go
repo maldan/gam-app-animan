@@ -37,6 +37,7 @@ type AnimationSequence struct {
 
 type AnimationPart struct {
 	Offset    uint16            `json:"offset"`
+	Repeat    uint16            `json:"repeat"`
 	Animation AnimationSequence `json:"animation"`
 }
 
@@ -59,10 +60,11 @@ type ObjectInfo struct {
 }
 
 type AudioPart struct {
-	ObjectId   string `json:"objectId"`
-	ResourceId string `json:"resourceId"`
-	Offset     int    `json:"offset"`
-	Repeat     int    `json:"repeat"`
+	ObjectId   string  `json:"objectId"`
+	ResourceId string  `json:"resourceId"`
+	Offset     int     `json:"offset"`
+	Repeat     int     `json:"repeat"`
+	Volume     float64 `json:"volume"`
 }
 
 /*type ClipInfo struct {

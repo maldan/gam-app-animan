@@ -361,6 +361,7 @@ export class AM_API {
           resourceId: objectList[i].animationController.audioList[j].audio.resourceId,
           offset: objectList[i].animationController.audioList[j].offset,
           repeat: objectList[i].animationController.audioList[j].repeat,
+          volume: objectList[i].animationController.audioList[j].volume,
         });
       }
     }

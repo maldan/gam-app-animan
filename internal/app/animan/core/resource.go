@@ -18,7 +18,10 @@ func UpdateResourceInfo(pathDir string, kind string, ext string) {
 	// Calculate name
 	nameTuple := strings.Split(pathDir, "/")
 	info.Name = nameTuple[len(nameTuple)-1]
-	info.ResourceId = cmhp_crypto.Sha1(info.Name)
+	if info.ResourceId == "" {
+		info.ResourceId = cmhp_crypto.UID(24)
+	}
+	// info.ResourceId = cmhp_crypto.Sha1(info.Name)
 
 	// Get working directory
 	wd, _ := os.Getwd()

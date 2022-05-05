@@ -116,7 +116,7 @@ export default defineComponent({
 
         clip.animationList[i].animationList?.forEach((x) => {
           const animation = AM_API.animation.fromJSON(x.animation);
-          obj.animationController.appendAnimation(animation, x.offset);
+          obj.animationController.appendAnimation(animation, x.offset, x.repeat);
         });
         obj.animationController.compile();
         obj.applyAnimation(obj.animationController.animation);
@@ -124,11 +124,18 @@ export default defineComponent({
 
       // Audio list
       for (let i = 0; i < clip.audioList.length; i++) {
-        const obj = AM_State.objectList.find((x) => x.id === clip.audioList[i].objectId);
+        const audioPart = clip.audioList[i];
+        console.log(audioPart);
+        const obj = AM_State.objectList.find((x) => x.id === audioPart.objectId);
         if (!obj) continue;
 
-        const info = await AM_API.audio.getInfo(clip.audioList[i].resourceId);
-        obj.animationController.appendAudio(info);
+        const info = await AM_API.audio.getInfo(audioPart.resourceId);
+        obj.animationController.appendAudio(
+          info,
+          audioPart.offset,
+          audioPart.repeat,
+          audioPart.volume,
+        );
       }
     },
   },
