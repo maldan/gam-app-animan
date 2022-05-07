@@ -149,9 +149,14 @@ export default defineComponent({
           position: { x: 80, y: 5, width: 18, height: 15 },
         },
         {
+          title: 'Object',
+          name: 'object',
+          position: { x: 80, y: 21, width: 18, height: 20 },
+        },
+        {
           title: 'Scene',
           name: 'scene',
-          position: { x: 1, y: 5, width: 18, height: 20 },
+          position: { x: 1, y: 5, width: 18, height: 40 },
         },
         /*{
           title: 'Clip List',

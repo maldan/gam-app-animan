@@ -5,6 +5,8 @@ import (
 	"github.com/maldan/gam-app-animan/internal/app/animan/core"
 	"github.com/maldan/go-cmhp/cmhp_file"
 	"github.com/maldan/go-rapi/rapi_core"
+	"os"
+	"strings"
 )
 
 type ObjectApi struct {
@@ -87,7 +89,9 @@ func (r ObjectApi) PutPreview(args struct {
 
 	info, err := core.GetResourceInfo(core.DataDir + "/object/" + args.Name)
 	if err == nil {
-		info.PreviewPath = core.DataDir + "/object/" + args.Name + "/preview.jpg"
+		wd, _ := os.Getwd()
+		wd = strings.ReplaceAll(wd, "\\", "/")
+		info.PreviewPath = strings.Replace(strings.Replace(core.DataDir, wd, "", 1), "/db", "db", 1) + "/object/" + args.Name + "/preview.jpg"
 		cmhp_file.Write(core.DataDir+"/object/"+args.Name+"/info.json", &info)
 	}
 }

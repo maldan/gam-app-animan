@@ -182,6 +182,7 @@ export class AM_Core {
     });
     this._manipulator.addEventListener('change', () => {
       // this.updateTRS();
+      AM_State.ui.object.refresh();
       if (AM_State.selectedObject instanceof AM_Bone) {
         AM_State.selectedObject.parent.update();
       } else {

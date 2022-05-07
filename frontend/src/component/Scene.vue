@@ -1,39 +1,51 @@
 <template>
-  <div :class="$style.scene">
-    <div
-      class="clickable"
-      :class="[$style.object, isSelected(x) ? $style.selected : null]"
-      v-for="x in objectList"
-      :key="x.name"
-      @click="selectObject(x)"
-    >
-      {{ x.type }} {{ x.name }}
-      <ui-icon
-        @click.stop="addAnimationObject(x)"
-        :class="$style.pencil"
-        name="pencil"
-        :width="18"
-        :height="18"
-        :color="isSelected(x) ? '#a6ff68' : undefined"
-      />
-      <ui-icon
-        @click.stop="toggleVisibility(x)"
-        :class="$style.visibility"
-        :name="isVisible(x) ? 'eye' : 'close'"
-        :width="18"
-        :height="18"
-        :color="isSelected(x) ? '#a6ff68' : undefined"
-      />
-      <ui-icon
-        @click.stop="removeObject(x)"
-        :class="$style.remove"
-        name="trash"
-        :width="18"
-        :height="18"
-        :color="isSelected(x) ? '#a6ff68' : undefined"
-      />
-    </div>
+  <div :class="$style.scene" ref="scene">
     <desktop-ui-button @click="pickObject" text="Add" />
+    <div :class="$style.list">
+      <div
+        class="clickable"
+        :class="[$style.object, isSelected(x) ? $style.selected : null]"
+        v-for="x in objectList"
+        :key="x.name"
+        @click="selectObject(x)"
+      >
+        <ui-icon
+          :class="$style.icon"
+          :name="iconByType(x)"
+          :width="20"
+          :height="20"
+          :color="isSelected(x) ? '#a6ff68' : undefined"
+        />
+
+        <div :class="$style.name">{{ x.name }}</div>
+
+        <ui-icon
+          v-if="isShowTimelineIcon(x)"
+          @click.stop="addAnimationObject(x)"
+          :class="$style.timeline"
+          name="film"
+          :width="20"
+          :height="20"
+          :color="isSelected(x) ? '#a6ff68' : undefined"
+        />
+        <ui-icon
+          @click.stop="toggleVisibility(x)"
+          :class="$style.visibility"
+          :name="isVisible(x) ? 'eye' : 'eye_hidden'"
+          :width="18"
+          :height="18"
+          :color="isSelected(x) ? '#a6ff68' : undefined"
+        />
+        <ui-icon
+          @click.stop="removeObject(x)"
+          :class="$style.remove"
+          name="trash"
+          :width="18"
+          :height="18"
+          :color="isSelected(x) ? '#a6ff68' : undefined"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -61,6 +73,7 @@ export default defineComponent({
   methods: {
     refresh() {
       this.r = Math.random();
+      // this.listHeight = (this.$refs['scene'] as HTMLElement).getBoundingClientRect().height - 8;
     },
     isCharacter(obj: AM_Object): boolean {
       return obj instanceof AM_Character;
@@ -85,7 +98,9 @@ export default defineComponent({
     toggleVisibility(obj: AM_Object) {
       obj.visible = !obj.visible;
       obj.update();
-      this.refresh();
+      this.$nextTick(() => {
+        this.refresh();
+      });
     },
     addAnimationObject(obj: AM_Object) {
       AM_State.addAnimationObject(obj);
@@ -114,10 +129,19 @@ export default defineComponent({
         },
       });
     },
+    iconByType(obj: AM_Object) {
+      if (obj instanceof AM_Character) return 'person';
+      return 'cube';
+    },
+    isShowTimelineIcon(obj: AM_Object) {
+      if (obj instanceof AM_Character) return true;
+      return false;
+    },
   },
   data: () => {
     return {
       r: 0,
+      listHeight: 100,
     };
   },
 });
@@ -129,18 +153,35 @@ export default defineComponent({
   flex-direction: column;
   font-size: 14px;
   user-select: none;
+  height: 100%;
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    height: calc(100% - 30px);
+    overflow-y: auto;
+  }
 
   .object {
     background: #1b1b1b;
     color: #999999;
-    padding: 3px 5px;
+    padding: 2px 3px;
     margin-bottom: 2px;
     display: flex;
     align-items: center;
     border-radius: 2px;
 
-    .pencil {
-      margin-left: auto;
+    .icon {
+      margin-right: 5px;
+    }
+
+    .name {
+      margin-right: auto;
+    }
+
+    .timeline {
+      margin-left: 5px;
     }
 
     .visibility {

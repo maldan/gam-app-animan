@@ -64,13 +64,13 @@ export class AM_Preview {
     l.shadow.mapSize.width = 2048; // default
     l.shadow.mapSize.height = 2048; // default
     l.shadow.camera.near = 0.1; // default
-    l.shadow.camera.far = 64; // default
-    l.shadow.bias = -0.004;
+    l.shadow.camera.far = 16; // default
+    l.shadow.bias = -0.002;
     scene.add(l);
 
-    const l2 = new THREE.DirectionalLight(0xffffff, 1);
+    /*const l2 = new THREE.DirectionalLight(0xffffff, 1);
     l2.position.set(0, -5, -10);
-    scene.add(l2);
+    scene.add(l2);*/
 
     // Inject html
     el.appendChild(renderer.domElement);

@@ -4,6 +4,7 @@ import { AM_AnimationController, AM_IAnimationPart } from '@/core/animation/AM_A
 import { AM_Core } from '@/core/AM_Core';
 import { AM_Animation } from '@/core/animation/AM_Animation';
 import { AM_IAnimation, AM_IVector3, AM_IVector4 } from '@/core/AM_Type';
+import { MathUtils } from 'three';
 
 export class AM_Object {
   public id = '';
@@ -82,6 +83,20 @@ export class AM_Object {
       y: this.#_threeObject.quaternion.y,
       z: this.#_threeObject.quaternion.z,
       w: this.#_threeObject.quaternion.w,
+    };
+  }
+
+  public set euler(value: AM_IVector3) {
+    this.#_threeObject.rotation.x = MathUtils.degToRad(value.x);
+    this.#_threeObject.rotation.y = MathUtils.degToRad(value.y);
+    this.#_threeObject.rotation.z = MathUtils.degToRad(value.z);
+  }
+
+  public get euler(): AM_IVector3 {
+    return {
+      x: MathUtils.radToDeg(this.#_threeObject.rotation.x),
+      y: MathUtils.radToDeg(this.#_threeObject.rotation.y),
+      z: MathUtils.radToDeg(this.#_threeObject.rotation.z),
     };
   }
 

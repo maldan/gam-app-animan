@@ -33,7 +33,7 @@ export class AM_UI {
       this.refs.forEach((x: any) => x.refresh());
     },
   };
-  public rig = {
+  public object = {
     ref: undefined as any,
     refresh(): void {
       this.ref?.refresh();
@@ -70,6 +70,7 @@ export class AM_UI {
     this.shape.refresh();
     this.project.refresh();
     this.clipEditor.refresh();
+    this.object.refresh();
   }
 }
 

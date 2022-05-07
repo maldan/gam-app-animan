@@ -5,19 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="331bac90-ead6-4d56-a2f8-56a23d8695cb" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/frontend/src/component/Object.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/asset/icon/cube.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/asset/icon/eye_hidden.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/asset/icon/film.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/asset/icon/person.svg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/desktop/ui.input.number.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/component/modal/pick/Audio.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/component/modal/pick/Audio.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/core/AM_API.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/core/AM_API.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/core/AM_Type.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/core/AM_Type.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/core/animation/AM_AnimationController.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/core/animation/AM_AnimationController.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.modal.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.modal.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/page/Audio.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/page/Audio.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/component/Scene.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/component/Scene.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/core/AM_Core.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/core/AM_Core.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/core/AM_Preview.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/core/AM_Preview.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/core/AM_State.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/core/AM_State.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/core/am/AM_Object.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/core/am/AM_Object.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/desktop/ui.input.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/desktop/ui.input.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.icon.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/ui.icon.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/page/clip/Editor.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/page/clip/Editor.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/animan/api/clip_api.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/animan/api/clip_api.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/animan/core/clip.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/animan/core/clip.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/animan/core/const.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/animan/core/const.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/app/animan/core/resource.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/animan/core/resource.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/app/animan/api/object_api.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/animan/api/object_api.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/todo.txt" beforeDir="false" afterPath="$PROJECT_DIR$/todo.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -50,7 +53,9 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="28YhDYYjBNCFeNUsoiFU3hxuzCq" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -64,7 +69,7 @@
     <property name="go.formatter.settings.were.checked" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.watchers.conflict.with.on.save.actions.check.performed" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/db/audio" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/frontend/src/gam_sdk_ui/vue/component/desktop" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.standard" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
@@ -81,15 +86,18 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\gam_app\animan\frontend\src\gam_sdk_ui\vue\component\desktop" />
+      <recent name="D:\gam_app\animan\frontend\src\component" />
+      <recent name="D:\gam_app\animan\db\object\home\furniture\bed_1" />
+      <recent name="D:\gam_app\animan\db\object\home\furniture" />
       <recent name="D:\gam_app\animan\db\audio" />
-      <recent name="D:\gam_app\animan\frontend\src\component\modal\pick" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\gam_app\animan\db\object\home\furniture\chair_1" />
+      <recent name="D:\gam_app\animan\db\object\home\furniture\lamp_1" />
+      <recent name="D:\gam_app\animan\db\object\home\furniture\bedside_table_1" />
+      <recent name="D:\gam_app\animan\db\object\home\furniture\bed_1" />
       <recent name="D:\gam_app\animan\db\audio\sex\squash\1" />
-      <recent name="D:\gam_app\animan\db\audio\sex\female\ough\1" />
-      <recent name="D:\gam_app\animan\db\audio\sex\slap\4" />
-      <recent name="D:\gam_app\animan\db\audio\sex\slap\3" />
-      <recent name="D:\gam_app\animan\db\audio\sex\slap\2" />
     </key>
   </component>
   <component name="RunManager">
@@ -162,6 +170,23 @@
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
+    </configuration>
+    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
+      <module name="animan" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="FILE" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
+      <module name="animan" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="DIRECTORY" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <method v="2" />
     </configuration>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
