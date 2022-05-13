@@ -23,6 +23,7 @@ import { AM_State } from '@/core/AM_State';
 import { AM_API } from '@/core/AM_API';
 import { AM_Character } from '@/core/object/AM_Character';
 import { AM_IPose, AM_KeyHelper } from '@/core/AM_Type';
+import { AM_DirectionalLight } from '@/core/object/AM_DirectionalLight';
 
 export default defineComponent({
   components: {},
@@ -30,6 +31,11 @@ export default defineComponent({
     AM_State.mode = 'pose';
     AM_State.init();
     AM_Core.init(this.$refs['scene'] as HTMLElement);
+    AM_State.addObject(
+      new AM_DirectionalLight({
+        euler: { x: -45, y: 0, z: 0 },
+      }),
+    );
 
     const info = await AM_API.pose.getInfo(this.$route.params.resourceId as string);
     AM_State.poseInfo = info;

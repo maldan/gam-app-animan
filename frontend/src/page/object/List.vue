@@ -1,17 +1,43 @@
 <template>
   <div :class="$style.main">
-    <desktop-ui-button @click="uploadModal" icon="arrow_up" text="Upload" />
+    <desktop-ui-input
+      :class="$style.search"
+      @change="refresh"
+      placeholder="Filter..."
+      v-model="search"
+    />
 
-    <div :class="$style.list">
-      <div
-        class="clickable"
-        :class="$style.preview"
-        v-for="x in list"
-        :key="x.filePath"
-        @click="$router.push(`/object/${x.resourceId}`)"
-      >
-        <img :src="x.previewPath" alt="Preview" />
-        <div :class="$style.title">{{ x.name }}</div>
+    <!-- List -->
+    <!-- <div :class="$style.list">
+     <div
+       class="clickable"
+       :class="$style.preview"
+       v-for="x in list"
+       :key="x.filePath"
+       @click="$router.push(`/object/${x.resourceId}`)"
+     >
+       <img :src="x.previewPath" alt="Preview" />
+       <div :class="$style.title">{{ x.name }}</div>
+     </div>
+   </div>-->
+
+    <!-- List -->
+    <div :class="$style.categoryList">
+      <div :class="$style.category" v-for="(v, k) in formattedList" :key="k">
+        <div :class="$style.name">{{ k }}</div>
+
+        <div :class="$style.list">
+          <div
+            class="clickable"
+            :class="$style.item"
+            v-for="x in v.list"
+            :key="x.filePath"
+            @click="$router.push(`/object/${x.resourceId}`)"
+          >
+            <img :src="x.previewPath" alt="" />
+            <div :class="$style.title">{{ x.name }}</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -25,6 +51,25 @@ import { AM_IResourceInfo } from '@/core/AM_Type';
 
 export default defineComponent({
   components: {},
+  computed: {
+    filteredList() {
+      if (!this.search) return this.list;
+      return this.list.filter((x) => x.name.match(this.search));
+    },
+    formattedList() {
+      const categories = {} as Record<string, { list: Partial<AM_IResourceInfo>[] }>;
+
+      for (let i = 0; i < this.filteredList.length; i++) {
+        if (!categories[this.filteredList[i].category]) {
+          categories[this.filteredList[i].category] = {
+            list: [],
+          };
+        }
+        categories[this.filteredList[i].category].list.push(this.filteredList[i]);
+      }
+      return categories;
+    },
+  },
   async mounted() {
     await this.refresh();
   },
@@ -53,6 +98,7 @@ export default defineComponent({
   },
   data: () => {
     return {
+      search: '',
       list: [] as AM_IResourceInfo[],
     };
   },
@@ -63,29 +109,43 @@ export default defineComponent({
 .main {
   padding: 10px;
 
-  .list {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
+  .categoryList {
+    display: flex;
+    flex-direction: column;
     margin-top: 10px;
 
-    .preview {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      justify-content: center;
-      background: #2b2b2b;
-      padding: 15px;
+    .category {
+      margin-bottom: 5px;
+
+      .name {
+        background: #1b1b1b;
+        padding: 4px 8px;
+        font-size: 14px;
+        margin-bottom: 5px;
+      }
+    }
+  }
+
+  .list {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 10px;
+
+    .item {
+      background: #1b1b1b;
+      padding: 10px;
+      font-size: 12px;
+      border-radius: 0;
+      text-align: center;
+
+      .title {
+        margin-top: 10px;
+        padding: 0;
+      }
+
       img {
         width: 100%;
-      }
-      .title {
-        // margin-top: 15px;
-        background: #222222;
-        flex: 1;
-        width: 100%;
-        padding: 5px;
-        box-sizing: border-box;
+        display: block;
       }
     }
   }

@@ -130,13 +130,13 @@ export default defineComponent({
 
             if (info.category.match('character')) {
               const obj = AM_State.instantiateObject(threeObj, 'character');
+              if (!obj) return;
               obj.resourceId = resourceId;
-              obj.name = name;
               AM_State.addObject(obj);
             } else {
               const obj = AM_State.instantiateObject(threeObj);
+              if (!obj) return;
               obj.resourceId = resourceId;
-              obj.name = name;
               AM_State.addObject(obj);
             }
           }
@@ -151,8 +151,8 @@ export default defineComponent({
       return 'cube';
     },
     isShowTimelineIcon(obj: AM_Object) {
-      if (obj instanceof AM_Character) return true;
-      return false;
+      // if (obj instanceof AM_Character) return true;
+      return true;
     },
   },
   data: () => {

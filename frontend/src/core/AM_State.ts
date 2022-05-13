@@ -6,7 +6,9 @@ import { AM_AnimationController, AM_IAnimationPart } from '@/core/animation/AM_A
 import { AM_Core } from '@/core/AM_Core';
 import { AM_Character } from '@/core/object/AM_Character';
 import { AM_Bone } from '@/core/object/AM_Bone';
-import { AM_IResourceInfo } from '@/core/AM_Type';
+import { AM_IResourceInfo, AM_ISceneObject } from '@/core/AM_Type';
+import { AM_DirectionalLight } from '@/core/object/AM_DirectionalLight';
+import { AM_API } from '@/core/AM_API';
 
 export class AM_UI {
   public scene = {
@@ -188,78 +190,52 @@ export class AM_State {
     this.emit('removeObject', obj);
   }
 
-  public static instantiateObject(obj: THREE.Object3D, kind = 'object'): AM_Object {
+  public static async createObjectFrom(
+    sceneObject: AM_ISceneObject,
+  ): Promise<AM_Object | undefined> {
+    let info: AM_IResourceInfo | undefined;
+    try {
+      info = await AM_API.object.getInfo(sceneObject.resourceId);
+    } catch (e) {}
+
+    const threeObj = info ? await AM_State.loadObject(info.filePath) : undefined;
+    const objInstance = AM_State.instantiateObject(threeObj, sceneObject.kind);
+    if (!objInstance) return undefined;
+    objInstance.id = sceneObject.id;
+    objInstance.resourceId = sceneObject.resourceId;
+    objInstance.name = sceneObject.name;
+    objInstance.params = sceneObject.params;
+    objInstance.update();
+    return objInstance;
+  }
+
+  public static instantiateObject(obj?: THREE.Object3D, kind = 'object'): AM_Object | undefined {
     let outObj: AM_Object;
+
+    if (!obj) {
+      if (kind === 'directionalLight') return new AM_DirectionalLight();
+      return undefined;
+    }
+
     if (kind === 'character') {
       outObj = new AM_Character(obj);
     } else outObj = new AM_Object(obj);
-
-    outObj.id = obj.uuid;
-    outObj.name = obj.name;
 
     return outObj;
   }
 
   public static async loadObject(path: string): Promise<THREE.Object3D> {
     const loader = new GLTFLoader();
+    const gltf = await loader.loadAsync(path);
 
-    return new Promise((resolve, reject) => {
-      loader.load(
-        path,
-        (gltf) => {
-          const object = gltf.scene.children[0] as THREE.Object3D;
-
-          object.traverse((child) => {
-            if (child instanceof THREE.Mesh) {
-              //child.geometry.computeBoundingSphere();
-
-              child.castShadow = true;
-              child.receiveShadow = true;
-              // console.log(child.material);
-            }
-          });
-          /* object.traverse(function (child) {
-            if ((child as THREE.Mesh).isMesh) {
-              if ((child as THREE.Mesh).material) {
-                ((child as THREE.Mesh).material as THREE.MeshPhongMaterial).shininess = 2;
-                ((child as THREE.Mesh).material as THREE.MeshPhongMaterial).reflectivity = 0.1;
-              }
-            }
-          });*/
-
-          /*const characterName = path.split('/').pop()?.replace('.glb', '') || 'Unknown';
-
-          const ch = new Animation_Character();
-          ch.init(characterName, object, this.scene);
-
-          object.userData.tag = 'Character';
-          object.userData.class = ch;
-          object.name = characterName;
-          console.log(object);
-          this.addToScene(object);*/
-
-          /*if (type === 'character') {
-            const obj = new AM_Character(object);
-
-            obj.id = object.uuid;
-            obj.name = object.name;
-            resolve(obj);
-          } else {
-            const obj = new AM_Object(object);
-
-            obj.id = object.uuid;
-            obj.name = object.name;
-            resolve(obj);
-          }*/
-
-          resolve(object);
-        },
-        (xhr) => {},
-        (error) => {
-          reject(error);
-        },
-      );
+    const object = gltf.scene.children[0] as THREE.Object3D;
+    object.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
     });
+    return object;
   }
 
   public static on(eventName: string, fn: (...data: unknown[]) => void): void {

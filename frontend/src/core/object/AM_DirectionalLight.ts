@@ -6,7 +6,7 @@ import { AM_Core } from '@/core/AM_Core';
 export class AM_DirectionalLight extends AM_Object {
   private readonly _xx!: THREE.ArrowHelper;
 
-  constructor() {
+  constructor(params: Record<string, unknown> = {}) {
     const l = new THREE.DirectionalLight();
     super(l);
     l.target = new THREE.Object3D();
@@ -22,6 +22,9 @@ export class AM_DirectionalLight extends AM_Object {
       0xff0000,
     );
     AM_Core.scene.add(this._xx);
+
+    this.params = params;
+    this.update();
   }
 
   public update(): void {

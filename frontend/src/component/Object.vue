@@ -1,5 +1,8 @@
 <template>
   <div v-if="selectedObject" :class="$style.object">
+    <desktop-ui-input v-model="selectedObject.id" />
+    <desktop-ui-input v-model="selectedObject.name" />
+
     <!-- Position -->
     <div :class="$style.label">Position</div>
     <div :class="$style.line">

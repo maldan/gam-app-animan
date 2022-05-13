@@ -35,6 +35,7 @@ export default defineComponent({
 
       const threeObj = await AM_State.loadObject(obj.filePath);
       const ch = AM_State.instantiateObject(threeObj, 'character');
+      if (!ch) return;
       ch.animationController = AM_State.animationController;
       AM_State.addObject(ch);
       AM_State.selectObject(ch);

@@ -40,6 +40,7 @@
 </template>
 
 <script lang="ts">
+import * as THREE from 'three';
 import { defineComponent } from 'vue';
 import { AM_Core } from '@/core/AM_Core';
 import { AM_State } from '@/core/AM_State';
@@ -93,21 +94,9 @@ export default defineComponent({
       const clip = await AM_API.getClip(name);
 
       for (let i = 0; i < clip.objectList.length; i++) {
-        const objectInfo = await AM_API.object.getInfo(clip.objectList[i].resourceId);
-        const threeObj = await AM_State.loadObject(objectInfo.filePath);
-        const objInstance = AM_State.instantiateObject(threeObj, clip.objectList[i].kind);
-
-        objInstance.id = clip.objectList[i].id;
-        objInstance.resourceId = clip.objectList[i].resourceId;
-        objInstance.name = clip.objectList[i].name;
-        objInstance.params = clip.objectList[i].params;
-
-        // obj.position = clip.objectList[i].position;
-        // obj.rotation = clip.objectList[i].rotation;
-        // obj.scale = objectInfo.scale;
-
+        const objInstance = await AM_State.createObjectFrom(clip.objectList[i]);
+        if (!objInstance) continue;
         AM_State.addObject(objInstance);
-        objInstance.update();
       }
 
       for (let i = 0; i < clip.animationList.length; i++) {

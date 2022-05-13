@@ -81,6 +81,7 @@ export class AM_Preview {
 
     // Load model
     const obj = await AM_State.loadObject(filePath);
+    AM_State.instantiateObject(obj);
   }
 
   public static async getPreview(virtualObject: { filePath: string }): Promise<string> {
