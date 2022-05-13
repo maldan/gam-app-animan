@@ -3,7 +3,7 @@ import { AM_KeyFloat } from '@/core/animation/key/AM_KeyFloat';
 import { AM_KeyVector3 } from '@/core/animation/key/AM_KeyVector3';
 import { AM_KeyQuaternion } from '@/core/animation/key/AM_KeyQuaternion';
 
-export interface AM_IObjectInfo {
+/*export interface AM_IObjectInfo {
   id: string;
   resourceId: string;
   name: string;
@@ -13,7 +13,7 @@ export interface AM_IObjectInfo {
   position: AM_IVector3;
   rotation: AM_IVector4;
   scale: AM_IVector3;
-}
+}*/
 
 /*
 export interface AM_IAudioInfo {
@@ -37,11 +37,20 @@ export interface AM_IAnimationInfo {
   filePath: string;
 }*/
 
+export interface AM_ISceneObject {
+  id: string;
+  resourceId: string;
+  kind: string;
+  name: string;
+  params: Record<string, unknown>;
+}
+
 export interface AM_IResourceInfo {
   resourceId: string;
   name: string;
   category: string;
   filePath: string;
+  previewPath: string;
 }
 
 export interface AM_IVector2 {
@@ -86,7 +95,7 @@ export interface AM_IAnimation {
 
 export interface AM_IClip {
   name: string;
-  objectList: AM_IObjectInfo[];
+  objectList: AM_ISceneObject[];
   animationList: {
     objectId: string;
     animationList: { offset: number; repeat: number; animation: AM_IAnimation }[];

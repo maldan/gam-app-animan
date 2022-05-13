@@ -1,12 +1,12 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { AM_Object } from '@/core/am/AM_Object';
+import { AM_Object } from '@/core/object/AM_Object';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import { AM_State } from '@/core/AM_State';
 import { AM_KeyVector3 } from '@/core/animation/key/AM_KeyVector3';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { AM_KeyQuaternion } from '@/core/animation/key/AM_KeyQuaternion';
-import { AM_Character } from '@/core/am/AM_Character';
+import { AM_Character } from '@/core/object/AM_Character';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { MathUtils } from 'three';
 import { AM_Core } from '@/core/AM_Core';

@@ -146,7 +146,7 @@ import {
   AM_IAnimationPart,
   AM_IAudioPart,
 } from '@/core/animation/AM_AnimationController';
-import { AM_Object } from '@/core/am/AM_Object';
+import { AM_Object } from '@/core/object/AM_Object';
 import { AM_API } from '@/core/AM_API';
 
 export default defineComponent({

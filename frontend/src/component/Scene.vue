@@ -52,10 +52,11 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { AM_State } from '@/core/AM_State';
-import { AM_Object } from '@/core/am/AM_Object';
+import { AM_Object } from '@/core/object/AM_Object';
 import { AM_API } from '@/core/AM_API';
-import { AM_Character } from '@/core/am/AM_Character';
-import { AM_Bone } from '@/core/am/AM_Bone';
+import { AM_Character } from '@/core/object/AM_Character';
+import { AM_Bone } from '@/core/object/AM_Bone';
+import { AM_DirectionalLight } from '@/core/object/AM_DirectionalLight';
 
 export default defineComponent({
   props: {},
@@ -116,20 +117,36 @@ export default defineComponent({
         onSuccess: async () => {
           const resourceId = store.state.modal.data.resourceId;
           const name = store.state.modal.data.name;
-          const info = await AM_API.object.getInfo(resourceId);
-          const obj = await AM_State.loadObject(
-            info.filePath,
-            info.category === 'character' ? 'character' : '',
-          );
-          obj.resourceId = resourceId;
-          obj.name = name;
 
-          AM_State.addObject(obj);
+          if (resourceId === 'directionalLight') {
+            const obj = new AM_DirectionalLight();
+            obj.resourceId = resourceId;
+            obj.name = name;
+            obj.update();
+            AM_State.addObject(obj);
+          } else {
+            const info = await AM_API.object.getInfo(resourceId);
+            const threeObj = await AM_State.loadObject(info.filePath);
+
+            if (info.category.match('character')) {
+              const obj = AM_State.instantiateObject(threeObj, 'character');
+              obj.resourceId = resourceId;
+              obj.name = name;
+              AM_State.addObject(obj);
+            } else {
+              const obj = AM_State.instantiateObject(threeObj);
+              obj.resourceId = resourceId;
+              obj.name = name;
+              AM_State.addObject(obj);
+            }
+          }
+
           AM_State.ui.refresh();
         },
       });
     },
     iconByType(obj: AM_Object) {
+      if (obj instanceof AM_DirectionalLight) return 'bulb';
       if (obj instanceof AM_Character) return 'person';
       return 'cube';
     },

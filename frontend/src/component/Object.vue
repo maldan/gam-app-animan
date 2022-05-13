@@ -47,8 +47,8 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { AM_State } from '@/core/AM_State';
-import { AM_Object } from '@/core/am/AM_Object';
-import { AM_Bone } from '@/core/am/AM_Bone';
+import { AM_Object } from '@/core/object/AM_Object';
+import { AM_Bone } from '@/core/object/AM_Bone';
 
 export default defineComponent({
   props: {},

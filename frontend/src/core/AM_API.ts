@@ -1,5 +1,5 @@
 import Axios from 'axios';
-import { AM_Object } from '@/core/am/AM_Object';
+import { AM_Object } from '@/core/object/AM_Object';
 import { AM_Animation } from '@/core/animation/AM_Animation';
 import { AM_KeyFloat } from '@/core/animation/key/AM_KeyFloat';
 import { AM_KeyVector3 } from '@/core/animation/key/AM_KeyVector3';
@@ -8,14 +8,13 @@ import {
   AM_IAnimation,
   AM_IClip,
   AM_IKey,
-  AM_IObjectInfo,
   AM_IPose,
   AM_IResourceInfo,
   AM_IVector2,
   AM_IVector3,
   AM_IVector4,
 } from '@/core/AM_Type';
-import { AM_Character } from '@/core/am/AM_Character';
+import { AM_Character } from '@/core/object/AM_Character';
 import { AM_KeyVector2 } from '@/core/animation/key/AM_KeyVector2';
 
 export class AM_API {
@@ -211,9 +210,9 @@ export class AM_API {
   };
 
   public static object = {
-    async getInfo(resourceId: string): Promise<AM_IObjectInfo> {
+    async getInfo(resourceId: string): Promise<AM_IResourceInfo> {
       const obj = (await Axios.get(`${AM_API.API_URL}/object/info?resourceId=${resourceId}`)).data
-        .response as AM_IObjectInfo;
+        .response as AM_IResourceInfo;
       obj.filePath = `${AM_API.ROOT_URL}/` + obj.filePath;
       if (obj.previewPath) obj.previewPath = `${AM_API.ROOT_URL}/` + obj.previewPath;
       return obj;
@@ -231,7 +230,7 @@ export class AM_API {
     },
     async getInfo(resourceId: string): Promise<AM_IResourceInfo> {
       const obj = (await Axios.get(`${AM_API.API_URL}/audio/info?resourceId=${resourceId}`)).data
-        .response as AM_IObjectInfo;
+        .response as AM_IResourceInfo;
       obj.filePath = `${AM_API.ROOT_URL}/` + obj.filePath;
       return obj;
     },
@@ -242,11 +241,59 @@ export class AM_API {
       return (await Axios.get(`${AM_API.API_URL}/clip/info?resourceId=${resourceId}`)).data
         .response;
     },
+
+    async save(name: string, objectList: AM_Object[]): Promise<void> {
+      // Build audio list
+      const audioList = [];
+      for (let i = 0; i < objectList.length; i++) {
+        for (let j = 0; j < objectList[i].animationController.audioList.length; j++) {
+          audioList.push({
+            objectId: objectList[i].id,
+            resourceId: objectList[i].animationController.audioList[j].audio.resourceId,
+            offset: objectList[i].animationController.audioList[j].offset,
+            repeat: objectList[i].animationController.audioList[j].repeat,
+            volume: objectList[i].animationController.audioList[j].volume,
+          });
+        }
+      }
+
+      // Prepare clip data
+      const clipData = {
+        name,
+        objectList: objectList.map((x) => {
+          return {
+            id: x.id,
+            resourceId: x.resourceId,
+            kind: x.kind,
+            name: x.name,
+            params: x.params,
+          };
+        }),
+        animationList: objectList.map((x) => {
+          return {
+            objectId: x.id,
+            animationList: x.animationController.animationList.map((x) => {
+              return {
+                offset: x.offset,
+                repeat: x.repeat,
+                animation: AM_API.animation.toJSON(x.animation),
+              };
+            }),
+          };
+        }),
+        audioList: audioList,
+      };
+
+      // Save
+      await Axios.put(`${AM_API.API_URL}/clip`, {
+        data: JSON.stringify(clipData),
+      });
+    },
   };
 
-  public static async getObjectList(): Promise<AM_IObjectInfo[]> {
+  public static async getObjectList(): Promise<AM_IResourceInfo[]> {
     return (await Axios.get(`${this.API_URL}/object/list`)).data.response.map(
-      (x: AM_IObjectInfo) => {
+      (x: AM_IResourceInfo) => {
         x.filePath = `${this.ROOT_URL}/` + x.filePath;
         if (x.previewPath) x.previewPath = `${this.ROOT_URL}/` + x.previewPath;
         return x;
@@ -254,7 +301,7 @@ export class AM_API {
     );
   }
 
-  public static async getCharacterList(): Promise<AM_IObjectInfo[]> {
+  public static async getCharacterList(): Promise<AM_IResourceInfo[]> {
     return (await this.getObjectList()).filter((x) => x.category.match('character'));
   }
 
@@ -350,53 +397,6 @@ export class AM_API {
     return animation;
   }
 */
-
-  public static async saveClip(name: string, objectList: AM_Object[]): Promise<void> {
-    const audioList = [];
-
-    for (let i = 0; i < objectList.length; i++) {
-      for (let j = 0; j < objectList[i].animationController.audioList.length; j++) {
-        audioList.push({
-          objectId: objectList[i].id,
-          resourceId: objectList[i].animationController.audioList[j].audio.resourceId,
-          offset: objectList[i].animationController.audioList[j].offset,
-          repeat: objectList[i].animationController.audioList[j].repeat,
-          volume: objectList[i].animationController.audioList[j].volume,
-        });
-      }
-    }
-
-    const clipData = {
-      name,
-      objectList: objectList.map((x) => {
-        return {
-          id: x.id,
-          resourceId: x.resourceId,
-          name: x.name,
-          position: x.position,
-          rotation: x.rotation,
-          scale: x.scale,
-        };
-      }),
-      animationList: objectList.map((x) => {
-        return {
-          objectId: x.id,
-          animationList: x.animationController.animationList.map((x) => {
-            return {
-              offset: x.offset,
-              repeat: x.repeat,
-              animation: AM_API.animation.toJSON(x.animation),
-            };
-          }),
-        };
-      }),
-      audioList: audioList,
-    };
-    // console.log(clipData);
-    await Axios.put(`${this.API_URL}/clip`, {
-      data: JSON.stringify(clipData),
-    });
-  }
 
   public static async getAudioList(): Promise<AM_IResourceInfo[]> {
     return (await Axios.get(`${this.API_URL}/audio/list`)).data.response.map(

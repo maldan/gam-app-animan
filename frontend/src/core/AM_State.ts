@@ -1,11 +1,11 @@
 import * as THREE from 'three';
-import { AM_Object } from '@/core/am/AM_Object';
+import { AM_Object } from '@/core/object/AM_Object';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { AM_Animation } from '@/core/animation/AM_Animation';
 import { AM_AnimationController, AM_IAnimationPart } from '@/core/animation/AM_AnimationController';
 import { AM_Core } from '@/core/AM_Core';
-import { AM_Character } from '@/core/am/AM_Character';
-import { AM_Bone } from '@/core/am/AM_Bone';
+import { AM_Character } from '@/core/object/AM_Character';
+import { AM_Bone } from '@/core/object/AM_Bone';
 import { AM_IResourceInfo } from '@/core/AM_Type';
 
 export class AM_UI {
@@ -188,7 +188,19 @@ export class AM_State {
     this.emit('removeObject', obj);
   }
 
-  public static async loadObject(path: string, type = ''): Promise<AM_Object> {
+  public static instantiateObject(obj: THREE.Object3D, kind = 'object'): AM_Object {
+    let outObj: AM_Object;
+    if (kind === 'character') {
+      outObj = new AM_Character(obj);
+    } else outObj = new AM_Object(obj);
+
+    outObj.id = obj.uuid;
+    outObj.name = obj.name;
+
+    return outObj;
+  }
+
+  public static async loadObject(path: string): Promise<THREE.Object3D> {
     const loader = new GLTFLoader();
 
     return new Promise((resolve, reject) => {
@@ -226,7 +238,7 @@ export class AM_State {
           console.log(object);
           this.addToScene(object);*/
 
-          if (type === 'character') {
+          /*if (type === 'character') {
             const obj = new AM_Character(object);
 
             obj.id = object.uuid;
@@ -238,7 +250,9 @@ export class AM_State {
             obj.id = object.uuid;
             obj.name = object.name;
             resolve(obj);
-          }
+          }*/
+
+          resolve(object);
         },
         (xhr) => {},
         (error) => {

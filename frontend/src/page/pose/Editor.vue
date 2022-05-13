@@ -21,7 +21,7 @@ import { defineComponent } from 'vue';
 import { AM_Core } from '@/core/AM_Core';
 import { AM_State } from '@/core/AM_State';
 import { AM_API } from '@/core/AM_API';
-import { AM_Character } from '@/core/am/AM_Character';
+import { AM_Character } from '@/core/object/AM_Character';
 import { AM_IPose, AM_KeyHelper } from '@/core/AM_Type';
 
 export default defineComponent({

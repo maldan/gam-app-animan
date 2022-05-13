@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { AM_Object } from '@/core/am/AM_Object';
-import { AM_Bone } from '@/core/am/AM_Bone';
+import { AM_Object } from '@/core/object/AM_Object';
+import { AM_Bone } from '@/core/object/AM_Bone';
 import { SkinnedMesh } from 'three';
 import { AM_State } from '@/core/AM_State';
 import { AM_Key } from '@/core/animation/key/AM_Key';
@@ -292,6 +292,10 @@ export class AM_Character extends AM_Object {
 
   public get visible(): boolean {
     return this.model.visible;
+  }
+
+  public get kind(): string {
+    return 'character';
   }
 
   public destroy(): void {

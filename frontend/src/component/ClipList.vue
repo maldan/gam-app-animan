@@ -16,7 +16,7 @@
 import { defineComponent } from 'vue';
 import { AM_API } from '@/core/AM_API';
 import { AM_State } from '@/core/AM_State';
-import { AM_Character } from '@/core/am/AM_Character';
+import { AM_Character } from '@/core/object/AM_Character';
 
 export default defineComponent({
   props: {},
@@ -27,7 +27,7 @@ export default defineComponent({
   methods: {
     async loadClip(name: string) {
       const clip = await AM_API.getClip(name);
-      for (let i = 0; i < clip.objectList.length; i++) {
+      /*for (let i = 0; i < clip.objectList.length; i++) {
         const objectInfo = await AM_API.object.getInfo(clip.objectList[i].resourceId);
         const obj = await AM_State.loadObject(
           objectInfo.filePath,
@@ -40,7 +40,7 @@ export default defineComponent({
         obj.rotation = clip.objectList[i].rotation;
         // obj.scale = objectInfo.scale;
         AM_State.addObject(obj);
-      }
+      }*/
 
       for (let i = 0; i < clip.animationList.length; i++) {
         const obj = AM_State.objectList.find((x) => x.id === clip.animationList[i].objectId);

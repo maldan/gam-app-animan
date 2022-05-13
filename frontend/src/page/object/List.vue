@@ -21,7 +21,7 @@
 import { defineComponent } from 'vue';
 import { AM_Preview } from '@/core/AM_Preview';
 import { AM_API } from '@/core/AM_API';
-import { AM_IObjectInfo } from '@/core/AM_Type';
+import { AM_IResourceInfo } from '@/core/AM_Type';
 
 export default defineComponent({
   components: {},
@@ -53,7 +53,7 @@ export default defineComponent({
   },
   data: () => {
     return {
-      list: [] as AM_IObjectInfo[],
+      list: [] as AM_IResourceInfo[],
     };
   },
 });

@@ -1,13 +1,13 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { AM_Object } from '@/core/am/AM_Object';
+import { AM_Object } from '@/core/object/AM_Object';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import { AM_State } from '@/core/AM_State';
 import { AM_KeyVector3 } from '@/core/animation/key/AM_KeyVector3';
 import Stats from 'three/examples/jsm/libs/stats.module';
 import { AM_KeyQuaternion } from '@/core/animation/key/AM_KeyQuaternion';
-import { AM_Character } from '@/core/am/AM_Character';
-import { AM_Bone } from '@/core/am/AM_Bone';
+import { AM_Character } from '@/core/object/AM_Character';
+import { AM_Bone } from '@/core/object/AM_Bone';
 import { MathUtils } from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
@@ -139,20 +139,20 @@ export class AM_Core {
     this._scene.add(new THREE.GridHelper(grid, grid * 2, 0x666666, 0x222222));
 
     // Floor
-    const geometry = new THREE.PlaneGeometry(grid, grid);
+    /*const geometry = new THREE.PlaneGeometry(grid, grid);
     const material = new THREE.MeshBasicMaterial({ color: 0x2b2b2b, side: THREE.DoubleSide });
     const plane = new THREE.Mesh(geometry, material);
     plane.position.set(0, -0.001, 0);
     plane.rotateX(MathUtils.degToRad(90));
-    this._scene.add(plane);
+    this._scene.add(plane);*/
 
     // Light
-    const l = new THREE.DirectionalLight(0xffffff, 1);
+    /*const l = new THREE.DirectionalLight(0xffffff, 1);
     l.position.set(0, 5, 10);
     this._scene.add(l);
     const l2 = new THREE.DirectionalLight(0xffffff, 1);
     l2.position.set(0, -5, -10);
-    this._scene.add(l2);
+    this._scene.add(l2);*/
 
     // Manipulator
     this._manipulator = new TransformControls(this._camera, this._renderer.domElement);

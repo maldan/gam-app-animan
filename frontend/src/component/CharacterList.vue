@@ -17,8 +17,8 @@ import { defineComponent } from 'vue';
 import { AM_API } from '@/core/AM_API';
 import { AM_State } from '@/core/AM_State';
 import { AM_Core } from '@/core/AM_Core';
-import { AM_Character } from '@/core/am/AM_Character';
-import { AM_IObjectInfo } from '@/core/AM_Type';
+import { AM_Character } from '@/core/object/AM_Character';
+import { AM_IResourceInfo } from '@/core/AM_Type';
 
 export default defineComponent({
   props: {},
@@ -27,13 +27,14 @@ export default defineComponent({
     this.list = await AM_API.getCharacterList();
   },
   methods: {
-    async addToScene(obj: AM_IObjectInfo) {
+    async addToScene(obj: AM_IResourceInfo) {
       const chList = AM_State.objectList.filter((x) => x instanceof AM_Character);
       chList.forEach((x) => {
         AM_State.removeObject(x);
       });
 
-      const ch = await AM_State.loadObject(obj.filePath, 'character');
+      const threeObj = await AM_State.loadObject(obj.filePath);
+      const ch = AM_State.instantiateObject(threeObj, 'character');
       ch.animationController = AM_State.animationController;
       AM_State.addObject(ch);
       AM_State.selectObject(ch);
@@ -44,7 +45,7 @@ export default defineComponent({
   },
   data: () => {
     return {
-      list: [] as AM_IObjectInfo[],
+      list: [] as AM_IResourceInfo[],
     };
   },
 });

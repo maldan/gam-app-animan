@@ -35,7 +35,7 @@ func (r ClipApi) GetIndex(args ArgsName) core.Clip {
 
 	clip := core.Clip{
 		Name:          args.Name,
-		ObjectList:    make([]core.ObjectInfo, 0),
+		ObjectList:    make([]core.SceneObject, 0),
 		AnimationList: make([]core.AnimationController, 0),
 		AudioList:     make([]core.AudioPart, 0),
 	}
@@ -48,13 +48,19 @@ func (r ClipApi) GetIndex(args ArgsName) core.Clip {
 		case "OBJECT_LIST":
 			amount := section.ReadUint16()
 			for i := 0; i < int(amount); i++ {
-				obj := core.ObjectInfo{}
+				obj := core.SceneObject{}
 				obj.Id = section.ReadUTF8()
 				obj.ResourceId = section.ReadUTF8()
+				obj.Kind = section.ReadUTF8()
 				obj.Name = section.ReadUTF8()
 
 				// Position
-				obj.Position.X = section.ReadFloat32()
+				params := section.ReadUTF8()
+				b := map[string]interface{}{}
+				json.Unmarshal([]byte(params), &b)
+				obj.Params = b
+
+				/*obj.Position.X = section.ReadFloat32()
 				obj.Position.Y = section.ReadFloat32()
 				obj.Position.Z = section.ReadFloat32()
 
@@ -67,7 +73,7 @@ func (r ClipApi) GetIndex(args ArgsName) core.Clip {
 				// Scale
 				obj.Scale.X = section.ReadFloat32()
 				obj.Scale.Y = section.ReadFloat32()
-				obj.Scale.Z = section.ReadFloat32()
+				obj.Scale.Z = section.ReadFloat32()*/
 
 				clip.ObjectList = append(clip.ObjectList, obj)
 			}

@@ -82,10 +82,10 @@ import { defineComponent } from 'vue';
 import { AM_State } from '@/core/AM_State';
 import { AM_AnimationController } from '@/core/animation/AM_AnimationController';
 import { AM_Animation } from '@/core/animation/AM_Animation';
-import { AM_Object } from '@/core/am/AM_Object';
-import { AM_Bone } from '@/core/am/AM_Bone';
+import { AM_Object } from '@/core/object/AM_Object';
+import { AM_Bone } from '@/core/object/AM_Bone';
 import { AM_Key } from '@/core/animation/key/AM_Key';
-import { AM_Character } from '@/core/am/AM_Character';
+import { AM_Character } from '@/core/object/AM_Character';
 import { AM_KeyQuaternion } from '@/core/animation/key/AM_KeyQuaternion';
 
 export default defineComponent({

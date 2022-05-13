@@ -1,17 +1,24 @@
 package core
 
-import "github.com/maldan/go-cmhp/cmhp_data"
+import (
+	"encoding/json"
+	"github.com/maldan/go-cmhp/cmhp_data"
+)
 
-func WriteClipObjectList(stream *cmhp_data.ByteArray, objectList []ObjectInfo) {
+func WriteClipObjectList(stream *cmhp_data.ByteArray, objectList []SceneObject) {
 	chunk := cmhp_data.Allocate(0, true)
 	chunk.WriteUInt16(uint16(len(objectList))) // Amount of objects
 	for _, obj := range objectList {
 		chunk.WriteUTF8(obj.Id)
 		chunk.WriteUTF8(obj.ResourceId)
+		chunk.WriteUTF8(obj.Kind)
 		chunk.WriteUTF8(obj.Name)
 
+		b, _ := json.Marshal(&obj.Params)
+		chunk.WriteUTF8(string(b))
+
 		// Position
-		chunk.WriteFloat32(obj.Position.X)
+		/*chunk.WriteFloat32(obj.Position.X)
 		chunk.WriteFloat32(obj.Position.Y)
 		chunk.WriteFloat32(obj.Position.Z)
 
@@ -24,7 +31,7 @@ func WriteClipObjectList(stream *cmhp_data.ByteArray, objectList []ObjectInfo) {
 		// Scale
 		chunk.WriteFloat32(obj.Scale.X)
 		chunk.WriteFloat32(obj.Scale.Y)
-		chunk.WriteFloat32(obj.Scale.Z)
+		chunk.WriteFloat32(obj.Scale.Z)*/
 	}
 	stream.WriteSection(ANIMATION_SECTION_MARKET, "OBJECT_LIST", chunk)
 }

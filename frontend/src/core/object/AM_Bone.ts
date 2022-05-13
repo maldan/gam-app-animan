@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { AM_Object } from '@/core/am/AM_Object';
-import { AM_Character } from '@/core/am/AM_Character';
+import { AM_Object } from '@/core/object/AM_Object';
+import { AM_Character } from '@/core/object/AM_Character';
 import { AM_IVector3, AM_IVector4 } from '@/core/AM_Type';
 
 export class AM_Bone extends AM_Object {
@@ -223,6 +223,10 @@ export class AM_Bone extends AM_Object {
     this.positionOffset = { x: 0, y: 0, z: 0 };
     this.rotationOffset = { x: 0, y: 0, z: 0, w: 1 };
     this.scaleOffset = { x: 0, y: 0, z: 0 };
+  }
+
+  public get kind(): string {
+    return 'bone';
   }
 
   public get isRotationChanged(): boolean {

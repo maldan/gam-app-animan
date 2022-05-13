@@ -28,11 +28,11 @@
 import { defineComponent } from 'vue';
 import { AM_State } from '@/core/AM_State';
 import { AM_AnimationController, AM_IAnimationPart } from '@/core/animation/AM_AnimationController';
-import { AM_Object } from '@/core/am/AM_Object';
-import { AM_Bone } from '@/core/am/AM_Bone';
+import { AM_Object } from '@/core/object/AM_Object';
+import { AM_Bone } from '@/core/object/AM_Bone';
 import { AM_API } from '@/core/AM_API';
 import { AM_IResourceInfo } from '@/core/AM_Type';
-import { AM_Character } from '@/core/am/AM_Character';
+import { AM_Character } from '@/core/object/AM_Character';
 
 export default defineComponent({
   props: {},
@@ -88,7 +88,7 @@ export default defineComponent({
       if (!AM_State.clipInfo) return;
 
       this.isLoading = true;
-      await AM_API.saveClip(
+      await AM_API.clip.save(
         AM_State.clipInfo.name,
         AM_State.objectList.filter((x) => !(x instanceof AM_Bone)),
       );

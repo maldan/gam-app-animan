@@ -47,12 +47,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { AM_State } from '@/core/AM_State';
-import { AM_Character } from '@/core/am/AM_Character';
+import { AM_Character } from '@/core/object/AM_Character';
 import { AM_IVector2 } from '@/core/AM_Type';
 import { AM_AnimationController } from '@/core/animation/AM_AnimationController';
 import { AM_KeyFloat } from '@/core/animation/key/AM_KeyFloat';
 import { AM_KeyVector2 } from '@/core/animation/key/AM_KeyVector2';
-import { AM_Object } from '@/core/am/AM_Object';
+import { AM_Object } from '@/core/object/AM_Object';
 
 export default defineComponent({
   props: {

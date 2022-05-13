@@ -1,5 +1,10 @@
 package core
 
+type Vector2 struct {
+	X float32 `json:"x"`
+	Y float32 `json:"y"`
+}
+
 type Vector3 struct {
 	X float32 `json:"x"`
 	Y float32 `json:"y"`
@@ -46,7 +51,7 @@ type AnimationController struct {
 	AnimationList []AnimationPart `json:"animationList"`
 }
 
-type ObjectInfo struct {
+/*type ObjectInfo struct {
 	Id          string `json:"id"`
 	ResourceId  string `json:"resourceId"`
 	Name        string `json:"name"`
@@ -57,6 +62,14 @@ type ObjectInfo struct {
 	Position Vector3    `json:"position"`
 	Rotation Quaternion `json:"rotation"`
 	Scale    Vector3    `json:"scale"`
+}*/
+
+type SceneObject struct {
+	Id         string                 `json:"id"`
+	ResourceId string                 `json:"resourceId"`
+	Kind       string                 `json:"kind"`
+	Name       string                 `json:"name"`
+	Params     map[string]interface{} `json:"params"`
 }
 
 type AudioPart struct {
@@ -66,20 +79,6 @@ type AudioPart struct {
 	Repeat     int     `json:"repeat"`
 	Volume     float64 `json:"volume"`
 }
-
-/*type ClipInfo struct {
-	ResourceId string `json:"resourceId"`
-	Name       string `json:"name"`
-	Category   string `json:"category"`
-	ClipPath   string `json:"clipPath"`
-}
-
-type AnimationInfo struct {
-	ResourceId string `json:"resourceId"`
-	Name       string `json:"name"`
-	Category   string `json:"category"`
-	FilePath   string `json:"filePath"`
-}*/
 
 type ResourceInfo struct {
 	ResourceId  string `json:"resourceId"`
@@ -91,7 +90,7 @@ type ResourceInfo struct {
 
 type Clip struct {
 	Name          string                `json:"name"`
-	ObjectList    []ObjectInfo          `json:"objectList"`
+	ObjectList    []SceneObject         `json:"objectList"`
 	AnimationList []AnimationController `json:"animationList"`
 	AudioList     []AudioPart           `json:"audioList"`
 }

@@ -17,6 +17,8 @@ export class AM_Object {
 
   constructor(o: THREE.Object3D) {
     this.#_threeObject = o;
+    this.id = o.uuid;
+    this.name = o.name;
     AM_Core.scene.add(o);
 
     // Set object
@@ -114,6 +116,25 @@ export class AM_Object {
 
   public get model(): THREE.Object3D {
     return this.#_threeObject;
+  }
+
+  public get kind(): string {
+    return 'object';
+  }
+
+  public get params(): Record<string, unknown> {
+    return {
+      position: this.position,
+      rotation: this.rotation,
+      scale: this.scale,
+    };
+  }
+
+  public set params(val: Record<string, unknown>) {
+    for (const key in val) {
+      // @ts-ignore
+      this[key] = val[key];
+    }
   }
 
   public destroy(): void {
