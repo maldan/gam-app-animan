@@ -80,6 +80,9 @@ func Start(frontFs embed.FS) {
 				Root: core.DataDir,
 			},
 		},
-		DbPath: core.DataDir,
+		DbPath:   core.DataDir,
+		IsHttps:  true,
+		CertFile: "./cert.pem",
+		KeyFile:  "./key.pem",
 	})
 }

@@ -24,6 +24,7 @@ export default defineComponent({
         { name: 'Object', url: '/object' },
         { name: 'Pose', url: '/pose' },
         { name: 'Audio', url: '/audio' },
+        { name: 'VR Preview', url: '/vr' },
       ],
       projectName: '',
     };

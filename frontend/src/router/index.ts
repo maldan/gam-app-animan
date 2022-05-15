@@ -9,6 +9,7 @@ import PoseEditor from '../page/pose/Editor.vue';
 import PoseList from '../page/pose/List.vue';
 
 import Audio from '../page/Audio.vue';
+import VRPreview from '../page/VRPreview.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -59,6 +60,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/audio',
     name: 'Audio',
     component: Audio,
+  },
+  {
+    path: '/vr',
+    name: 'VR Preview',
+    component: VRPreview,
   },
 ];
 

@@ -8,10 +8,15 @@ import Stats from 'three/examples/jsm/libs/stats.module';
 import { AM_KeyQuaternion } from '@/core/animation/key/AM_KeyQuaternion';
 import { AM_Character } from '@/core/object/AM_Character';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { MathUtils } from 'three';
+import { MathUtils, XRGamepad } from 'three';
 import { AM_Core } from '@/core/AM_Core';
+// @ts-ignore
+import { VRButton } from '@/core/VRButton';
+import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory';
 
 export class AM_Preview {
+  public static logs: string[] = [];
+
   public static async init(el: HTMLElement, filePath: string): Promise<void> {
     // Camera
     const camera = new THREE.PerspectiveCamera(
@@ -82,6 +87,103 @@ export class AM_Preview {
     // Load model
     const obj = await AM_State.loadObject(filePath);
     AM_State.instantiateObject(obj);
+  }
+
+  public static async initXR(el: HTMLElement, logs: HTMLElement): Promise<void> {
+    // Camera
+    const camera = new THREE.PerspectiveCamera(
+      45,
+      window.innerWidth / window.innerHeight,
+      0.001,
+      64,
+    );
+    camera.position.y = 2;
+    camera.position.z = 5;
+
+    // Scene
+    const scene = new THREE.Scene();
+    AM_Core.scene = scene;
+
+    // Render
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setAnimationLoop(() => {
+      if (gamepad) {
+        camera.position.x += gamepad.axes[0];
+
+        if (gamepad.buttons[0].pressed) {
+          camera.position.x += 1;
+        }
+      }
+
+      renderer.setClearColor(0x333333);
+      renderer.render(scene, camera);
+      controls.update();
+    });
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
+    renderer.xr.enabled = true;
+
+    // Scene control
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.mouseButtons = {
+      // @ts-ignore
+      LEFT: null,
+      MIDDLE: THREE.MOUSE.ROTATE,
+      // @ts-ignore
+      RIGHT: null,
+    };
+    controls.autoRotate = false;
+
+    // Grid
+    const grid = 5;
+    scene.add(new THREE.GridHelper(grid, grid * 2, 0x666666, 0x222222));
+
+    // Light
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.25);
+    scene.add(ambientLight);
+
+    const l = new THREE.DirectionalLight(0xffffff, 1);
+    l.position.set(0, 5, 10);
+    l.castShadow = true;
+    l.shadow.mapSize.width = 2048; // default
+    l.shadow.mapSize.height = 2048; // default
+    l.shadow.camera.near = 0.1; // default
+    l.shadow.camera.far = 16; // default
+    l.shadow.bias = -0.002;
+    scene.add(l);
+
+    /*const l2 = new THREE.DirectionalLight(0xffffff, 1);
+    l2.position.set(0, -5, -10);
+    scene.add(l2);*/
+
+    // Inject html
+    el.appendChild(renderer.domElement);
+    renderer.domElement.style.position = 'absolute';
+    renderer.domElement.style.left = '0';
+    renderer.domElement.style.top = '0';
+    renderer.domElement.style.zIndex = '0';
+
+    document.body.appendChild(VRButton.createButton(renderer));
+
+    // Load model
+    //const obj = await AM_State.loadObject(filePath);
+    //AM_State.instantiateObject(obj);
+    const controllerModelFactory = new XRControllerModelFactory();
+
+    let gamepad: XRGamepad | undefined = undefined;
+    const controller1 = renderer.xr.getController(0);
+    scene.add(controller1);
+    controller1.addEventListener('connected', (e) => {
+      gamepad = e.data.gamepad;
+      AM_Preview.logs.push(e.data.profiles);
+      logs.innerHTML = AM_Preview.logs.join('<br>');
+    });
+
+    const grip = renderer.xr.getControllerGrip(0);
+    grip.add(controllerModelFactory.createControllerModel(grip));
+    scene.add(grip);
   }
 
   public static async getPreview(virtualObject: { filePath: string }): Promise<string> {
