@@ -27,22 +27,26 @@ export class AM_Character extends AM_Object {
   constructor(o: THREE.Object3D) {
     super(o);
 
-    this.prepareEyes(o);
+    // Disable fucking culling
+    o.traverse((object) => {
+      object.frustumCulled = false;
+    });
 
+    this.prepareEyes(o);
     this.prepareSkeleton(o);
     this.prepareShapes(o);
   }
 
   private prepareEyes(skeleton: THREE.Object3D): void {
     skeleton.traverse((object) => {
-      if (object.name === 'EyeL' && object instanceof THREE.Mesh) {
+      if (object.name === 'Eye_L' && object instanceof THREE.Mesh) {
         this._eyeL = object;
         object.material = AM_Shader.eyeShader();
         object.material.uniforms.eyeColor.value = new THREE.Vector3(1, 0, 0);
         object.material.uniforms.eyePosition.value = new THREE.Vector3(0, 0, 0);
         object.material.skinning = true;
       }
-      if (object.name === 'EyeR' && object instanceof THREE.Mesh) {
+      if (object.name === 'Eye_R' && object instanceof THREE.Mesh) {
         this._eyeR = object;
         object.material = AM_Shader.eyeShader();
         object.material.uniforms.eyeColor.value = new THREE.Vector3(1, 0, 0);
